@@ -20,29 +20,87 @@ HEADERS = {
 }
 
 # ── Configuração dos temas e queries de busca ──
+# Cada tema tem buscas separadas em inglês (mundo) e português (Brasil),
+# para cobrir tanto fontes internacionais quanto nacionais.
 FEEDS = [
+    # ───────── SAF (Sustainable Aviation Fuel) ─────────
     {
         "cat": "saf",
         "label": "SAF",
-        "query": '"sustainable aviation fuel" OR "SAF fuel" OR "aviation biofuel"',
+        "lang": "en",
+        "query": (
+            '"sustainable aviation fuel" OR "SAF mandate" OR "aviation biofuel" '
+            'OR "SAF ATJ" OR "alcohol to jet" OR "SAF production" OR "jet biofuel"'
+        ),
+    },
+    {
+        "cat": "saf",
+        "label": "SAF",
+        "lang": "pt",
+        "query": (
+            '"combustível sustentável de aviação" OR "SAF" OR "querosene sustentável" '
+            'OR "etanol para aviação" OR "biocombustível de aviação"'
+        ),
+    },
+
+    # ───────── Biobunker (combustível marítimo sustentável) ─────────
+    {
+        "cat": "bio",
+        "label": "Biobunker",
+        "lang": "en",
+        "query": (
+            '"biobunker" OR "marine biofuel" OR "bio-bunker" OR "green shipping fuel" '
+            'OR "ethanol shipping fuel" OR "IMO biofuel" OR "IMO decarbonization" '
+            'OR "maritime ethanol fuel" OR "shipping ethanol"'
+        ),
     },
     {
         "cat": "bio",
         "label": "Biobunker",
-        "query": '"biobunker" OR "marine biofuel" OR "bio-bunker" OR "green shipping fuel"',
+        "lang": "pt",
+        "query": (
+            '"biobunker" OR "combustível marítimo sustentável" OR "etanol marítimo" '
+            'OR "etanol para navios" OR "descarbonização marítima" OR "IMO biocombustível"'
+        ),
+    },
+
+    # ───────── Blending (mandatos de mistura — etanol na gasolina) ─────────
+    {
+        "cat": "blend",
+        "label": "Blending",
+        "lang": "en",
+        "query": (
+            '"ethanol blending mandate" OR "ethanol gasoline blend" OR "E10" OR "E15" OR "E20" OR "E25" '
+            'OR "ethanol blending requirement" OR "gasoline ethanol mandate"'
+        ),
     },
     {
         "cat": "blend",
         "label": "Blending",
-        "query": '"blending mandate" OR "biofuel mandate" OR "ReFuelEU" OR "CORSIA"',
+        "lang": "pt",
+        "query": (
+            '"mistura de etanol na gasolina" OR "mandato de mistura etanol" OR "mistura obrigatória etanol" '
+            'OR "RenovaBio mistura etanol" OR "percentual de etanol na gasolina" '
+            'OR "ANP mistura etanol"'
+        ),
+    },
+
+    # ───────── Regulação internacional transversal (CORSIA / mandatos por país) ─────────
+    {
+        "cat": "saf",
+        "label": "SAF",
+        "lang": "en",
+        "query": '"CORSIA" OR "ReFuelEU aviation" OR "SAF mandate" country OR "national SAF mandate"',
     },
 ]
 
-MAX_PER_FEED = 15
+MAX_PER_FEED = 12
 
 
-def build_feed_url(query: str) -> str:
+def build_feed_url(query: str, lang: str = "en") -> str:
     q = quote(query)
+    if lang == "pt":
+        return f"https://news.google.com/rss/search?q={q}&hl=pt-BR&gl=BR&ceid=BR:pt-419"
     return f"https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en"
 
 
@@ -70,7 +128,7 @@ def fetch_news():
     seen_urls = set()
 
     for feed_cfg in FEEDS:
-        url = build_feed_url(feed_cfg["query"])
+        url = build_feed_url(feed_cfg["query"], feed_cfg.get("lang", "en"))
         req = urllib.request.Request(url, headers=HEADERS)
         try:
             with urllib.request.urlopen(req, timeout=15) as resp:
