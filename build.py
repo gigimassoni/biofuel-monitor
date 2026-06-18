@@ -85,12 +85,12 @@ FEEDS = [
         ),
     },
 
-    # ───────── Regulação internacional transversal (CORSIA / mandatos por país) ─────────
+    # ───────── Regulação internacional (CORSIA / mandatos de SAF por país) ─────────
     {
         "cat": "saf",
         "label": "SAF",
         "lang": "en",
-        "query": '"CORSIA" OR "ReFuelEU aviation" OR "SAF mandate" country OR "national SAF mandate"',
+        "query": '"CORSIA" OR "ReFuelEU aviation" OR "national SAF mandate" OR "SAF policy"',
     },
 ]
 
@@ -123,9 +123,18 @@ def fmt_date(parsed_time) -> str:
     return dt.strftime("%d/%m %H:%M UTC")
 
 
+def normalize_title(title: str) -> str:
+    """Normaliza o título para detectar notícias duplicadas vindas de fontes diferentes."""
+    t = title.lower().strip()
+    t = re.sub(r"[^\w\s]", "", t)   # remove pontuação
+    t = re.sub(r"\s+", " ", t)      # espaços múltiplos
+    return t
+
+
 def fetch_news():
     all_items = []
     seen_urls = set()
+    seen_titles = set()
 
     for feed_cfg in FEEDS:
         url = build_feed_url(feed_cfg["query"], feed_cfg.get("lang", "en"))
@@ -142,10 +151,16 @@ def fetch_news():
             link = entry.get("link", "")
             if not link or link in seen_urls:
                 continue
-            seen_urls.add(link)
 
             raw_title = entry.get("title", "Sem título")
             title = clean_title(raw_title)
+            norm = normalize_title(title)
+            if norm in seen_titles:
+                continue
+
+            seen_urls.add(link)
+            seen_titles.add(norm)
+
             source = extract_source(raw_title, entry)
             summary = entry.get("summary", "")
             summary = re.sub(r"<[^>]+>", "", summary).strip()
