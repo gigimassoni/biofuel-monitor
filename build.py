@@ -126,7 +126,7 @@ def fmt_date(parsed_time) -> str:
 # Palavras que indicam que a notícia é sobre futebol (SAF = Sociedade Anônima
 # do Futebol no Brasil), e não sobre Sustainable Aviation Fuel.
 FOOTBALL_BLOCKLIST = [
-    "futebol", "clube", "campeonato", "técnico", "jogador", "estádio",
+    "futebol","vasco", "clube", "campeonato", "técnico", "jogador", "estádio",
     "libertadores", "brasileirão", "copa", "futebolístic", "atlético",
     "flamengo", "corinthians", "palmeiras", "vasco", "botafogo",
     "fluminense", "grêmio", "internacional", "cruzeiro", "athletico",
