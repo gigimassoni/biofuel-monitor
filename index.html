@@ -59,8 +59,8 @@
   .news-time{font-size:11px;color:var(--text3);margin-left:auto}
   .news-title{font-size:14px;font-weight:500;line-height:1.45;margin-bottom:8px}
   .news-desc{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:10px}
-  .news-footer{display:flex;align-items:center}
-  .news-source{font-size:11px;color:var(--text3)}
+  .news-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .news-source{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:75%}
   .news-read{font-size:11px;color:var(--accent-l);margin-left:auto}
 
   .empty{padding:60px 20px;text-align:center;color:var(--text2)}
@@ -74,7 +74,7 @@
 <div class="header">
   <div>
     <div class="header-title">Todas<br>as<br>Notícias</div>
-    <div class="updated">Atualizado em 25/06/2026 às 16:11 UTC</div>
+    <div class="updated">Atualizado em 25/06/2026 às 16:57 UTC</div>
   </div>
 </div>
 
@@ -88,7 +88,7 @@
 <div class="stats">
   <div class="stat-card" id="sc-saf" onclick="setFilter('saf')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--saf)"></span><span class="stat-label">SAF</span></div>
-    <div class="stat-num">36</div><div class="stat-sub">notícias</div>
+    <div class="stat-num">35</div><div class="stat-sub">notícias</div>
   </div>
   <div class="stat-card" id="sc-bio" onclick="setFilter('bio')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--blend)"></span><span class="stat-label">Biobunker</span></div>
@@ -100,7 +100,7 @@
   </div>
   <div class="stat-card active-all" id="sc-all" onclick="setFilter('all')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--bio)"></span><span class="stat-label">Total</span></div>
-    <div class="stat-num">82</div><div class="stat-sub">—</div>
+    <div class="stat-num">81</div><div class="stat-sub">—</div>
   </div>
 </div>
 
@@ -112,51 +112,9 @@
 </div>
 
 <div class="news-wrap" id="news-area">
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMivwFBVV95cUxOWjQzOUE4bXlRaF9jVThEdDVQX2NIM3I0bXVJTXdNV01DNUphYndaWWxZT19mVEpEZjRxZklpdjJscHJlRklxVUJwZWNBMVg5ZUNvek1Ia1NNYkwtcVlmb2s4U3J4T1ljLUtHZTl4ZWZoTFQ2VDNxMW5pb1Y1aVA4S3JONVVFTzN4SDA3NGVQYi1VSmhLSHRsbmZfeEVENk9JOWJtYXlSMW93cENId25LZzNxSTRyN0lVTE5McmVQbw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="interventora fala pela primeira vez após assumir a saf do vasco: &#x27;última palavra é minha&#x27;"
-       style="animation-delay:0ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">25/06 15:39 UTC</span>
-      </div>
-      <div class="news-title">Interventora fala pela primeira vez após assumir a SAF do Vasco: &#x27;Última palavra é minha&#x27;</div>
-      <div class="news-desc">Interventora fala pela primeira vez após assumir a SAF do Vasco: &#x27;Última palavra é minha&#x27;&amp;nbsp;&amp;nbsp;LANCE!…</div>
-      <div class="news-footer">
-        <span class="news-source">LANCE!</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi1wFBVV95cUxQWURBR202ajVhRmYtcnExV1Z6T1F3SW9mRlgyTFlDTTBjV1ZlUDluQ2o3QU5NRUlIRWs1M0IyV191Mmo0YlUyX2JxMGdubXJXTGJ1d0EyLUVZMDl3S1kwSkwwSHlmLVpBR2RXcjN4dmZGeE95Y250RktDY2JGY0lCcmpSVER5RV85WE9EZlNwZlNjXy1QUnB3cGthUHRtelcwd04yZEpKVjJCamNISlI5U1c5OXpJVTN6TGczZW45MktPQ0ZpMEsycGhCdkczTHdMRFI1TTd4bw?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="iran supplemental includes year-round e15 and farm aid"
-       style="animation-delay:20ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">25/06 15:39 UTC</span>
-      </div>
-      <div class="news-title">Iran Supplemental includes year-round E15 and farm aid</div>
-      <div class="news-desc">Iran Supplemental includes year-round E15 and farm aid&amp;nbsp;&amp;nbsp;norfolkneradio.com…</div>
-      <div class="news-footer">
-        <span class="news-source">norfolkneradio.com</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxNRGh3cVp0dlpEeHVTSW9pV0p0SG1wMzhxSXJfX3FFUE9TblVwTGt5VFl6c2NWTGM1bm1qS0MyX3FmTHlDYVE3a1kwWl9CVU10UWZieGJLY2tJRWNvWW1TZTJ4aDIwN1FhSzNEY0JBVWxwVmFwYXFKVE5Ka2lnTzRYbmhkSG9HT0tJZkE3OU5MajJRUkhuTGg4U3NIR0l5ckExLWstb0J5WmZuMFdRaEQ5dzVqY01zN1pwU0s4bnQ3QmJENnRPd1pfcnV3bHdUdHUtaE1vZnpsclY0bmdjNS1sdg?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="lamacchia diz se leila pereira pode mandar em saf do vasco e garante: &#x27;eu e meu filho vamos salvar o clube&#x27;"
-       style="animation-delay:40ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">25/06 14:44 UTC</span>
-      </div>
-      <div class="news-title">Lamacchia diz se Leila Pereira pode mandar em SAF do Vasco e garante: &#x27;Eu e meu filho vamos salvar o clube&#x27;</div>
-      <div class="news-desc">Lamacchia diz se Leila Pereira pode mandar em SAF do Vasco e garante: &#x27;Eu e meu filho vamos salvar o clube&#x27;&amp;nbsp;&amp;nbsp;ESPN Brasil…</div>
-      <div class="news-footer">
-        <span class="news-source">ESPN Brasil</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMilgJBVV95cUxPYWw4eF9ScHZxczR6R2U1ODRzRTJQZU1KRFg1TDJyQmFwd2FpV0JWYWVDY2VBanA3TlljWEpEQlR2NkFXVUZEakdpbXJIaE1yMXdDZC1oWlNHOWE3SkJvMnB5Njhtb3BHYndWVTZnVGpLeS1kbGR5bm81anFtU1JHT05sSmtuc2J3a0ZOajNCUGJZdmNNM3F6QUdMcFZJLUdJN0tnRmFQbmluMVY2V0JUN2h0NlpYMHp1cTBRbWl4LXVCVmJ4ZUo0VXJkXy05aks3b0lQQmpIMjZEYkdTVVpJQmhTa0gzNDMyaTVYYjhMb2JjQXpiQXZzblk1UnpmbkpmNzNJck1RaGNtMGozeEJxNFhqYzFUUQ?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="mistura de etanol na gasolina sobe para 32% e reforça produção nacional, sustentabilidade e economia, avalia sifaeg"
-       style="animation-delay:60ms">
+       style="animation-delay:0ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">25/06 14:39 UTC</span>
@@ -164,13 +122,13 @@
       <div class="news-title">Mistura de etanol na gasolina sobe para 32% e reforça produção nacional, sustentabilidade e economia, avalia Sifaeg</div>
       <div class="news-desc">Mistura de etanol na gasolina sobe para 32% e reforça produção nacional, sustentabilidade e economia, avalia Sifaeg&amp;nbsp;&amp;nbsp;Portal do Agronegócio…</div>
       <div class="news-footer">
-        <span class="news-source">Portal do Agronegócio</span>
+        <span class="news-source">🌐 Global · Portal do Agronegócio</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMid0FVX3lxTE45d2l1US1xSzdfYVNNakdRVHhNZTdFOExaNVRGc0JvTFVKbXVUcDRSN19hek9lR1FOVVpuLUxIMXUtaXdudVhIb193V252ZmMzMFEyNTZBaHpfVVJIUlZQQlh0b0ZJSzE2SF9VYVZuNG9ZbXF2SUpv?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="farm aid request adds e15 and hemp policy push - rfd-tv"
-       style="animation-delay:80ms">
+       style="animation-delay:20ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">25/06 14:37 UTC</span>
@@ -178,41 +136,13 @@
       <div class="news-title">Farm Aid Request Adds E15 and Hemp Policy Push - RFD-TV</div>
       <div class="news-desc">Farm Aid Request Adds E15 and Hemp Policy Push&amp;nbsp;&amp;nbsp;RFD-TV…</div>
       <div class="news-footer">
-        <span class="news-source">RFD-TV</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiwgFBVV95cUxOMnZxbVVPRTRLZ2xPRmx1Zk5DWHVxOUtJOVAzTFNVV2dwbFJ3NGxaeWdIdW4xck1WTlZmMGxnQnV4ZGt4TXNWVWMxZDVhWVZCNHA1Mnh6bTE5N1J6bEpyeGRvUk9SQ0tzbEl1SFJIX2FRV0ZpakhqNGU4anc2U1Vld3JCUEVNVzVqZERXWEN2Ynl6d3BQMUJUWlJPRTkzc2F4Ymg3bGkwNWdubl9NT25WcDdwZkx0V1ppOUJNWmxPSGc1QdIBxwFBVV95cUxOSWdLaFJfeENvSGd4TWNUUGVLTGdxQ0I0ZnkxY1JwN2tlbjQwTkMwa1d6TV9jN25wUWhGbXpUbS0wQmUyNmdYZFdSZWVUNC1mMUk4Y2JHNF9ZVmk4Tm93SkthckJETzEtbWRLcEFDcW5wdXY2WUdLR0tFdUtsZTZRcWpEV0ZHWlBxa2ROaTgwMVlfX1JjSTQ0cXI5Vy1UYUJKa2c0M0tpUDNSOEpGUE9CaC1idHhUblAwLUJoV0txZTl4MVhOLXpB?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="mudança na saf do vasco pode interferir na contratação de reforços"
-       style="animation-delay:100ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">25/06 14:33 UTC</span>
-      </div>
-      <div class="news-title">Mudança na SAF do Vasco pode interferir na contratação de reforços</div>
-      <div class="news-desc">Mudança na SAF do Vasco pode interferir na contratação de reforços&amp;nbsp;&amp;nbsp;O Dia…</div>
-      <div class="news-footer">
-        <span class="news-source">O Dia</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMinwFBVV95cUxPWlF6eWNkS2JNcU44cVZIZVBhNUlpWGV3Q05GZ2dWcG02eUJjQkpYTEw1ZFc3azhLZlllc3MwamlSZlJ3N0M2ODF5d2dOLW1GYlJYenVNWWdpTDF6cWVLOWVVNW5Cbm1obGRobDR4bi1yVkhqZFVMcVo1LVJMSmp3ZnJKNURXdGtUZm1HUzVfdXFlUDhRZm03UXBZT0FPRzg?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="nextchem e cazaquistão unem forças para desenvolver combustível de aviação sustentável"
-       style="animation-delay:120ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">25/06 13:51 UTC</span>
-      </div>
-      <div class="news-title">Nextchem e Cazaquistão unem forças para desenvolver Combustível de Aviação Sustentável</div>
-      <div class="news-desc">Nextchem e Cazaquistão unem forças para desenvolver Combustível de Aviação Sustentável&amp;nbsp;&amp;nbsp;JornalCana…</div>
-      <div class="news-footer">
-        <span class="news-source">JornalCana</span>
+        <span class="news-source">🌐 Global · RFD-TV</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxQUENTRUU1MkhtR0ZETXdIWTFiOVczNVRZQ0QyM0pwVkpRUkY5Mi1Ra0NqLVBJbzFuNlNjNFV0bHdFS1VSNUZCREs2eTNyVW1hX0FBWEdsTWkzQUlhRU10N3pwZVk2cnhoenBXcTNieW1LeloxUi1YaG8zZlRGQWRWdk9tRDR3Z19icklGZy1JNU5ucF9wNk1nWEFVZURRczUtdlU1ME9Bc3Q?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="allied biofuels advances $6.1 billion sustainable aviation fuel project in uzbekistan"
-       style="animation-delay:140ms">
+       style="animation-delay:40ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">25/06 13:47 UTC</span>
@@ -220,41 +150,27 @@
       <div class="news-title">Allied Biofuels Advances $6.1 Billion Sustainable Aviation Fuel Project in Uzbekistan</div>
       <div class="news-desc">Allied Biofuels Advances $6.1 Billion Sustainable Aviation Fuel Project in Uzbekistan&amp;nbsp;&amp;nbsp;The Times Of Central Asia…</div>
       <div class="news-footer">
-        <span class="news-source">The Times Of Central Asia</span>
+        <span class="news-source">🌐 Global · The Times Of Central Asia</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi7gFBVV95cUxQVmdWNXNQX2otQTlJUnRlWGUxUXNCc3FWX09kRmR5VTI1UDZBTUdFNVpicVp4VTRpTFhyeXpadnZyUnBCY0F1a0pOaF94MWdPTHdBSER1dzNSTm5KZk1NV2cxU3VVc215bGhHVDJORTgycXU1MWhZSDBtUGh2Y0Jxbm9hLVdYdU8tMXpGY1J6WmlqLWRZVmtrWGFmWGlwWWdVSUVEQUdGWDJiQXhqZ1pJekpXUGNkYnFuS3o4TGY4UEhfOS1ZSTRsckZkbEI4WWsxQzdvaC1xM2l4b0ozS1IxT2wzdFU2Z3BwczQxdXJB?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="interventora da saf do vasco não pretende atuar nas decisões esportivas"
-       style="animation-delay:160ms">
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMixAFBVV95cUxPNm5oRnFYTWJlS0ZiX3N1blowVnRhUEpoMHJrRmhUV25lSUtSSHZRLUhkSlJLNDVhNWlncG5iZnBRSnJobEVfTTMwNmdFRU4teDZGSjJueGtQclhWZ29WejRuTlFYNzVvYVZ0aGF3cWhTU25MXzhpTVZ1NVQ5OU9qR3lka1lPR3h2Ym41X09aTGdiT2I4TTltalZVTHBYa1hWNVZITERqVHpVQ3ptLVNHMW9VMUJBbGV5bUIzd3l2anJtb3RD?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="farm bureau applauds president’s call for farmer aid and year-round e15, urges bipartisan action"
+       style="animation-delay:60ms">
       <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">25/06 12:59 UTC</span>
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">25/06 13:01 UTC</span>
       </div>
-      <div class="news-title">Interventora da SAF do Vasco não pretende atuar nas decisões esportivas</div>
-      <div class="news-desc">Interventora da SAF do Vasco não pretende atuar nas decisões esportivas&amp;nbsp;&amp;nbsp;Terra…</div>
+      <div class="news-title">Farm Bureau Applauds President’s Call for Farmer Aid and Year-Round E15, Urges Bipartisan Action</div>
+      <div class="news-desc">Farm Bureau Applauds President’s Call for Farmer Aid and Year-Round E15, Urges Bipartisan Action&amp;nbsp;&amp;nbsp;American Farm Bureau Federation…</div>
       <div class="news-footer">
-        <span class="news-source">Terra</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi4gFBVV95cUxOejlscEM1ZzhHTGNLVnVValZOSUlCUHZkV1JIUFFpM211aWVrZWhQVDVyLUVHUWd5aWhWQm5SVWhjSWMwcTd5UzNrdEhXblRlWUhoUGJDdWdyRVl0OVp6cmZiYlRfYjdWazRkUGdna29ZcTZDUm5KWXE1bGVQRHo4X1UxbHRWYkItbFF4Z0UtSUM3NHdwaW81eDBPaTEtaFVDellXcjBsVDJENTJlbHFsTU11S2V1ZFdrUHp4dEVlUldNdTh2ak9UcmNwazBrbnhIcW1tWUVjTTJoNndpVGpsMzh3?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="pedrinho explica situação da compra da saf do vasco: &#x27;mãos atadas&#x27;"
-       style="animation-delay:180ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">25/06 12:46 UTC</span>
-      </div>
-      <div class="news-title">Pedrinho explica situação da compra da SAF do Vasco: &#x27;Mãos atadas&#x27;</div>
-      <div class="news-desc">Pedrinho explica situação da compra da SAF do Vasco: &#x27;Mãos atadas&#x27;&amp;nbsp;&amp;nbsp;Rádio Itatiaia…</div>
-      <div class="news-footer">
-        <span class="news-source">Rádio Itatiaia</span>
+        <span class="news-source">🇺🇸 EUA · American Farm Bureau Federation</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiigFBVV95cUxQdUlYaW1DaEV5YzQwc2pIY0t1VllnVjB2QThtV3NKZE1qc3dYUktxM2xXTkozRUdqRWppNEtTYW92dXVmVGhmVlNPMEFJaWxyeHlvV1lIZHQ2MnIwUS1XNDNrNjRKNER0eGRDREhaQlhwcTZua19wVGt5NUhYTlpEdmMweE5zQWtGYlE?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="white house includes e15 in funding request"
-       style="animation-delay:200ms">
+       style="animation-delay:80ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">25/06 12:03 UTC</span>
@@ -262,13 +178,13 @@
       <div class="news-title">White House Includes E15 in Funding Request</div>
       <div class="news-desc">White House Includes E15 in Funding Request&amp;nbsp;&amp;nbsp;AgWired…</div>
       <div class="news-footer">
-        <span class="news-source">AgWired</span>
+        <span class="news-source">🌐 Global · AgWired</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMi6gFBVV95cUxQelJwYVdSb2RSbkFrSUV4WjR0YzJQRnlPY25ocWxVUGx6dENCYTdxUXN2UnBTZk5WUDBwdDg4UjZjcl9uMHBOcklhZjUzaGpmM2xPbWRwbE9ONjN2WnA4NElTeTNxb1lHZU1VeUhUaUpsVlJGVUFmOFZ1X3AwR1JJZHVuS05feFlEM3RWTm1xcmlIVm5GQnUxQkZpcnlvM08tLUFHQWNJcW03SXV6dXRnRTRiRWF2Zk1Gam14RWFYRjM2M0ZOR3hNeDMwaERuNVJ1eFZjei1XYUFJelFRRnFTdzE5cmFDcDVnZEE?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="money moment: trump administration proposes year-round e15 gas"
-       style="animation-delay:220ms">
+       style="animation-delay:100ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">25/06 11:41 UTC</span>
@@ -276,27 +192,27 @@
       <div class="news-title">Money Moment: Trump administration proposes year-round E15 gas</div>
       <div class="news-desc">Money Moment: Trump administration proposes year-round E15 gas&amp;nbsp;&amp;nbsp;WWLTV.com…</div>
       <div class="news-footer">
-        <span class="news-source">WWLTV.com</span>
+        <span class="news-source">🌐 Global · WWLTV.com</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiowFBVV95cUxNMmpOQ0JCNldtYWkxZUhMVGo4dnpfRlV1TlNtajZiUTh5TmtFSVJWWWoxYW5zMWtnanZTQ0t5N3Ftd1ZwRFZpeTFJa2JSczhlY3h1WVU5YjhjbGs2UFoxZ0pxSUVEMHdnR0dBMGw0OW1aSjJheGxMaDR1cjVXOUliZDJWWmpJSWNsWGV0MmprZFFjbFlFMUc1cG5WYXg0RFBRWGh3?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="ceo da nextplay explica garantias da proposta da saf do paraná e comenta voto contrário de rubão"
-       style="animation-delay:240ms">
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMinAFBVV95cUxPc29TNUs2eHk3aUJfa1B6X05jMWs1OWlyaHp4anppMjdnRkp0M1BYa0FKZ3puejNrUkhJV0pGYlFDMVc4dEVYQ2VpckRzdGlZc00xMjI5RUdZZm5USm1wRmJKSE1vZi1oejhhbTF1eFE4ZWJuNXRGRV9HWDZWQlBrWHpNZnoxX3lkeXUybllPaXg2ZkdnQ3VfSjNOUF8?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="white house pushes for e15 fuel sales year-round in bid to lower fuel prices - straight arrow news - san"
+       style="animation-delay:120ms">
       <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">25/06 11:34 UTC</span>
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">25/06 10:50 UTC</span>
       </div>
-      <div class="news-title">CEO da NextPlay explica garantias da proposta da SAF do Paraná e comenta voto contrário de Rubão</div>
-      <div class="news-desc">CEO da NextPlay explica garantias da proposta da SAF do Paraná e comenta voto contrário de Rubão&amp;nbsp;&amp;nbsp;UmDois Esportes…</div>
+      <div class="news-title">White House pushes for E15 fuel sales year-round in bid to lower fuel prices - Straight Arrow News - SAN</div>
+      <div class="news-desc">White House pushes for E15 fuel sales year-round in bid to lower fuel prices&amp;nbsp;&amp;nbsp;Straight Arrow News - SAN - Unbiased. Straight Facts.…</div>
       <div class="news-footer">
-        <span class="news-source">UmDois Esportes</span>
+        <span class="news-source">🌐 Global · Straight Arrow News - SAN - Unbiased. Straight Facts.</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiowFBVV95cUxQZ1VoX1dXVVM2QUpqUG9YNUpuMGlJbXZOdk9jUllzZVpfSVV5XzBHTHpWbGE4aWhGRnozZkFhS0JyVkozcEtYRVk0VUJYSEF6RU82aVJKSDNrQnh5NTlRRUtGOTZEdzRTaXZ0cVRNRlZIN1ZtUHRWeWQ0cUsxSUdYWThsUlRUZ1RnMDNlV3RWRC1MUjBCM3E3QlBMOFBKNG8tVG9R?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="ethanol industry points to major savings to consumers from e15, and other blends"
-       style="animation-delay:260ms">
+       style="animation-delay:140ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">25/06 09:02 UTC</span>
@@ -304,13 +220,13 @@
       <div class="news-title">Ethanol Industry Points to Major Savings to Consumers From E15, and Other Blends</div>
       <div class="news-desc">Ethanol Industry Points to Major Savings to Consumers From E15, and Other Blends&amp;nbsp;&amp;nbsp;KRWC 1360 AM…</div>
       <div class="news-footer">
-        <span class="news-source">KRWC 1360 AM</span>
+        <span class="news-source">🌐 Global · KRWC 1360 AM</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMitwFBVV95cUxNN0lJLVp4RTFoLTEzY2J5b1p5d2pZQVFmV3BzSUtaWVJpVHV0WTZyR0RvY2R6bktkbkxDN2RHaG5RQnRKcVNSU1djM1YtQnIwV3M4RUdjSHdUdElKVlg5VjZZWklkSnhjRkF3UlJleHJwbVE1NzByTWRGemJ2Mm41T1d2TDE0VURHMkVyV1ppbGpFUkE0RU42NGsydmI4emNnSXB5WXR6ZHVoYVhEdFVQdUs0eExCVGs?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="maire partners with samruk-kazyna and acik to advance saf development in kazakhstan"
-       style="animation-delay:280ms">
+       style="animation-delay:160ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">25/06 09:00 UTC</span>
@@ -318,13 +234,13 @@
       <div class="news-title">MAIRE Partners with Samruk-Kazyna and ACIK to Advance SAF Development in Kazakhstan</div>
       <div class="news-desc">MAIRE Partners with Samruk-Kazyna and ACIK to Advance SAF Development in Kazakhstan&amp;nbsp;&amp;nbsp;ChemAnalyst…</div>
       <div class="news-footer">
-        <span class="news-source">ChemAnalyst</span>
+        <span class="news-source">🌐 Global · ChemAnalyst</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMitgFBVV95cUxPazQyWDR3TnJuX2l0c2ZvdDE0aFFxXzVZNDYxVnBScW9SeHpOQUhsdDBDcGVMX3cybGhhYW55UTBVdG9UV2RyTVlJeGpvekFqMGk5WUZiUEh3bE9TTkVUVW1kS1hYRjltTDJSX0Z6RVBlQ2dKbHhHZTJsQXhLNHliSjJheEVjNkc1Q3Y5blhMcUsySERLMF9PUkg2RzJxRHlycjVhcTlmZl9LdUU4anpkVlF5X0ptUQ?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="vietnam advances sustainable aviation fuel dialogue as industry leaders gather in hanoi"
-       style="animation-delay:300ms">
+       style="animation-delay:180ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">25/06 07:28 UTC</span>
@@ -332,13 +248,13 @@
       <div class="news-title">Vietnam advances sustainable aviation fuel dialogue as industry leaders gather in Hanoi</div>
       <div class="news-desc">Vietnam advances sustainable aviation fuel dialogue as industry leaders gather in Hanoi&amp;nbsp;&amp;nbsp;BioEnergy Times…</div>
       <div class="news-footer">
-        <span class="news-source">BioEnergy Times</span>
+        <span class="news-source">🇻🇳 Vietnã · BioEnergy Times</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxPMDRVeWk3Vm5kdjdPSDBESW8yNjJjdHhlbzI4T1E5MmF2QjlxNnNhc2VjMHBjRTBUcjNYbWhtQlUtcHdZVEVNeVpNR01IWkx5VmM2eUlrNDY2eE1hMEtpLUpkUWdYZS1BWUd1LWVqRjJpbkNQUS1TWEduRkRSNWg4OXZoN3VpQ1k1dlBXYUwxcUNXYWx5a3k5NHYyalZPMV94NURTZ1BDQW01SklFTlVFZUFsUzBHUGtxd1VqaEZNQVo2QzQ3SS02d21BNkhuTzhZUDd2QThoUy0tTDdUS3dCMw?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="vietnam explores sustainable aviation fuel development at international conference in hanoi"
-       style="animation-delay:320ms">
+       style="animation-delay:200ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">25/06 06:20 UTC</span>
@@ -346,13 +262,13 @@
       <div class="news-title">Vietnam Explores Sustainable Aviation Fuel Development at International Conference in Hanoi</div>
       <div class="news-desc">Vietnam Explores Sustainable Aviation Fuel Development at International Conference in Hanoi&amp;nbsp;&amp;nbsp;PR Newswire…</div>
       <div class="news-footer">
-        <span class="news-source">PR Newswire</span>
+        <span class="news-source">🇻🇳 Vietnã · PR Newswire</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMisgFBVV95cUxQaGtybHBSQjBGOExhTDNSZXF4YlRTSlhIZjRvNnRIZHhNUmVNYXZxZlpBYW9EcHhvcHRQX0RaN1dKdWstc1NJN3FWS2xMTmlDSWxaalJNc0tzUkZ1RGFaMms5WEFDVGVMN2NEaEhmZVhNOGVvZ0w4RTN2SDM2SVpwRUZDZjR6ejNLZ0Qwa3NZS21JMThhVjN1Q0Fub0hsaWY5dWFSNktBdEJuRTBOTzN3QjFB?oc=5" target="_blank" rel="noopener"
        data-cat="bio" data-title="exxonmobil completes first sea trial of bio bunker fuel blend made from fame"
-       style="animation-delay:340ms">
+       style="animation-delay:220ms">
       <div class="news-top">
         <span class="news-badge bio">Biobunker</span>
         <span class="news-time">25/06 04:59 UTC</span>
@@ -360,27 +276,13 @@
       <div class="news-title">ExxonMobil completes first sea trial of bio bunker fuel blend made from FAME</div>
       <div class="news-desc">ExxonMobil completes first sea trial of bio bunker fuel blend made from FAME&amp;nbsp;&amp;nbsp;Manifold Times…</div>
       <div class="news-footer">
-        <span class="news-source">Manifold Times</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiigFBVV95cUxQLU1yMDlqYVpfdmJxM24xVHBEUFFsbDlSX2lPSFRnM2VNV1pDVWVfMHhVZ2RVc1pRMHFRSUZkeDkxdEV0cTY3VXVXaktvcHAyTmVwTVJEUnpPSjh4bWc3Z24xUTFaMDdKWVdDdTRwMDZkalpfTGR6eGNmVXloVDVfeVBCZGI1bkVpSEE?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="joni ernst says farm bill draft will boost biofuels, meat processing and rural america"
-       style="animation-delay:360ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">25/06 02:39 UTC</span>
-      </div>
-      <div class="news-title">Joni Ernst says Farm Bill draft will boost biofuels, meat processing and rural America</div>
-      <div class="news-desc">Joni Ernst says Farm Bill draft will boost biofuels, meat processing and rural America&amp;nbsp;&amp;nbsp;KCCI…</div>
-      <div class="news-footer">
-        <span class="news-source">KCCI</span>
+        <span class="news-source">🌐 Global · Manifold Times</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMivAFBVV95cUxOd1I1dFpCbnVuSFBSd0xsX043Yi0zWk1aU2pobkUzVU1Hd21wRFZsNjdTT0d4YVJGNzZlMDBQX3JaRWR0bUp0T21uRktmQW42b2FqblRIUUotcEUtQW0wQUxlVVBGNGhaTU1fM3djdEpkZDNyYThuZnVWNDdnd1FadTFHR3E0ek1DRjRvVkVaRFBpSURqRUh6MzdlaEFtWmJkN2JCRWlOWGptZHlLM2RVblJBNjRpWFRTYi1pMg?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="petrobras sells first batch of saf made using bunge’s corsia-certified soybean oil"
-       style="animation-delay:380ms">
+       style="animation-delay:240ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">24/06 23:28 UTC</span>
@@ -388,13 +290,13 @@
       <div class="news-title">Petrobras sells first batch of SAF made using Bunge’s CORSIA-certified soybean oil</div>
       <div class="news-desc">Petrobras sells first batch of SAF made using Bunge’s CORSIA-certified soybean oil&amp;nbsp;&amp;nbsp;Biodiesel Magazine…</div>
       <div class="news-footer">
-        <span class="news-source">Biodiesel Magazine</span>
+        <span class="news-source">🇧🇷 Brasil · Biodiesel Magazine</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE85RDJMYmJKMkp2N3BNSlk2bUVmQW5wczZRWlFtdDk1c2R2YUlHN0Z2MGlHcVFrSVMxeUZTLUw1NHhKZ3NPRkptZGpGSndCVVVRY21MelVEeTRQVWI5Mzg1NUZtLVg2YTg?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="lg chem to demonstrate sustainable aviation fuel production using co₂"
-       style="animation-delay:400ms">
+       style="animation-delay:260ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">24/06 22:29 UTC</span>
@@ -402,13 +304,13 @@
       <div class="news-title">LG Chem to Demonstrate Sustainable Aviation Fuel Production Using CO₂</div>
       <div class="news-desc">LG Chem to Demonstrate Sustainable Aviation Fuel Production Using CO₂&amp;nbsp;&amp;nbsp;thelec.net…</div>
       <div class="news-footer">
-        <span class="news-source">thelec.net</span>
+        <span class="news-source">🌐 Global · thelec.net</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMivgFBVV95cUxQcGt2aWczcV8xcGR1VmdpRW9lNkx1VnlWVW5GSk50aHVYa21aeE04MmlUSHhHMkNUcE12YXBYRjBRMUhWOE5xYm1acFJXRURKZUZZeFB4WDZsTzc5OThEOEpvQ1hKWHpTb2lpb2ZZZU0tSWdLVUYyNlpZTWxqY0JJVGVEX1R1dW95eV9WZ0QyWE5qd1pKYW0wTmpjUUxXS0VKNjNkb1BzdEg4TEx2OWYtQ1lnRjI3eUxrTTlHZndB?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="trump urges congress to pass e15 bill, requests an additional $11.1 billion in farm aid"
-       style="animation-delay:400ms">
+       style="animation-delay:280ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">24/06 22:28 UTC</span>
@@ -416,13 +318,13 @@
       <div class="news-title">Trump urges Congress to pass E15 bill, requests an additional $11.1 billion in farm aid</div>
       <div class="news-desc">Trump urges Congress to pass E15 bill, requests an additional $11.1 billion in farm aid&amp;nbsp;&amp;nbsp;Ethanol Producer Magazine…</div>
       <div class="news-footer">
-        <span class="news-source">Ethanol Producer Magazine</span>
+        <span class="news-source">🌐 Global · Ethanol Producer Magazine</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiygFBVV95cUxPN2JJNWloa0Nfb1NMZGdiN1dmM3pPUDBqYVhZRFRCczRlYi1WRkFyM1lsbV9Ecnp0cXY4a0pYUndDUF9RTW9zZGJpaU5MY2RfVlBoV1ViUTV0SndGNzAwVzRNRFl6NDZaSFdyRDlzOEJqQW5kT0ZxdWdKd1BMZWZsbWxuOG9KZk9kcFFGR2FGR3JGMF90bUJadnltV2tWQzcwN2tCVmtnTlU3UTltbmJjSGtYZUlPVUVneURFSUtEUkJrMXRJRFpKb0Rn?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="ncga applauds trump administration’s continued support of e15"
-       style="animation-delay:400ms">
+       style="animation-delay:300ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">24/06 22:26 UTC</span>
@@ -430,13 +332,13 @@
       <div class="news-title">NCGA Applauds Trump Administration’s Continued Support of E15</div>
       <div class="news-desc">NCGA Applauds Trump Administration’s Continued Support of E15&amp;nbsp;&amp;nbsp;National Corn Growers Association…</div>
       <div class="news-footer">
-        <span class="news-source">National Corn Growers Association</span>
+        <span class="news-source">🌐 Global · National Corn Growers Association</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxOZTh1WTA3V1RsZUkySGd2em1KaXcyT3BlV0hVSnRibVhZRHB3VEJZOWZIRHJtaDljYkFLOXBhTzRVRk0tNjI2NDRlZFpKZEtsWWR3ekxCYjFPNjFwZTRCZkV6NWdad3dlT0tGR0ZNNWlTLUtDM05GdUJRVlNjdURXalRENWdXOUt2b3RKVTd6cWNGdFltMUJlNUtLWjI4LXkzR3VGQ0lDSzBkV3c3V0h0Z2lDLXpqc3o3c3lhUlJVTnA?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="trump white house asks congress to approve year-round e15 gasoline sales"
-       style="animation-delay:400ms">
+       style="animation-delay:320ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">24/06 20:54 UTC</span>
@@ -444,27 +346,13 @@
       <div class="news-title">Trump White House asks Congress to approve year-round E15 gasoline sales</div>
       <div class="news-desc">Trump White House asks Congress to approve year-round E15 gasoline sales&amp;nbsp;&amp;nbsp;Reuters…</div>
       <div class="news-footer">
-        <span class="news-source">Reuters</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiigJBVV95cUxQakNfdVlucEdWbUVGVTJzQzFONHdHbVN5bFgtNlR2NmNjTXM0RmRaeXBYS1h0dlMtYzVzM3hxNW5TaTVmMXRINjd5SzVacmNKM2ZfUHVFaDJaeVdQS252Z2NjUmVNZ2xzU2lhN1cteld1M3RydE5kMk5fb3NMLTgyTk1Nc2xSd1h4bFZoQ3JNcUVqbW5vb3pqSHJPaWN3NU1qbzhDa2lMLTdoZ1FlWXV4UzVYQ0VLdklyd2JtbENqR1Vzdlc2NDd2bEJ0bnJjSFJKY0NMWVJSeW83MXdyelJDZ3MyVlZyQXdtTTNsTU1tamdOektOMXZ0OGRxQktjaXItVDFkcGg4VElvd9IBmAJBVV95cUxNT2RubEQwQTAzRFVGVEZFbjZMTTlIYlR1U2lKVS04MEkwcjVzd0I2ZEFBS0MzZHJOc0s5UEpDT1RDeWNIbkRZVENNdkZ1QzhyYTlzY29RaHdBSW9ObklMVlo0WkwxV1RZeThlUUdVM3Z2LTU2M1kxa0pIZndveEJ0amJVV1FkXzBYem9KUTRVQjlrM3pzeUNVcXZoRlRzNnlOaDFUbUROTTRvSE1TLVdVRGxLbkpGZzlaMmQwWGN1T1R3RmRtSEVxUVc0TVpPUS0xVE5nNmV1bXQ5VUJKR2VWZTFORkk1ZFNuWURmdm53U0hmTWdVX3pCYWpmZ3pEc05YZnpRc3ltSDJLSWxzUEdsSmZHWWYyQmFG?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="pedrinho diz que lamacchia segue interessado na saf do vasco, mas avisa: &quot;estou de mãos atadas&quot;"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">24/06 20:52 UTC</span>
-      </div>
-      <div class="news-title">Pedrinho diz que Lamacchia segue interessado na SAF do Vasco, mas avisa: &quot;Estou de mãos atadas&quot;</div>
-      <div class="news-desc">Pedrinho diz que Lamacchia segue interessado na SAF do Vasco, mas avisa: &quot;Estou de mãos atadas&quot;&amp;nbsp;&amp;nbsp;GE…</div>
-      <div class="news-footer">
-        <span class="news-source">GE</span>
+        <span class="news-source">🌐 Global · Reuters</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE8zT0xjVlRtbFVWYTJVS09rQ20xOUZTdk5MQ0E1cXBrSnMyQW1lam4wNWN5ZDFRdGZ1Rld2eTFVNjl6dUQ0TXg4c3M1cXUwUjB0YXpMUXM0Q0ppZHMwN1NQcURrb2Q4d2ljbEl1U2lHbGw?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="white house issues call for year-round e15 in funding request"
-       style="animation-delay:400ms">
+       style="animation-delay:340ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">24/06 20:45 UTC</span>
@@ -472,13 +360,13 @@
       <div class="news-title">White House Issues Call for Year-Round E15 in Funding Request</div>
       <div class="news-desc">White House Issues Call for Year-Round E15 in Funding Request&amp;nbsp;&amp;nbsp;Growth Energy…</div>
       <div class="news-footer">
-        <span class="news-source">Growth Energy</span>
+        <span class="news-source">🌐 Global · Growth Energy</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiiAFBVV95cUxNZWRQQkpOVWNHVUcxQnlUV2lnZGNlOUtoV0hKMy1tcWx4LS0wOURkeG1fZDVtdURWYjZuVU1sQlJQS1JXeTI5aVJOcERRVWpvRHJpSVJtLTVLR2pvbHdmLW5GUm9IdzB1V2xnd2ZwbVpWZUJSXzdOS0JfUy1yMk02QlAyVlN1TnZD?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="trump to ask congress to make 15% ethanol-gas blend permanent"
-       style="animation-delay:400ms">
+       style="animation-delay:360ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">24/06 19:14 UTC</span>
@@ -486,13 +374,13 @@
       <div class="news-title">Trump to ask Congress to make 15% ethanol-gas blend permanent</div>
       <div class="news-desc">Trump to ask Congress to make 15% ethanol-gas blend permanent&amp;nbsp;&amp;nbsp;CBS News…</div>
       <div class="news-footer">
-        <span class="news-source">CBS News</span>
+        <span class="news-source">🌐 Global · CBS News</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMingJBVV95cUxQcFJuM3Nyc2ROblp4Tl9BZ24zeXIxY3dWYUNXZXFOZHhYbXlOcWFwY3ViVFJmbDRjdl9LNlVmZnFtaDF1eTRyX2hCMFZMOFFYM1VKTkdjcDdqNjdzWU5EazJ5WUhPYTRTalhaay0xbWxlMmdKcmphaGFnX05jTVg5UXZWelVsU18xMXMySGVtVnM1cDFIT0hvTGNpaWMzS3ZDOGNBRXlXZWVpalAtcHBXeDV6a21FN1lHWmc0ZkMwZW4taUpzeE5NVTNueXl1VXFJT0lheVlDbGt3TnAwMUplVDVGYlgweHJGUFNyX0tKMG5qandwQXlCZ1ZETlM0QmFyZEVIVklKUk03N3hyWHVMeDdVd3FsVFhjTWFUd1B30gGjAkFVX3lxTE54SGZPR1JRVWQxMXRoNlFBSHlhZ1hXdlppZ2FkYnZDdnNDWjZZRjFsdElxOHhHNDRRN0FlZ2lXQXE0UkFsNjlJZ1N4UWtycHVtX1lranMxMk5IX2VSSldsV3U1QUFxSlZ2VUN3eldYUllyNTQtbllRZkU4alhPbDJpOEFJVXdGTEVvRXc1U3VUZzhFU3RSSmFWa1ctTGV5aUk1VnpUX203RGpHM3p5R0dnMDNXeWNia3NNLU4wREpzaXg3Q2Q2M19UVEFOOURBSy16VmRaTThTSUU1U1VXTnhNOUVLRGl4YnU1TzRNRHBxXzlXRl94UXRiblFVR0JvWmpVVXp2MGhxM1JMZDJpeGIxbVVMRDlHWnNZVHptNE1iUTlBdw?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="aumento da mistura de etanol na gasolina fortalece produção nacional, reduz emissões e impulsiona economia, avalia sifaeg"
-       style="animation-delay:400ms">
+       style="animation-delay:380ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">24/06 18:52 UTC</span>
@@ -500,7 +388,7 @@
       <div class="news-title">Aumento da mistura de etanol na gasolina fortalece produção nacional, reduz emissões e impulsiona economia, avalia Sifaeg</div>
       <div class="news-desc">Aumento da mistura de etanol na gasolina fortalece produção nacional, reduz emissões e impulsiona economia, avalia Sifaeg&amp;nbsp;&amp;nbsp;Notícias Agrícolas…</div>
       <div class="news-footer">
-        <span class="news-source">Notícias Agrícolas</span>
+        <span class="news-source">🌐 Global · Notícias Agrícolas</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -514,7 +402,7 @@
       <div class="news-title">Vibra defende previsibilidade para mudanças na mistura de etanol na gasolina</div>
       <div class="news-desc">Vibra defende previsibilidade para mudanças na mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;Canal Rural…</div>
       <div class="news-footer">
-        <span class="news-source">Canal Rural</span>
+        <span class="news-source">🌐 Global · Canal Rural</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -528,7 +416,7 @@
       <div class="news-title">IATA alliance reaches 50 members to support aviation carbon markets</div>
       <div class="news-desc">IATA alliance reaches 50 members to support aviation carbon markets&amp;nbsp;&amp;nbsp;International Airport Review…</div>
       <div class="news-footer">
-        <span class="news-source">International Airport Review</span>
+        <span class="news-source">🌐 Global · International Airport Review</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -542,21 +430,7 @@
       <div class="news-title">Aumento da mistura de etanol na gasolina para 32% deve impactar preço dos combustíveis, diz setor</div>
       <div class="news-desc">Aumento da mistura de etanol na gasolina para 32% deve impactar preço dos combustíveis, diz setor&amp;nbsp;&amp;nbsp;CBN Ribeirão…</div>
       <div class="news-footer">
-        <span class="news-source">CBN Ribeirão</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMisgFBVV95cUxOOVFnZ0F0S2kycnhqRjhGREMzTmZBdTdPRWtjMkFkcWNfcDJFbFV6Qk56bS1lLWs2V2s0YUdrWVhOMFNCN1dEemNuOGd4WjZKTlY5eHZlQnRFWC1aVEhqOGQ0NVNVcDBkZ1VtcVNIYjdzek0xWHgwY25KcDRUcmZjNnlpOEdod18wSTZyX1VSZ2prOVdRQzlMS25RRUV5VkFGX18zRkVMVWFsVFZBdnlTQVFn?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="justiça afasta presidente do vasco do conselho de administração da saf"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">24/06 11:08 UTC</span>
-      </div>
-      <div class="news-title">Justiça afasta presidente do Vasco do Conselho de Administração da SAF</div>
-      <div class="news-desc">Justiça afasta presidente do Vasco do Conselho de Administração da SAF&amp;nbsp;&amp;nbsp;Agência Brasil…</div>
-      <div class="news-footer">
-        <span class="news-source">Agência Brasil</span>
+        <span class="news-source">🌐 Global · CBN Ribeirão</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -570,7 +444,7 @@
       <div class="news-title">COMMENTARY: CORSIA – A flawed scheme worth saving?</div>
       <div class="news-desc">COMMENTARY: CORSIA – A flawed scheme worth saving?&amp;nbsp;&amp;nbsp;GreenAir News…</div>
       <div class="news-footer">
-        <span class="news-source">GreenAir News</span>
+        <span class="news-source">🌐 Global · GreenAir News</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -584,7 +458,7 @@
       <div class="news-title">Kazakhstan, Italy Partner to Produce Sustainable Aviation Fuel</div>
       <div class="news-desc">Kazakhstan, Italy Partner to Produce Sustainable Aviation Fuel&amp;nbsp;&amp;nbsp;Caspian Post…</div>
       <div class="news-footer">
-        <span class="news-source">Caspian Post</span>
+        <span class="news-source">🇮🇹 Itália · Caspian Post</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -598,21 +472,7 @@
       <div class="news-title">MAIRE, Samruk-Kazyna and ACIK join forces to advance sustainable av...</div>
       <div class="news-desc">MAIRE, Samruk-Kazyna and ACIK join forces to advance sustainable av...&amp;nbsp;&amp;nbsp;Group MAIRE…</div>
       <div class="news-footer">
-        <span class="news-source">Group MAIRE</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMizgFBVV95cUxPTEhvUWdwN0lFZ3NnaFhic0dQLWNjc2lwUzFjVW4yaU5sSzJUUThmZzFOcmlBc2JPRFc3Q2ZiV3R5NnlNdHVFeU5WXzFyUHpNUy1oTE1WTndZSXNFNWVJOWt1d2E0c09sZFFvT0gzbEY3LW1mV1VuWDNOVDhHS3hJMU5YNGJBVk9xQk0zSjhscjdEWTRuQ1o4SGhMbFZvWEtQOHhnR1lYZ19NenAyS2pGd1hTNl9GaWNIb194dlFnNjEwZmpnaWROZk5QVU1PUdIB3AFBVV95cUxNdndSY01ET3h4SmluY19CdVMtTU51SVpYR3VQNmRkQUVzUEhMdC1tUmM5aXpMSjVHNDNhSEdlMWd2TngxTS1WYy1VOFRTSTZWdlludE9CM3BkOVUyVXZkcXJCQ05wazMwTXhSWENFN2ktX1c1S3NMc2QxTEFUMU1ndUQ4TjFHYWt6UWNLV0hXNkE5b0Z1NlhFak04RFdYWU9mU3FYSzVUWTYzUmlYb295VzB0eEk5NjlRaDV4YUdNTTZpM3dWdF9yMDB1OTA1T1dYR3BmQW5iMG14azhU?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="vasco ainda pode vender a saf após justiça afastar pedrinho? entenda"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">24/06 04:00 UTC</span>
-      </div>
-      <div class="news-title">Vasco ainda pode vender a SAF após Justiça afastar Pedrinho? Entenda</div>
-      <div class="news-desc">Vasco ainda pode vender a SAF após Justiça afastar Pedrinho? Entenda&amp;nbsp;&amp;nbsp;GE…</div>
-      <div class="news-footer">
-        <span class="news-source">GE</span>
+        <span class="news-source">🌐 Global · Group MAIRE</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -626,7 +486,7 @@
       <div class="news-title">Governo adia reunião que discutiria aumento da mistura de etanol na gasolina</div>
       <div class="news-desc">Governo adia reunião que discutiria aumento da mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;R7…</div>
       <div class="news-footer">
-        <span class="news-source">R7</span>
+        <span class="news-source">🌐 Global · R7</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -640,7 +500,7 @@
       <div class="news-title">Governo adia reunião do CNPE que discutiria aumento da mistura de etanol na gasolina</div>
       <div class="news-desc">Governo adia reunião do CNPE que discutiria aumento da mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;Terra…</div>
       <div class="news-footer">
-        <span class="news-source">Terra</span>
+        <span class="news-source">🌐 Global · Terra</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -654,7 +514,7 @@
       <div class="news-title">Governo adia reunião do CNPE que discutiria aumento da mistura de etanol na gasolina Por Reuters - Investing.com Brasil</div>
       <div class="news-desc">Governo adia reunião do CNPE que discutiria aumento da mistura de etanol na gasolina Por Reuters&amp;nbsp;&amp;nbsp;Investing.com Brasil - Finanças, Câmbio e Investimentos…</div>
       <div class="news-footer">
-        <span class="news-source">Investing.com Brasil - Finanças, Câmbio e Investimentos</span>
+        <span class="news-source">🇧🇷 Brasil · Investing.com Brasil - Finanças, Câmbio e Investimentos</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -668,7 +528,7 @@
       <div class="news-title">Minnesota Corn leader urges Senate to act on year-round E15</div>
       <div class="news-desc">Minnesota Corn leader urges Senate to act on year-round E15&amp;nbsp;&amp;nbsp;Brownfield Ag News…</div>
       <div class="news-footer">
-        <span class="news-source">Brownfield Ag News</span>
+        <span class="news-source">🌐 Global · Brownfield Ag News</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -682,21 +542,7 @@
       <div class="news-title">States and Supporting Partners Join IATA’s Alliance to Expand CORSIA Carbon Credit Supply</div>
       <div class="news-desc">States and Supporting Partners Join IATA’s Alliance to Expand CORSIA Carbon Credit Supply&amp;nbsp;&amp;nbsp;IATA…</div>
       <div class="news-footer">
-        <span class="news-source">IATA</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMizgFBVV95cUxQTEUtaW5GZFVnQjY2U2Q4cHYyWVlpZlZlWFRBcW1FUGhyZEFnWm1UaWVQSzFZUTVHeE9CZ2VnaF9RWDlsc0tKLUg2VDlqNFRYZVplWVV1MGhIM1U2SEhWWkRtX3hRLWQ1ajJCcHFGS1JZUWdVRFQ1MlNLNHlwTzg1Zm1SMTVTbWw1Ujlxb0o3Nk5rMUlPWmkteHRxYWd5OXJLbHBQME13WHNXYVVoU3NzVjgwR2g5NklGRkgtTDdySDR2OGZQQ0pwdldPenlmQQ?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="iata accelerates airline decarbonization with a global alliance to expand carbon credits"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">23/06 14:41 UTC</span>
-      </div>
-      <div class="news-title">IATA accelerates airline decarbonization with a global alliance to expand carbon credits</div>
-      <div class="news-desc">IATA accelerates airline decarbonization with a global alliance to expand carbon credits&amp;nbsp;&amp;nbsp;Travel2Latam…</div>
-      <div class="news-footer">
-        <span class="news-source">Travel2Latam</span>
+        <span class="news-source">🌐 Global · IATA</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -710,7 +556,7 @@
       <div class="news-title">Petrobras markets first batch of SAF produced from CORSIA-certified soybean oil supplied by Bunge</div>
       <div class="news-desc">Petrobras markets first batch of SAF produced from CORSIA-certified soybean oil supplied by Bunge&amp;nbsp;&amp;nbsp;Hydrocarbon Engineering…</div>
       <div class="news-footer">
-        <span class="news-source">Hydrocarbon Engineering</span>
+        <span class="news-source">🇧🇷 Brasil · Hydrocarbon Engineering</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -724,7 +570,21 @@
       <div class="news-title">UFSM integra projeto de pesquisa com a Petrobras para estudar combustível sustentável de aviação</div>
       <div class="news-desc">UFSM integra projeto de pesquisa com a Petrobras para estudar combustível sustentável de aviação&amp;nbsp;&amp;nbsp;UFSM…</div>
       <div class="news-footer">
-        <span class="news-source">UFSM</span>
+        <span class="news-source">🇧🇷 Brasil · UFSM</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMizwFBVV95cUxPd3I0UnNnMTJWWG9jVFBTcHBRQUxwRGk5ZjVxZUxBd1QyTkNad0ltY0hKcGQyM1NyXzRIRzYzQkJfY0s1dldkVGRuTEdCaGwwZUpPQ2plNHhRa1FIRnpaaFk1WFVCOE5hU2pyVFMzUjRCc29CRWdPcGlxRncxVUZpS0kzMXB1MVBiUnNrTHlMM1VSUjNQanZaaUFEUEF6QTVsNS1rN25rU0w2SXp6NUZtMEJCZnRwTWFvY1FCa0Q1UWxlOGt0X21kTldJY0pfd0E?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="petrobras aprova us$ 1,2 bilhão para produzir combustível sustentável de aviação em cubatão"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">22/06 18:39 UTC</span>
+      </div>
+      <div class="news-title">Petrobras aprova US$ 1,2 bilhão para produzir combustível sustentável de aviação em Cubatão</div>
+      <div class="news-desc">Petrobras aprova US$ 1,2 bilhão para produzir combustível sustentável de aviação em Cubatão&amp;nbsp;&amp;nbsp;Transporte Moderno…</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · Transporte Moderno</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -738,7 +598,7 @@
       <div class="news-title">Sustainable Aviation Fuel Initiative</div>
       <div class="news-desc">Sustainable Aviation Fuel Initiative&amp;nbsp;&amp;nbsp;Department of Energy (.gov)…</div>
       <div class="news-footer">
-        <span class="news-source">Department of Energy (.gov)</span>
+        <span class="news-source">🌐 Global · Department of Energy (.gov)</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -752,7 +612,7 @@
       <div class="news-title">Governo deve elevar mistura de etanol na gasolina para 32% e aposta em queda nos preços dos combustíveis</div>
       <div class="news-desc">Governo deve elevar mistura de etanol na gasolina para 32% e aposta em queda nos preços dos combustíveis&amp;nbsp;&amp;nbsp;Nativa News…</div>
       <div class="news-footer">
-        <span class="news-source">Nativa News</span>
+        <span class="news-source">🌐 Global · Nativa News</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -766,7 +626,7 @@
       <div class="news-title">IATA estimates 2026 SAF production at just 0.8% of jet fuel use</div>
       <div class="news-desc">IATA estimates 2026 SAF production at just 0.8% of jet fuel use&amp;nbsp;&amp;nbsp;Oils &amp; Fats International…</div>
       <div class="news-footer">
-        <span class="news-source">Oils &amp; Fats International</span>
+        <span class="news-source">🌐 Global · Oils &amp; Fats International</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -780,7 +640,7 @@
       <div class="news-title">Alckmin: aumento da mistura de etanol na gasolina para 32% será aprovada quarta-feira</div>
       <div class="news-desc">Alckmin: aumento da mistura de etanol na gasolina para 32% será aprovada quarta-feira&amp;nbsp;&amp;nbsp;InfoMoney…</div>
       <div class="news-footer">
-        <span class="news-source">InfoMoney</span>
+        <span class="news-source">🌐 Global · InfoMoney</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -794,7 +654,7 @@
       <div class="news-title">Alckmin diz que aumento da mistura de etanol na gasolina ajudará a baratear combustível</div>
       <div class="news-desc">Alckmin diz que aumento da mistura de etanol na gasolina ajudará a baratear combustível&amp;nbsp;&amp;nbsp;Valor Econômico…</div>
       <div class="news-footer">
-        <span class="news-source">Valor Econômico</span>
+        <span class="news-source">🌐 Global · Valor Econômico</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -808,7 +668,7 @@
       <div class="news-title">Aumento da mistura de etanol na gasolina de 30% para 32% será aprovado quarta-feira, 24, diz Alckmin</div>
       <div class="news-desc">Aumento da mistura de etanol na gasolina de 30% para 32% será aprovado quarta-feira, 24, diz Alckmin&amp;nbsp;&amp;nbsp;Estadão…</div>
       <div class="news-footer">
-        <span class="news-source">Estadão</span>
+        <span class="news-source">🌐 Global · Estadão</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -822,7 +682,7 @@
       <div class="news-title">Webinar - Sustainable Aviation Fuel&#x27;s Potential: US Policy and Targeted Opportunity Regions</div>
       <div class="news-desc">Webinar - Sustainable Aviation Fuel&#x27;s Potential: US Policy and Targeted Opportunity Regions&amp;nbsp;&amp;nbsp;RMI…</div>
       <div class="news-footer">
-        <span class="news-source">RMI</span>
+        <span class="news-source">🌐 Global · RMI</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -836,7 +696,7 @@
       <div class="news-title">IATA: SAF Production Volumes Still Disappointing</div>
       <div class="news-desc">IATA: SAF Production Volumes Still Disappointing&amp;nbsp;&amp;nbsp;Leeham News and Analysis…</div>
       <div class="news-footer">
-        <span class="news-source">Leeham News and Analysis</span>
+        <span class="news-source">🌐 Global · Leeham News and Analysis</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -850,7 +710,7 @@
       <div class="news-title">Kvasir Technologies raises EUR 10m to scale marine biofuel tech</div>
       <div class="news-desc">Kvasir Technologies raises EUR 10m to scale marine biofuel tech&amp;nbsp;&amp;nbsp;Renewables Now…</div>
       <div class="news-footer">
-        <span class="news-source">Renewables Now</span>
+        <span class="news-source">🌐 Global · Renewables Now</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -864,7 +724,7 @@
       <div class="news-title">Will Corsia collapse? IATA criticizes lack of support for airline carbon-offset scheme</div>
       <div class="news-desc">Will Corsia collapse? IATA criticizes lack of support for airline carbon-offset scheme&amp;nbsp;&amp;nbsp;Travel Weekly…</div>
       <div class="news-footer">
-        <span class="news-source">Travel Weekly</span>
+        <span class="news-source">🌐 Global · Travel Weekly</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -878,7 +738,7 @@
       <div class="news-title">Kvasir Technologies raises €10m to commercialise climate-neutral marine biofuel</div>
       <div class="news-desc">Kvasir Technologies raises €10m to commercialise climate-neutral marine biofuel&amp;nbsp;&amp;nbsp;Net Zero Investor…</div>
       <div class="news-footer">
-        <span class="news-source">Net Zero Investor</span>
+        <span class="news-source">🌐 Global · Net Zero Investor</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -892,7 +752,7 @@
       <div class="news-title">Danish startup raises €10m to scale cellulosic marine biofuel tech</div>
       <div class="news-desc">Danish startup raises €10m to scale cellulosic marine biofuel tech&amp;nbsp;&amp;nbsp;Quantum Commodity Intelligence…</div>
       <div class="news-footer">
-        <span class="news-source">Quantum Commodity Intelligence</span>
+        <span class="news-source">🌐 Global · Quantum Commodity Intelligence</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -906,7 +766,63 @@
       <div class="news-title">Copenhagen-based Kvasir Technologies raises €10 million to scale climate-neutral marine biofuel</div>
       <div class="news-desc">Copenhagen-based Kvasir Technologies raises €10 million to scale climate-neutral marine biofuel&amp;nbsp;&amp;nbsp;BeBeez International…</div>
       <div class="news-footer">
-        <span class="news-source">BeBeez International</span>
+        <span class="news-source">🌐 Global · BeBeez International</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMi1gFBVV95cUxQMkgzQVVWbVNVZGNURWhYNnJhdW50YlIzSTBvMkI4Y054SUItVkcwWXA3ZjgtT0R1MFFsZUtRRjFfX2tNTGthX2NPbm5wZzdVUnIwTlY4M1ZwSDRESDRsczR4ZG1URjRycW45NWlBUzM3MTkyakQ5YjRIYzFNNkdNX1gycElLMkpDSVZNd2J2TWR2S181dlV2UHNJdWpfOEFhUmg1SThiVGdLRU5YNGRJQkhtb1VWRC1jQVdqbkpNQmdKcmlmZUt0dFN1UVJ1Y1R4U3lJODdR?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="governo prepara decreto para regulamentar combustível sustentável de aviação e acelerar investimentos no setor"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">18/06 00:23 UTC</span>
+      </div>
+      <div class="news-title">Governo prepara decreto para regulamentar combustível sustentável de aviação e acelerar investimentos no setor</div>
+      <div class="news-desc">Governo prepara decreto para regulamentar combustível sustentável de aviação e acelerar investimentos no setor&amp;nbsp;&amp;nbsp;Diário da Guanabara…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · Diário da Guanabara</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxOUzU1OUhjcG1QelVCbEZ1SDZ5WTVrMV9xdnpzLVBZTGNVVVp2Nnp0Nm1kdHlUUjZfRnFUN0FCTTlaR0N2VW9MWVh1OTRJWlp0dEZGZGJnUWNCMWE4OV8wMkJNZ1lzNlY5UEpjMXJ5eEZKdS1qVTNfSmNYVEEybkdMT2dtYWU5MlhrOXEtbVl1UWNhSWdacTJwV1ZaMDVPOVo3Q24zNzd6YTBYeWtsbGZ2dTVFcTFVTVp1MEVWSWp5QThEZmpjUVozTA?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="decreto para combustível sustentável de aviação deve sair em breve, diz diretora do mme"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">17/06 20:42 UTC</span>
+      </div>
+      <div class="news-title">Decreto para combustível sustentável de aviação deve sair em breve, diz diretora do MME</div>
+      <div class="news-desc">Decreto para combustível sustentável de aviação deve sair em breve, diz diretora do MME&amp;nbsp;&amp;nbsp;Agência eixos…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · Agência eixos</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMirwFBVV95cUxPdEg1UUV2VlNzU21KREFDWXBLNTZISVVsRkRqYmtXVTRvTGN5aWtseFJvNmxrbUtvSUtnSG85VjByaERsX3hrSW1HZHNlSWttcG1nLTlyZE1Qa1lVN3JhWnEzTEFPQTN0c3RzaF9ERTZLem9UdFlRdHpiQlV3dVRGSFdjQUlmR08wWUsyemVFdGk0ZzFhdFNEeC1SbGgtbWF1QVFsZ3FOZGo3RDl6a09R0gG0AUFVX3lxTE15S1M3bDNmOWdXd2xJRVgtcmxGQmdoQVFaWnA0cjdvRXJ0dHdFQ3Rmd0JpN1dvWGFHSTFPLXhfak0wVDdMLWxYRzgtbmcwSXJPcThPYzZnbE5yTnZ4N0E3ZFVMNWNlLXMxcUxCWjhjYXhKSzVTLWJDbi1wbTZsaGVHa2kyWHJZdHR5R2xza2RETi14LThtOXVXNWN0M3ZoOUlpcGJQbTZIWVljSGNGY3ZEYWJGWg?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="expansão da produção de combustível sustentável de aviação no brasil avança"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">17/06 17:04 UTC</span>
+      </div>
+      <div class="news-title">Expansão da produção de combustível sustentável de aviação no Brasil avança</div>
+      <div class="news-desc">Expansão da produção de combustível sustentável de aviação no Brasil avança&amp;nbsp;&amp;nbsp;AERO Magazine…</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · AERO Magazine</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMi6AFBVV95cUxNM3NKc0lNYzlkUVJKX0tkd3dCZ0lMUzVFOFVQQktoazJhanZnSEx3OW5aNmFROXcwd2plR2x4aWx0Rkc3VWQ2TklOeXNUcWRIS1ZoRmZKQl82V2xYbU9mYWJ3d3FEUHdZSXZrNzNlcWpMdUZzX291WFlnRHBJc01TNkgwUmRKMnhud3h2ZGFLV1QybzktVzE2cXgxWlUxTTZZa0lMTGIxSUpUeElHaHRWRmJUNFF0SmxSX0dRWDZqR1JLMjlaMW1pQ3pWVmlDZE1uWWMtTnNDendCSTBMQW9TVHdUamhmY1ZX?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="na holanda, mme participa do principal congresso mundial sobre combustível sustentável de aviação"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">17/06 14:05 UTC</span>
+      </div>
+      <div class="news-title">Na Holanda, MME participa do principal congresso mundial sobre combustível sustentável de aviação</div>
+      <div class="news-desc">Na Holanda, MME participa do principal congresso mundial sobre combustível sustentável de aviação&amp;nbsp;&amp;nbsp;GOV.BR…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · GOV.BR</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -920,21 +836,7 @@
       <div class="news-title">Petrobras produces, sells first CORSIA-certified soybean SAF batch</div>
       <div class="news-desc">Petrobras produces, sells first CORSIA-certified soybean SAF batch&amp;nbsp;&amp;nbsp;Reuters…</div>
       <div class="news-footer">
-        <span class="news-source">Reuters</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMijgJBVV95cUxQdkVzS1lpZkhRcGYxd0dyVUdabGlacVNjalJTQTVpN2Rfb0tqTGItUzAzTTBGcDR5azA0R1podFF0U3RVOFRvRE00dzM4N3diVkxmT1htMi1VT3dQZGNHYzI0NUpKeTJ0NExZT2hGTUVsQzVCZ2VzampBS1lQSWduUDlpRy1KQmRva052WlZXck1vazZVdVhnRjZIZzFsU2JxNTRfSldGN1pDVEpab2o5UEdINzVBcDFncUE0cmpsMEg0S1FMMmdQbnp1VEl6V2I2dmhyaGxRZkkyNE9NU0pXWVFlY1VMazVGRXFnVHV5enJ0NVdVYUNqYmFjaFZ0aXFGSGd6Y3FhRjdQa2JoOEE?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="petrobras comercializa primeiro lote de saf produzido a partir de óleo de soja com certificação corsia fornecido pela bunge"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">17/06 13:31 UTC</span>
-      </div>
-      <div class="news-title">Petrobras comercializa primeiro lote de SAF produzido a partir de óleo de soja com certificação CORSIA fornecido pela Bunge</div>
-      <div class="news-desc">Petrobras comercializa primeiro lote de SAF produzido a partir de óleo de soja com certificação CORSIA fornecido pela Bunge&amp;nbsp;&amp;nbsp;Agência Petrobras de Notícias…</div>
-      <div class="news-footer">
-        <span class="news-source">Agência Petrobras de Notícias</span>
+        <span class="news-source">🇧🇷 Brasil · Reuters</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -948,21 +850,7 @@
       <div class="news-title">4º Agroenergia – Transição Energética Sustentável - edição SAF e Biobunker</div>
       <div class="news-desc">4º Agroenergia – Transição Energética Sustentável - edição SAF e Biobunker&amp;nbsp;&amp;nbsp;cnabrasil.org.br…</div>
       <div class="news-footer">
-        <span class="news-source">cnabrasil.org.br</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi_gFBVV95cUxQWUUxTG5QVm40Z2Z0ZzBGMk9yMmhoRkhtaXRxbi1NdFVXY054eXJmMVFGQW1WakV0ZENycndIWkFfR1JmY1dZazZrczJpcG5oU0o2YTliSUZ6Qm5iZEhtSXE0T2t6NU15NHBlM1VXMFJkeWJaSUlSX2NXT0tUWWZTRW84eTZyOVA1N29qZmhINmZTcHJ0NS1TbDA1cFRxSVBLTk1Od19rVloyMHA2QzZZbTN2d1JkSG5tZTZVM0NrX0NiOFlOSFdVeWVjamdyQWx5X3NiNUduc3U0MmhabGZYYXI4LS1iUUxxaEZuZWZoc2pyaXF1d0JyU2NaS3VSQQ?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="nodal exchange and incubex expand environmental product suite with corsia, california and massachusetts contracts"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">16/06 13:00 UTC</span>
-      </div>
-      <div class="news-title">Nodal Exchange and IncubEx Expand Environmental Product Suite With CORSIA, California and Massachusetts Contracts</div>
-      <div class="news-desc">Nodal Exchange and IncubEx Expand Environmental Product Suite With CORSIA, California and Massachusetts Contracts&amp;nbsp;&amp;nbsp;Business Wire…</div>
-      <div class="news-footer">
-        <span class="news-source">Business Wire</span>
+        <span class="news-source">🇧🇷 Brasil · cnabrasil.org.br</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -976,7 +864,21 @@
       <div class="news-title">Supply and strategy: Addressing the risks of CORSIA compliance</div>
       <div class="news-desc">Supply and strategy: Addressing the risks of CORSIA compliance&amp;nbsp;&amp;nbsp;Marsh…</div>
       <div class="news-footer">
-        <span class="news-source">Marsh</span>
+        <span class="news-source">🌐 Global · Marsh</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMi1AFBVV95cUxOZTFtSXZwekF4WlEwVFRHZDYyQkJpdUM2NkpaUU82RG94ejJZTlotMWpRaUJ6d2hFSFhPUlI0WWdHZnVERDB2cEhyUGpCMlpiTzVzWUUyZWh0ek9xVEp6MGdnU0c2T2xpcGp6a3NYMmUtc0R3YWlmWGRqVVRpd1ZBVFg3OUw0OTFXMXZONm5KSDJaVmgtQm1RanVVQzFwTzgxdWFKSlNUUE9IcTZ1N3VON2t5RUgzWmlnaHpsTFJMOXNZX1g0VVJTUVl6eUFjVkdOWVNDSQ?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="brasil apresenta oportunidades em combustível sustentável de aviação durante principal congresso global do setor"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">15/06 07:00 UTC</span>
+      </div>
+      <div class="news-title">Brasil apresenta oportunidades em combustível sustentável de aviação durante principal congresso global do setor</div>
+      <div class="news-desc">Brasil apresenta oportunidades em combustível sustentável de aviação durante principal congresso global do setor&amp;nbsp;&amp;nbsp;Apex Brasil…</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · Apex Brasil</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -990,7 +892,7 @@
       <div class="news-title">Ask the Experts: CORSIA Insights for Airlines</div>
       <div class="news-desc">Ask the Experts: CORSIA Insights for Airlines&amp;nbsp;&amp;nbsp;Shell Global…</div>
       <div class="news-footer">
-        <span class="news-source">Shell Global</span>
+        <span class="news-source">🇳🇱 Países Baixos · Shell Global</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1004,7 +906,7 @@
       <div class="news-title">DNV alerta para necessidade de clareza regulatória na descarbonização marítima</div>
       <div class="news-desc">DNV alerta para necessidade de clareza regulatória na descarbonização marítima&amp;nbsp;&amp;nbsp;Portos e Navios…</div>
       <div class="news-footer">
-        <span class="news-source">Portos e Navios</span>
+        <span class="news-source">🌐 Global · Portos e Navios</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1018,7 +920,7 @@
       <div class="news-title">Hidrogênio verde e descarbonização marítima serão temas de palestra no Energy Summit 2026</div>
       <div class="news-desc">Hidrogênio verde e descarbonização marítima serão temas de palestra no Energy Summit 2026&amp;nbsp;&amp;nbsp;Sala da Notícia…</div>
       <div class="news-footer">
-        <span class="news-source">Sala da Notícia</span>
+        <span class="news-source">🌐 Global · Sala da Notícia</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1032,7 +934,21 @@
       <div class="news-title">American Airlines and Google sign record-breaking sustainable aviation fuel agreement</div>
       <div class="news-desc">American Airlines and Google sign record-breaking sustainable aviation fuel agreement&amp;nbsp;&amp;nbsp;American Airlines…</div>
       <div class="news-footer">
-        <span class="news-source">American Airlines</span>
+        <span class="news-source">🇺🇸 EUA · American Airlines</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxNaGM0OTd3bnJucE5fYnNyZnhZOUo3ZHJ0d1FQMGxZbVpOdmlwX3huTWFLeTVCdmQ1RFVQSWpra0R1RjlIdmtuVEcyTmdZczFfYkRpVzFHTDI1RUVHZ3NxemsxUmRyUlJ3MTVTQzJpTHdqNW1yYU5JQnl3N1dqN0xUOUVyUTJBSXlUcms2b1U0ckFfOGNaUHRtZk94OHJnaGh2NzZ6eU02aE5UWkFtWkRiRWpXTndTYkRrN3BxaTRma2toQ2h2bDNOUTdWX2ZVSkk2ZWg4dTEzLWZyV3R3UFY0NtIB7wFBVV95cUxOc19CZklPVnpMRVgzSUx0c0prZ3ZOTFJkRlhLLVRsTnlEaHA5d3NuSnVHVDRfTkMyVGdnOXdEbzFVeTlVU18xaHFlaUNHS1JxTkY4MUM0MkhLaEJTLVZpb0pjMUhqM2ItbnRVdTV6U2J4Q2lSNHpucEs5N05jb1NTT0pUbWdhM2s4NkEwMUtNNFBqc3dMVk44eGZHUWpqZ1lnam5YNEtLenM5aTdjTEUyMDJTTU9GVE1KUmJCTVlsbWJMU1prYzZnUWVKbWIxaTBhOVhKWnBtTk9TY0szc2d4YzcxaFJJQXdyVmVXMzVVZw?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="brasil pode ser potência global de saf, o biocombustível de aviação, diz entidade"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">08/06 07:00 UTC</span>
+      </div>
+      <div class="news-title">Brasil pode ser potência global de SAF, o biocombustível de aviação, diz entidade</div>
+      <div class="news-desc">Brasil pode ser potência global de SAF, o biocombustível de aviação, diz entidade&amp;nbsp;&amp;nbsp;O Globo…</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · O Globo</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1046,7 +962,7 @@
       <div class="news-title">ABS Calls for More Flexible IMO Decarbonization Framework</div>
       <div class="news-desc">ABS Calls for More Flexible IMO Decarbonization Framework&amp;nbsp;&amp;nbsp;gCaptain…</div>
       <div class="news-footer">
-        <span class="news-source">gCaptain</span>
+        <span class="news-source">🌐 Global · gCaptain</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1060,7 +976,7 @@
       <div class="news-title">Energy Summit 2026 debate hidrogênio verde e descarbonização marítima</div>
       <div class="news-desc">Energy Summit 2026 debate hidrogênio verde e descarbonização marítima&amp;nbsp;&amp;nbsp;Portal Radar…</div>
       <div class="news-footer">
-        <span class="news-source">Portal Radar</span>
+        <span class="news-source">🌐 Global · Portal Radar</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1074,21 +990,35 @@
       <div class="news-title">Energy Summit 2026 terá painel sobre hidrogênio verde e descarbonização marítima</div>
       <div class="news-desc">Energy Summit 2026 terá painel sobre hidrogênio verde e descarbonização marítima&amp;nbsp;&amp;nbsp;kondzilla.com…</div>
       <div class="news-footer">
-        <span class="news-source">kondzilla.com</span>
+        <span class="news-source">🌐 Global · kondzilla.com</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxNZFdfckVFRzVRSWdtSURDVmw4TEljSG1nOGotQnhBQnlYNV9TdmxMNmRVa3F6TnhxMHFFNlZ2MWJxejdCTjJ4cVZfWVJFUS1OMVJPMEZYdmNHcWVWZ3EzZFJKR29sV0EwdjJqWUFONXdIcjV5SkQ0ZF9mOGdqTEdtb0JOOFg5bjRUc25hN2xmUTVzSVNncFZ4M2lZaWlmMFJZTDh3YlRaNXBIUQ?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="iata launches supporting alliance for corsia eeu supply"
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMirAFBVV95cUxQM01nMU1UajJqOHJNcEJQdU1rTU92ZmFBb0VNVWFMeHp5TlktMFNPSllWbEZRRU1KY0F3bjJ0WnllTlh6VGlmcVlieDBkeXdFWjdyY0JZcnM0NHlUeThqdFk0ZUVqWkY5bjR3RVQ1cmxNMW5kWkRHYUlBLUlxVk9KYnBXOThTWE55NGU4MG9QUVRGTVVvVHRySmNCQmktUHhBVGxmQm8zbTR3M1gw0gGyAUFVX3lxTE0yNXR1V0NtSjZfNm5mTDBJVFJ0Skw5ejg4dG9hU0VHM01fbk9nZUIxTzNzRzlUd2RpQUVZcWQ3TVViejNmcHVzVjBzYlpzRXJvQl9CZ1otZVB1X3BvUGNDS2pSU1U1RmMyVmJqZGFrNm1mVWNsR2hUdmFBN1pBZ0h4VHBFQVVCdDRPU29SRXFrVGJCOFZjYkgwdkxnU0thM1VsWFV4ek5uV3BST2VLV01Pc1E?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="brasil está em posição de liderar produção de combustível sustentável de aviação, diz alckmin"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">06/06 07:00 UTC</span>
+        <span class="news-time">07/06 07:00 UTC</span>
       </div>
-      <div class="news-title">IATA Launches Supporting Alliance for CORSIA EEU Supply</div>
-      <div class="news-desc">IATA Launches Supporting Alliance for CORSIA EEU Supply&amp;nbsp;&amp;nbsp;IATA…</div>
+      <div class="news-title">Brasil está em posição de liderar produção de combustível sustentável de aviação, diz Alckmin</div>
+      <div class="news-desc">Brasil está em posição de liderar produção de combustível sustentável de aviação, diz Alckmin&amp;nbsp;&amp;nbsp;Estadão…</div>
       <div class="news-footer">
-        <span class="news-source">IATA</span>
+        <span class="news-source">🇧🇷 Brasil · Estadão</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMi6gFBVV95cUxPM3hnZFNjbk5nRmJhMEw1cG9pazR1MDhQcEFGUndjdFFmTnBnQnpzZk05alNWblZFYUFGNFhpLXJQblFwWjNoMlNVUllSYUdPWlY5VzAwNUNwejMxei1QN1Iwd2wwQl9lVUd2VlhKREJEV1A3N29Bemp2a2pwczdITlJLQ0NTd3o4LXVBdWZxalE5ZGQ3eXpnSllNV2hCSjg5Q2UwWDZLT3lJTUdMS1Fhd2wtekhIQzRENlczWGE3a21ycVQtZFBZa3hQTGxLeW1HalhTcTB0cW5MN2xmNUNydkdNSzNWTHo5bFHSAfgBQVVfeXFMTVdOVkt5SW1TcFZLdHdwVVFKQjRGSW5ydEJnRkg0UjZJV3psMHlGbDJyeUhER0pWVVF3alctcHhUTEhrUy1yWnJ2Qktadzh6LVlRYnlJWklGUk9DMEM1X25EWmowaTItMWo3dUpvVWRfYnRaU2dCMzl5Y3VwaVFOVV9fbE9aNWdZMUVGaTRwejRQZkFEMnRnQ19vTlJhTzRiUmp6UlNpb1JaZjdxLTJ5S3JOamVVenBCY2JCT2s5VkgzVUJfMUdzd0ctOXNlU3pySkVHbllBem1JdGhQRlc3el96enJURzFjWS1KTWJranYzVUtzVlJxUE0?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="brasil pode ter a maior fábrica do mundo de saf de etanol para aviação, da americana jetbio"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">02/06 07:00 UTC</span>
+      </div>
+      <div class="news-title">Brasil pode ter a maior fábrica do mundo de SAF de etanol para aviação, da americana JetBio</div>
+      <div class="news-desc">Brasil pode ter a maior fábrica do mundo de SAF de etanol para aviação, da americana JetBio&amp;nbsp;&amp;nbsp;O Globo…</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · O Globo</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1102,7 +1032,21 @@
       <div class="news-title">U.S. marine biofuel hopes build despite uncertain global market - Agri-Pulse</div>
       <div class="news-desc">U.S. marine biofuel hopes build despite uncertain global market&amp;nbsp;&amp;nbsp;Agri-Pulse…</div>
       <div class="news-footer">
-        <span class="news-source">Agri-Pulse</span>
+        <span class="news-source">🇺🇸 EUA · Agri-Pulse</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMitAFBVV95cUxPbU54a0FKQmZDM3JNUngyM3lkVEpiVnNtYUpPMUJVUGFqTHNfNXVZb2dreUFmcV8wUS1xMEVueUppMUV4cGJtQWhDVjBsTm9WWlpCR3ZvVVQ4c0tWRmdUNjVIWlJvZ0ZWdEMyckZGeVJzYWlrZTI3T082RzZ5VEN3S1pibWhMTUhpZ2dSSVFiMU53RWY3UXp4dWhNeVFXUjlGdlNfYmxIeS1qa2JKWFBsUXU0bGI?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="navigating article 6.2 and corsia: an overview of verra&#x27;s updated label guidance documents"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">20/05 07:00 UTC</span>
+      </div>
+      <div class="news-title">Navigating Article 6.2 and CORSIA: An Overview of Verra&#x27;s Updated Label Guidance Documents</div>
+      <div class="news-desc">Navigating Article 6.2 and CORSIA: An Overview of Verra&#x27;s Updated Label Guidance Documents&amp;nbsp;&amp;nbsp;Verra…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · Verra</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1116,7 +1060,7 @@
       <div class="news-title">Norueguesa Odfjell inaugura corredor verde com biobunker da Petrobras</div>
       <div class="news-desc">Norueguesa Odfjell inaugura corredor verde com biobunker da Petrobras&amp;nbsp;&amp;nbsp;Agência eixos…</div>
       <div class="news-footer">
-        <span class="news-source">Agência eixos</span>
+        <span class="news-source">🇧🇷 Brasil · Agência eixos</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1130,7 +1074,21 @@
       <div class="news-title">PBIO amplia sinergia com Petrobras e mira mercado de biobunker</div>
       <div class="news-desc">PBIO amplia sinergia com Petrobras e mira mercado de biobunker&amp;nbsp;&amp;nbsp;Agência eixos…</div>
       <div class="news-footer">
-        <span class="news-source">Agência eixos</span>
+        <span class="news-source">🇧🇷 Brasil · Agência eixos</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiggFBVV95cUxQN2N4ZFg1ZF9YZ2hTNDBScGJCUTB2ejBWQld2RF9uakFEc2htdXpQd01CVVE2R3FHM3JWRE9fWTU4TVJUNnlWYnZpNDhsZGU4Y0JLU1p1Unh6dmJKUDdZUE01aHBlQk1Hck02clBSVnhhbmlUdHdOTjJjXzNYQ0xLeXpn?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="corsia update: icao approves two new programmes as eu mulls specific requirements for its airlines"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">30/04 07:00 UTC</span>
+      </div>
+      <div class="news-title">CORSIA update: ICAO approves two new programmes as EU mulls specific requirements for its airlines</div>
+      <div class="news-desc">CORSIA update: ICAO approves two new programmes as EU mulls specific requirements for its airlines&amp;nbsp;&amp;nbsp;Abatable…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · Abatable</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1144,7 +1102,7 @@
       <div class="news-title">MME analisa incluir combustível marítimo sustentável no RenovaBio</div>
       <div class="news-desc">MME analisa incluir combustível marítimo sustentável no RenovaBio&amp;nbsp;&amp;nbsp;JOTA…</div>
       <div class="news-footer">
-        <span class="news-source">JOTA</span>
+        <span class="news-source">🇧🇷 Brasil · JOTA</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1158,7 +1116,7 @@
       <div class="news-title">US Proposes Ethanol-Bunker Friendly Change to IMO Biofuel Rules</div>
       <div class="news-desc">US Proposes Ethanol-Bunker Friendly Change to IMO Biofuel Rules&amp;nbsp;&amp;nbsp;Ship &amp; Bunker…</div>
       <div class="news-footer">
-        <span class="news-source">Ship &amp; Bunker</span>
+        <span class="news-source">🌐 Global · Ship &amp; Bunker</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1172,7 +1130,7 @@
       <div class="news-title">Africa Searches for a Common Position in IMO Decarbonization Negotiations</div>
       <div class="news-desc">Africa Searches for a Common Position in IMO Decarbonization Negotiations&amp;nbsp;&amp;nbsp;The Maritime Executive…</div>
       <div class="news-footer">
-        <span class="news-source">The Maritime Executive</span>
+        <span class="news-source">🌐 Global · The Maritime Executive</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1186,7 +1144,21 @@
       <div class="news-title">O etanol brasileiro na rota da descarbonização marítima global</div>
       <div class="news-desc">O etanol brasileiro na rota da descarbonização marítima global&amp;nbsp;&amp;nbsp;Movimento Econômico…</div>
       <div class="news-footer">
-        <span class="news-source">Movimento Econômico</span>
+        <span class="news-source">🇧🇷 Brasil · Movimento Econômico</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMipgFBVV95cUxPMGJhOU9kLXhHZnEwQllXdGhkU1VyTU8xRm9YaWtiMGhZbmt3cmZuZEptamtkQWVWdlBWMHZEOFAwa3VvdUw5QXdfbjktTDBjOXI1bUxZZGRCYWRMVS0wNWJZNXBzV19yaFA4WGZOWVNvbzdjaFlMQXE3UWhWRHpNdGZqQV90ZGUwOG9oTXZ6N2MzTnVYSXA2UGVqVGZ2cHplOHMxRGdR?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="with or without penalties, corsia doesn’t score for the climate"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">04/03 08:00 UTC</span>
+      </div>
+      <div class="news-title">With or without penalties, CORSIA doesn’t score for the climate</div>
+      <div class="news-desc">With or without penalties, CORSIA doesn’t score for the climate&amp;nbsp;&amp;nbsp;Carbon Market Watch…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · Carbon Market Watch</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1200,7 +1172,7 @@
       <div class="news-title">China launches first marine biofuel blending pilot in Zhoushan</div>
       <div class="news-desc">China launches first marine biofuel blending pilot in Zhoushan&amp;nbsp;&amp;nbsp;S&amp;amp;P Global…</div>
       <div class="news-footer">
-        <span class="news-source">S&amp;P Global</span>
+        <span class="news-source">🇨🇳 China · S&amp;P Global</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1214,7 +1186,21 @@
       <div class="news-title">Petrobras Signs Historic Marine Biofuel Supply Deal With Odfjell</div>
       <div class="news-desc">Petrobras Signs Historic Marine Biofuel Supply Deal With Odfjell&amp;nbsp;&amp;nbsp;Yahoo Finance…</div>
       <div class="news-footer">
-        <span class="news-source">Yahoo Finance</span>
+        <span class="news-source">🇧🇷 Brasil · Yahoo Finance</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMi2AFBVV95cUxNY1NfZHFDUWlaUEloR0tVMTRId2NPZUZJR012elJSSWd4dF9aQ0pxSkFDcTJSWUdBcUVJbUF0bHRKVjlQZG0tYjFiUThVQXFKWk5BSktocnJkbG5YUmdXYk91Y2t4bGNUQW5jYkViUGt6Tm1lUTRfRFR4cVZuLThBTmx2MnhORGJSMlNlSnVxN3pYRGVXTGFCZmxZMWNfVlhZVEpTVGJTYUhCYUJrdVpyc05rWEpZOVJPb3hrR3BzdGR3cDJDVkViUkJHYTZPSWRLTlRQOUpKYkU?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="petrobras lança combustível sustentável de aviação produzido totalmente no brasil"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">05/12 08:00 UTC</span>
+      </div>
+      <div class="news-title">Petrobras lança combustível sustentável de aviação produzido totalmente no Brasil</div>
+      <div class="news-desc">Petrobras lança combustível sustentável de aviação produzido totalmente no Brasil&amp;nbsp;&amp;nbsp;Agência Petrobras de Notícias…</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · Agência Petrobras de Notícias</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1228,7 +1214,7 @@
       <div class="news-title">Portuários são certificados em programa global de descarbonização marítima</div>
       <div class="news-desc">Portuários são certificados em programa global de descarbonização marítima&amp;nbsp;&amp;nbsp;Administração dos Portos de Paranaguá e Antonina…</div>
       <div class="news-footer">
-        <span class="news-source">Administração dos Portos de Paranaguá e Antonina</span>
+        <span class="news-source">🌐 Global · Administração dos Portos de Paranaguá e Antonina</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1242,7 +1228,7 @@
       <div class="news-title">Brasil poderá liderar a descarbonização marítima global</div>
       <div class="news-desc">Brasil poderá liderar a descarbonização marítima global&amp;nbsp;&amp;nbsp;CNN Brasil…</div>
       <div class="news-footer">
-        <span class="news-source">CNN Brasil</span>
+        <span class="news-source">🇧🇷 Brasil · CNN Brasil</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1256,7 +1242,7 @@
       <div class="news-title">Etanol pode crescer 9,2 vezes com SAF, biobunker e bioplásticos, aponta especialista</div>
       <div class="news-desc">Etanol pode crescer 9,2 vezes com SAF, biobunker e bioplásticos, aponta especialista&amp;nbsp;&amp;nbsp;Cana Online…</div>
       <div class="news-footer">
-        <span class="news-source">Cana Online</span>
+        <span class="news-source">🌐 Global · Cana Online</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
