@@ -38,8 +38,8 @@ FEEDS = [
         "label": "SAF",
         "lang": "pt",
         "query": (
-            '"combustível sustentável de aviação" OR "SAF" OR "querosene sustentável" '
-            'OR "etanol para aviação" OR "biocombustível de aviação"'
+            '"combustível sustentável de aviação" OR "SAF aviação" OR "querosene sustentável" '
+            'OR "etanol para aviação" OR "biocombustível de aviação" OR "SAF combustível"'
         ),
     },
 
@@ -123,6 +123,71 @@ def fmt_date(parsed_time) -> str:
     return dt.strftime("%d/%m %H:%M UTC")
 
 
+# Palavras que indicam que a notícia é sobre futebol (SAF = Sociedade Anônima
+# do Futebol no Brasil), e não sobre Sustainable Aviation Fuel.
+FOOTBALL_BLOCKLIST = [
+    "futebol", "clube", "campeonato", "técnico", "jogador", "estádio",
+    "libertadores", "brasileirão", "copa", "futebolístic", "atlético",
+    "flamengo", "corinthians", "palmeiras", "vasco", "botafogo",
+    "fluminense", "grêmio", "internacional", "cruzeiro", "athletico",
+    "bahia", "fortaleza", "vitória", "soccer", "football club",
+    "midfielder", "striker", "manager sacked", "premier league",
+    "champions league", "transfer window",
+]
+
+
+def is_football_noise(title: str, summary: str) -> bool:
+    text = f"{title} {summary}".lower()
+    return any(word in text for word in FOOTBALL_BLOCKLIST)
+
+
+# ── Detecção de país pelo conteúdo da notícia ──
+# Cada país tem: bandeira, nome de exibição, e palavras-chave que o identificam
+# (nomes do país, gentílicos, órgãos/empresas nacionais relevantes ao setor).
+COUNTRY_RULES = [
+    ("🇧🇷", "Brasil",        ["brasil", "brazil", "brazilian", "petrobras", "anp ", "renovabio",
+                               "embraer", "raízen", "ubrabio", "abraba", "são paulo", "rio de janeiro"]),
+    ("🇺🇸", "EUA",           ["united states", " u.s.", "usa", "american", "faa", "epa ",
+                               "washington", "california", "texas", "boeing", "delta air"]),
+    ("🇪🇺", "União Europeia", ["european union", "eu commission", "brussels", "refueleu", "eu parliament"]),
+    ("🇬🇧", "Reino Unido",    ["uk ", "united kingdom", "britain", "british", "london"]),
+    ("🇩🇪", "Alemanha",       ["germany", "german", "berlin", "lufthansa"]),
+    ("🇫🇷", "França",         ["france", "french", "paris", "total energies", "airbus"]),
+    ("🇳🇱", "Países Baixos",  ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
+    ("🇪🇸", "Espanha",        ["spain", "spanish", "madrid", "repsol"]),
+    ("🇨🇳", "China",          ["china", "chinese", "beijing", "sinopec"]),
+    ("🇯🇵", "Japão",          ["japan", "japanese", "tokyo", "ana holdings", "jal "]),
+    ("🇮🇳", "Índia",          ["india", "indian", "delhi", "indianoil"]),
+    ("🇸🇬", "Singapura",      ["singapore", "singaporean"]),
+    ("🇦🇺", "Austrália",      ["australia", "australian", "qantas", "sydney"]),
+    ("🇨🇦", "Canadá",         ["canada", "canadian", "toronto", "air canada"]),
+    ("🇦🇪", "Emirados Árabes", ["uae", "emirates", "dubai", "abu dhabi"]),
+    ("🇸🇦", "Arábia Saudita", ["saudi arabia", "saudi", "aramco"]),
+    ("🇮🇩", "Indonésia",      ["indonesia", "indonesian", "jakarta"]),
+    ("🇰🇷", "Coreia do Sul",  ["south korea", "korean", "seoul"]),
+    ("🇻🇳", "Vietnã",         ["vietnam", "vietnamese", "hanoi", "ho chi minh"]),
+    ("🇹🇭", "Tailândia",      ["thailand", "thai ", "bangkok"]),
+    ("🇲🇾", "Malásia",        ["malaysia", "malaysian", "kuala lumpur", "petronas"]),
+    ("🇵🇭", "Filipinas",      ["philippines", "filipino", "manila"]),
+    ("🇵🇰", "Paquistão",      ["pakistan", "pakistani", "islamabad", "karachi"]),
+    ("🇧🇩", "Bangladesh",     ["bangladesh", "dhaka"]),
+    ("🇹🇼", "Taiwan",         ["taiwan", "taiwanese", "taipei"]),
+    ("🇲🇽", "México",         ["mexico", "mexican"]),
+    ("🇦🇷", "Argentina",      ["argentina", "argentine", "buenos aires"]),
+    ("🇮🇹", "Itália",         ["italy", "italian", "rome", "eni "]),
+    ("🇳🇴", "Noruega",        ["norway", "norwegian"]),
+]
+
+
+def detect_country(title: str, summary: str):
+    text = f" {title} {summary} ".lower()
+    for flag, name, keywords in COUNTRY_RULES:
+        for kw in keywords:
+            if kw in text:
+                return flag, name
+    return "🌐", "Global"
+
+
 def normalize_title(title: str) -> str:
     """Normaliza o título para detectar notícias duplicadas vindas de fontes diferentes."""
     t = title.lower().strip()
@@ -158,12 +223,18 @@ def fetch_news():
             if norm in seen_titles:
                 continue
 
+            summary = entry.get("summary", "")
+            summary = re.sub(r"<[^>]+>", "", summary).strip()
+
+            # Filtra ruído de "SAF" = Sociedade Anônima do Futebol
+            if feed_cfg["cat"] == "saf" and is_football_noise(title, summary):
+                continue
+
             seen_urls.add(link)
             seen_titles.add(norm)
 
             source = extract_source(raw_title, entry)
-            summary = entry.get("summary", "")
-            summary = re.sub(r"<[^>]+>", "", summary).strip()
+            flag, country = detect_country(title, summary)
 
             all_items.append({
                 "title": title,
@@ -173,6 +244,8 @@ def fetch_news():
                 "date_str": fmt_date(entry.get("published_parsed")),
                 "date_sort": entry.get("published_parsed") or (0,) * 9,
                 "category": feed_cfg["cat"],
+                "flag": flag,
+                "country": country,
             })
 
     # Sort newest first
@@ -205,7 +278,7 @@ def render_html(items):
       <div class="news-title">{html.escape(item['title'])}</div>
       {f'<div class="news-desc">{html.escape(item["summary"])}…</div>' if item['summary'] else ''}
       <div class="news-footer">
-        <span class="news-source">{html.escape(item['source'])}</span>
+        <span class="news-source">{item['flag']} {html.escape(item['country'])} · {html.escape(item['source'])}</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>"""
@@ -279,8 +352,8 @@ def render_html(items):
   .news-time{{font-size:11px;color:var(--text3);margin-left:auto}}
   .news-title{{font-size:14px;font-weight:500;line-height:1.45;margin-bottom:8px}}
   .news-desc{{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:10px}}
-  .news-footer{{display:flex;align-items:center}}
-  .news-source{{font-size:11px;color:var(--text3)}}
+  .news-footer{{display:flex;align-items:center;gap:8px;flex-wrap:wrap}}
+  .news-source{{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:75%}}
   .news-read{{font-size:11px;color:var(--accent-l);margin-left:auto}}
 
   .empty{{padding:60px 20px;text-align:center;color:var(--text2)}}
