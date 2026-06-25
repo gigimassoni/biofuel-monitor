@@ -132,7 +132,7 @@ FOOTBALL_BLOCKLIST = [
     "fluminense", "grêmio", "internacional", "cruzeiro", "athletico",
     "bahia", "fortaleza", "vitória", "soccer", "football club",
     "midfielder", "striker", "manager sacked", "premier league",
-    "champions league", "transfer window",
+    "champions league","Sociedade Anônima do Futebol no Brasil" "transfer window",
 ]
 
 
