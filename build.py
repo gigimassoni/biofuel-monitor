@@ -6,12 +6,12 @@ no Google News e gera um arquivo index.html estático.
 Roda sozinho via GitHub Actions todo dia, sem precisar de chave de API.
 """
 
+import feedparser
 import html
 import re
 import urllib.request
 from datetime import datetime, timezone
 from urllib.parse import quote
-import feedparser
 
 # Google News blocks requests without a browser-like User-Agent
 HEADERS = {
@@ -19,89 +19,82 @@ HEADERS = {
                   "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 }
 
+# ── Configuração dos temas e queries de busca ──
+# Cada tema tem buscas separadas em inglês (mundo) e português (Brasil),
+# para cobrir tanto fontes internacionais quanto nacionais.
 FEEDS = [
     # ───────── SAF (Sustainable Aviation Fuel) ─────────
     {
         "cat": "saf",
         "label": "SAF",
         "lang": "en",
-        "query": '"sustainable aviation fuel" OR "SAF mandate" OR "aviation biofuel" OR "SAF ATJ" OR "alcohol to jet" OR "SAF production" OR "jet biofuel"',
+        "query": (
+            '"sustainable aviation fuel" OR "SAF mandate" OR "aviation biofuel" '
+            'OR "SAF ATJ" OR "alcohol to jet" OR "SAF production" OR "jet biofuel"'
+        ),
     },
     {
         "cat": "saf",
         "label": "SAF",
         "lang": "pt",
-        "query": '"combustível sustentável de aviação" OR "SAF aviação" OR "querosene sustentável" OR "etanol para aviação" OR "biocombustível de aviação" OR "SAF combustível"',
+        "query": (
+            '"combustível sustentável de aviação" OR "SAF aviação" OR "querosene sustentável" '
+            'OR "etanol para aviação" OR "biocombustível de aviação" OR "SAF combustível"'
+        ),
     },
-    # ───────── Biobunker ─────────
+
+    # ───────── Biobunker (combustível marítimo sustentável) ─────────
     {
         "cat": "bio",
         "label": "Biobunker",
         "lang": "en",
-        "query": '"biobunker" OR "marine biofuel" OR "bio-bunker" OR "green shipping fuel" OR "ethanol shipping fuel" OR "IMO biofuel" OR "IMO decarbonization" OR "maritime ethanol fuel" OR "shipping ethanol"',
+        "query": (
+            '"biobunker" OR "marine biofuel" OR "bio-bunker" OR "green shipping fuel" '
+            'OR "ethanol shipping fuel" OR "IMO biofuel" OR "IMO decarbonization" '
+            'OR "maritime ethanol fuel" OR "shipping ethanol"'
+        ),
     },
     {
         "cat": "bio",
         "label": "Biobunker",
         "lang": "pt",
-        "query": '"biobunker" OR "combustível marítimo sustentável" OR "etanol marítimo" OR "etanol para navios" OR "descarbonização marítima" OR "IMO biocombustível"',
+        "query": (
+            '"biobunker" OR "combustível marítimo sustentável" OR "etanol marítimo" '
+            'OR "etanol para navios" OR "descarbonização marítima" OR "IMO biocombustível"'
+        ),
     },
-    # ───────── Blending ─────────
+
+    # ───────── Blending (mandatos de mistura — etanol na gasolina) ─────────
     {
         "cat": "blend",
         "label": "Blending",
         "lang": "en",
-        "query": '"ethanol blending mandate" OR "ethanol gasoline blend" OR "E10" OR "E15" OR "E20" OR "E25" OR "ethanol blending requirement" OR "gasoline ethanol mandate"',
+        "query": (
+            '"ethanol blending mandate" OR "ethanol gasoline blend" OR "E10" OR "E15" OR "E20" OR "E25" '
+            'OR "ethanol blending requirement" OR "gasoline ethanol mandate"'
+        ),
     },
     {
         "cat": "blend",
         "label": "Blending",
         "lang": "pt",
-        "query": '"mistura de etanol na gasolina" OR "mandato de mistura etanol" OR "mistura obrigatória etanol" OR "RenovaBio mistura etanol" OR "percentual de etanol na gasolina" OR "ANP mistura etanol"',
+        "query": (
+            '"mistura de etanol na gasolina" OR "mandato de mistura etanol" OR "mistura obrigatória etanol" '
+            'OR "RenovaBio mistura etanol" OR "percentual de etanol na gasolina" '
+            'OR "ANP mistura etanol"'
+        ),
     },
-    # ───────── Regulação internacional ─────────
+
+    # ───────── Regulação internacional (CORSIA / mandatos de SAF por país) ─────────
     {
         "cat": "saf",
-        "label": "SAF Intl",
+        "label": "SAF",
         "lang": "en",
         "query": '"CORSIA" OR "ReFuelEU aviation" OR "national SAF mandate" OR "SAF policy"',
     },
 ]
 
 MAX_PER_FEED = 12
-
-FOOTBALL_BLOCKLIST = [
-    "futebol", "clube", "campeonato", "técnico", "jogador", "estádio",
-    "libertadores", "brasileirão", "copa", "futebolístic", "atlético",
-    "flamengo", "corinthians", "palmeiras", "vasco", "botafogo",
-    "fluminense", "grêmio", "internacional", "cruzeiro", "athletico",
-    "bahia", "fortaleza", "vitória", "soccer", "football club",
-    "midfielder", "striker", "manager sacked", "premier league",
-    "champions league", "transfer window",
-]
-
-COUNTRY_RULES = [
-    ("🇧🇷", "Brasil", ["brasil", "brazil", "brazilian", "petrobras", "anp ", "renovabio", "embraer", "raízen", "ubrabio", "abraba", "são paulo", "rio de janeiro"]),
-    ("🇺🇸", "EUA", ["united states", " u.s.", "usa", "american", "faa", "epa ", "washington", "california", "texas", "boeing", "delta air"]),
-    ("🇪🇺", "União Europeia", ["european union", "eu commission", "brussels", "refueleu", "eu parliament"]),
-    ("🇬🇧", "Reino Unido", ["uk ", "united kingdom", "britain", "british", "london"]),
-    ("🇩🇪", "Alemanha", ["germany", "german", "berlin", "lufthansa"]),
-    ("🇫🇷", "França", ["france", "french", "paris", "total energies", "airbus"]),
-    ("🇳🇱", "Países Baixos", ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
-    ("🇪🇸", "Espanha", ["spain", "spanish", "madrid", "repsol"]),
-    ("🇨🇳", "China", ["china", "chinese", "beijing", "sinopec"]),
-    ("🇯🇵", "Japão", ["japan", "japanese", "tokyo", "ana holdings", "jal "]),
-    ("🇮🇳", "Índia", ["india", "indian", "delhi", "indianoil"]),
-    ("🇸🇬", "Singapura", ["singapore", "singaporean"]),
-    ("🇦🇺", "Austrália", ["australia", "australian", "qantas", "sydney"]),
-    ("🇨🇦", "Canadá", ["canada", "canadian", "toronto", "air canada"]),
-    ("🇦🇪", "Emirados Árabes", ["uae", "emirates", "dubai", "abu dhabi"]),
-    ("🇸🇦", "Arábia Saudita", ["saudi arabia", "saudi", "aramco"]),
-    ("🇮🇩", "Indonésia", ["indonesia", "indonesian", "jakarta"]),
-    ("🇰🇷", "Coreia do Sul", ["south korea", "korean", "seoul"]),
-    ("🇮🇹", "Itália", ["italy", "italian", "rome", "eni "]),
-    ("🇳🇴", "Noruega", ["norway", "norwegian"]),
-]
 
 
 def build_feed_url(query: str, lang: str = "en") -> str:
@@ -112,6 +105,7 @@ def build_feed_url(query: str, lang: str = "en") -> str:
 
 
 def clean_title(title: str) -> str:
+    # Google News titles often end with " - Source Name"
     return re.sub(r" - [^-]{2,60}$", "", title).strip()
 
 
@@ -129,23 +123,77 @@ def fmt_date(parsed_time) -> str:
     return dt.strftime("%d/%m %H:%M UTC")
 
 
+# Palavras que indicam que a notícia é sobre futebol (SAF = Sociedade Anônima
+# do Futebol no Brasil), e não sobre Sustainable Aviation Fuel.
+FOOTBALL_BLOCKLIST = [
+    "futebol", "clube", "campeonato", "técnico", "jogador", "estádio",
+    "libertadores", "brasileirão", "copa", "futebolístic", "atlético",
+    "flamengo", "corinthians", "palmeiras", "vasco", "botafogo",
+    "fluminense", "grêmio", "internacional", "cruzeiro", "athletico",
+    "bahia", "fortaleza", "vitória", "soccer", "football club",
+    "midfielder", "striker", "manager sacked", "premier league",
+    "champions league", "transfer window",
+]
+
+
 def is_football_noise(title: str, summary: str) -> bool:
     text = f"{title} {summary}".lower()
     return any(word in text for word in FOOTBALL_BLOCKLIST)
 
 
+# ── Detecção de país pelo conteúdo da notícia ──
+# Cada país tem: bandeira, nome de exibição, e palavras-chave que o identificam
+# (nomes do país, gentílicos, órgãos/empresas nacionais relevantes ao setor).
+COUNTRY_RULES = [
+    ("🇧🇷", "Brasil",        ["brasil", "brazil", "brazilian", "petrobras", "anp ", "renovabio",
+                               "embraer", "raízen", "ubrabio", "abraba", "são paulo", "rio de janeiro"]),
+    ("🇺🇸", "EUA",           ["united states", " u.s.", "usa", "american", "faa", "epa ",
+                               "washington", "california", "texas", "boeing", "delta air"]),
+    ("🇪🇺", "União Europeia", ["european union", "eu commission", "brussels", "refueleu", "eu parliament"]),
+    ("🇬🇧", "Reino Unido",    ["uk ", "united kingdom", "britain", "british", "london"]),
+    ("🇩🇪", "Alemanha",       ["germany", "german", "berlin", "lufthansa"]),
+    ("🇫🇷", "França",         ["france", "french", "paris", "total energies", "airbus"]),
+    ("🇳🇱", "Países Baixos",  ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
+    ("🇪🇸", "Espanha",        ["spain", "spanish", "madrid", "repsol"]),
+    ("🇨🇳", "China",          ["china", "chinese", "beijing", "sinopec"]),
+    ("🇯🇵", "Japão",          ["japan", "japanese", "tokyo", "ana holdings", "jal "]),
+    ("🇮🇳", "Índia",          ["india", "indian", "delhi", "indianoil"]),
+    ("🇸🇬", "Singapura",      ["singapore", "singaporean"]),
+    ("🇦🇺", "Austrália",      ["australia", "australian", "qantas", "sydney"]),
+    ("🇨🇦", "Canadá",         ["canada", "canadian", "toronto", "air canada"]),
+    ("🇦🇪", "Emirados Árabes", ["uae", "emirates", "dubai", "abu dhabi"]),
+    ("🇸🇦", "Arábia Saudita", ["saudi arabia", "saudi", "aramco"]),
+    ("🇮🇩", "Indonésia",      ["indonesia", "indonesian", "jakarta"]),
+    ("🇰🇷", "Coreia do Sul",  ["south korea", "korean", "seoul"]),
+    ("🇻🇳", "Vietnã",         ["vietnam", "vietnamese", "hanoi", "ho chi minh"]),
+    ("🇹🇭", "Tailândia",      ["thailand", "thai ", "bangkok"]),
+    ("🇲🇾", "Malásia",        ["malaysia", "malaysian", "kuala lumpur", "petronas"]),
+    ("🇵🇭", "Filipinas",      ["philippines", "filipino", "manila"]),
+    ("🇵🇰", "Paquistão",      ["pakistan", "pakistani", "islamabad", "karachi"]),
+    ("🇧🇩", "Bangladesh",     ["bangladesh", "dhaka"]),
+    ("🇹🇼", "Taiwan",         ["taiwan", "taiwanese", "taipei"]),
+    ("🇲🇽", "México",         ["mexico", "mexican"]),
+    ("🇦🇷", "Argentina",      ["argentina", "argentine", "buenos aires"]),
+    ("🇮🇹", "Itália",         ["italy", "italian", "rome", "eni "]),
+    ("🇳🇴", "Noruega",        ["norway", "norwegian"]),
+]
+
+
 def detect_country(title: str, summary: str):
     text = f" {title} {summary} ".lower()
     for flag, name, keywords in COUNTRY_RULES:
-        if any(kw in text for kw in keywords):
-            return flag, name
+        for kw in keywords:
+            if kw in text:
+                return flag, name
     return "🌐", "Global"
 
 
 def normalize_title(title: str) -> str:
+    """Normaliza o título para detectar notícias duplicadas vindas de fontes diferentes."""
     t = title.lower().strip()
-    t = re.sub(r"[^\w\s]", "", t)
-    return re.sub(r"\s+", " ", t)
+    t = re.sub(r"[^\w\s]", "", t)   # remove pontuação
+    t = re.sub(r"\s+", " ", t)      # espaços múltiplos
+    return t
 
 
 def fetch_news():
@@ -159,9 +207,9 @@ def fetch_news():
         try:
             with urllib.request.urlopen(req, timeout=15) as resp:
                 raw_data = resp.read()
-                parsed = feedparser.parse(raw_data)
+            parsed = feedparser.parse(raw_data)
         except Exception as e:
-            print(f" Aviso: falha ao buscar feed '{feed_cfg['label']}': {e}")
+            print(f"  Aviso: falha ao buscar feed '{feed_cfg['label']}': {e}")
             continue
 
         for entry in parsed.entries[:MAX_PER_FEED]:
@@ -178,6 +226,7 @@ def fetch_news():
             summary = entry.get("summary", "")
             summary = re.sub(r"<[^>]+>", "", summary).strip()
 
+            # Filtra ruído de "SAF" = Sociedade Anônima do Futebol
             if feed_cfg["cat"] == "saf" and is_football_noise(title, summary):
                 continue
 
@@ -199,6 +248,7 @@ def fetch_news():
                 "country": country,
             })
 
+    # Sort newest first
     all_items.sort(key=lambda x: x["date_sort"], reverse=True)
     return all_items
 
@@ -263,8 +313,8 @@ def render_html(items):
   body{{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}}
 
   .header{{padding:28px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}}
-  .header-title{{font-size:24px;font-weight:700;line-height:1.2;letter-spacing:-.5px}}
-  .updated{{font-size:12px;color:var(--text3);margin-top:8px}}
+  .header-title{{font-size:32px;font-weight:700;line-height:1.1;letter-spacing:-.5px}}
+  .updated{{font-size:12px;color:var(--text3);margin-top:6px}}
 
   .search-wrap{{padding:0 20px 16px}}
   .search-box{{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}}
@@ -309,4 +359,92 @@ def render_html(items):
   .empty{{padding:60px 20px;text-align:center;color:var(--text2)}}
   .empty-icon{{font-size:40px;margin-bottom:14px;opacity:.3}}
   .empty-title{{font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px}}
-  .empty-desc{{font-size:13px;line-height:1.6;max-width:300px;margin:0
+  .empty-desc{{font-size:13px;line-height:1.6;max-width:300px;margin:0 auto}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">Todas<br>as<br>Notícias</div>
+    <div class="updated">Atualizado em {now}</div>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="search-input" placeholder="Buscar..." oninput="renderCards()"/>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-card" id="sc-saf" onclick="setFilter('saf')">
+    <div class="stat-head"><span class="stat-dot" style="background:var(--saf)"></span><span class="stat-label">SAF</span></div>
+    <div class="stat-num">{counts['saf']}</div><div class="stat-sub">notícias</div>
+  </div>
+  <div class="stat-card" id="sc-bio" onclick="setFilter('bio')">
+    <div class="stat-head"><span class="stat-dot" style="background:var(--blend)"></span><span class="stat-label">Biobunker</span></div>
+    <div class="stat-num">{counts['bio']}</div><div class="stat-sub">notícias</div>
+  </div>
+  <div class="stat-card" id="sc-blend" onclick="setFilter('blend')">
+    <div class="stat-head"><span class="stat-dot" style="background:var(--saf)"></span><span class="stat-label">Blending</span></div>
+    <div class="stat-num">{counts['blend']}</div><div class="stat-sub">notícias</div>
+  </div>
+  <div class="stat-card active-all" id="sc-all" onclick="setFilter('all')">
+    <div class="stat-head"><span class="stat-dot" style="background:var(--bio)"></span><span class="stat-label">Total</span></div>
+    <div class="stat-num">{counts['all']}</div><div class="stat-sub">—</div>
+  </div>
+</div>
+
+<div class="filters">
+  <button class="chip a" id="chip-all"   onclick="setFilter('all')">Todos</button>
+  <button class="chip"   id="chip-saf"   onclick="setFilter('saf')">SAF</button>
+  <button class="chip"   id="chip-bio"   onclick="setFilter('bio')">Biobunker</button>
+  <button class="chip"   id="chip-blend" onclick="setFilter('blend')">Blending</button>
+</div>
+
+<div class="news-wrap" id="news-area">{cards_html}
+</div>
+
+<script>
+let activeFilter = 'all';
+
+function setFilter(f) {{
+  activeFilter = f;
+  ['all','saf','bio','blend'].forEach(k=>{{
+    document.getElementById('chip-'+k).className = 'chip'+(k===f?' a':'');
+    document.getElementById('sc-'+k).className   = 'stat-card'+(k===f?' active-'+k:'');
+  }});
+  renderCards();
+}}
+
+function renderCards() {{
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const cards = document.querySelectorAll('.news-card');
+  cards.forEach(c => {{
+    const matchesFilter = activeFilter === 'all' || c.dataset.cat === activeFilter;
+    const matchesSearch = !q || c.dataset.title.includes(q);
+    c.style.display = (matchesFilter && matchesSearch) ? 'block' : 'none';
+  }});
+}}
+</script>
+</body>
+</html>"""
+
+    return template
+
+
+def main():
+    print("Buscando notícias...")
+    items = fetch_news()
+    print(f"Encontradas {len(items)} notícias.")
+
+    output = render_html(items)
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(output)
+    print("Arquivo index.html gerado com sucesso.")
+
+
+if __name__ == "__main__":
+    main()
