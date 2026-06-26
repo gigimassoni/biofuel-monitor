@@ -313,7 +313,7 @@ def render_html(items):
   body{{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}}
 
   .header{{padding:28px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}}
-  .header-title{{font-size:32px;font-weight:700;line-height:1.1;letter-spacing:-.5px}}
+  .header-title{{font-size:24px;font-weight:700;line-height:1.25;letter-spacing:-.3px}}
   .updated{{font-size:12px;color:var(--text3);margin-top:6px}}
 
   .search-wrap{{padding:0 20px 16px}}
@@ -366,7 +366,7 @@ def render_html(items):
 
 <div class="header">
   <div>
-    <div class="header-title">Todas<br>as<br>Notícias</div>
+    <div class="header-title">Ferramenta de monitoramento de notícias para novos mercados</div>
     <div class="updated">Atualizado em {now}</div>
   </div>
 </div>
@@ -384,15 +384,15 @@ def render_html(items):
     <div class="stat-num">{counts['saf']}</div><div class="stat-sub">notícias</div>
   </div>
   <div class="stat-card" id="sc-bio" onclick="setFilter('bio')">
-    <div class="stat-head"><span class="stat-dot" style="background:var(--blend)"></span><span class="stat-label">Biobunker</span></div>
+    <div class="stat-head"><span class="stat-dot" style="background:var(--bio)"></span><span class="stat-label">Biobunker</span></div>
     <div class="stat-num">{counts['bio']}</div><div class="stat-sub">notícias</div>
   </div>
   <div class="stat-card" id="sc-blend" onclick="setFilter('blend')">
-    <div class="stat-head"><span class="stat-dot" style="background:var(--saf)"></span><span class="stat-label">Blending</span></div>
+    <div class="stat-head"><span class="stat-dot" style="background:var(--blend)"></span><span class="stat-label">Blending</span></div>
     <div class="stat-num">{counts['blend']}</div><div class="stat-sub">notícias</div>
   </div>
   <div class="stat-card active-all" id="sc-all" onclick="setFilter('all')">
-    <div class="stat-head"><span class="stat-dot" style="background:var(--bio)"></span><span class="stat-label">Total</span></div>
+    <div class="stat-head"><span class="stat-dot" style="background:var(--accent)"></span><span class="stat-label">Total</span></div>
     <div class="stat-num">{counts['all']}</div><div class="stat-sub">—</div>
   </div>
 </div>
