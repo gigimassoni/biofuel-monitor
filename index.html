@@ -19,7 +19,17 @@
   }
   body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}
 
-  .header{padding:28px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  /* ── NAVBAR ── */
+  .navbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+  .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+  .nav-logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#2bc4a0,#065c3d);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .nav-logo-name{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+  .nav-tabs{display:flex;gap:4px}
+  .nav-tab{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all .15s;border:1px solid transparent}
+  .nav-tab:hover{color:var(--text);background:var(--bg3)}
+  .nav-tab.active{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+
+  .header{padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
   .header-title{font-size:24px;font-weight:700;line-height:1.25;letter-spacing:-.3px}
   .updated{font-size:12px;color:var(--text3);margin-top:6px}
 
@@ -71,10 +81,21 @@
 </head>
 <body>
 
+<nav class="navbar">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-mark">🛢️</div>
+    <span class="nav-logo-name">BioFuel Monitor</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab active" href="index.html">📰 Notícias</a>
+    <a class="nav-tab" href="mapa-mandatos.html">🗺️ Mapa de Mandatos</a>
+  </div>
+</nav>
+
 <div class="header">
   <div>
     <div class="header-title">Ferramenta de monitoramento de notícias para novos mercados</div>
-    <div class="updated">Atualizado em 14/07/2026 às 11:59 UTC</div>
+    <div class="updated">Atualizado em 14/07/2026 às 17:03 UTC</div>
   </div>
 </div>
 
@@ -112,93 +133,219 @@
 </div>
 
 <div class="news-wrap" id="news-area">
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMihwFBVV95cUxQaWFpS1cxNE44SndqVW1GODU4M2ZtNmVuZkF6djB3OExKX0lTTDdDQ0xoNDlFRGVFLWt3RHJUaHZFZ2xPTDBXWm9tS2VTUGJEMERwMlVGalJqekx4ekFXRTQ2UXQxVmFTcmp1T2dmbmNYWTNKdWpxdm0wbERqRENiMG5mWkVVRE0?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="poll reveals record voter support for e15"
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMilAFBVV95cUxNR3RTcFZ6eVFaQWhvb2Y5RzR5b0FMQ1hjUE5ieXRpR0x6elpkR3dOVWVUVUc1aExSOXNtWTRNRUNUM1ZPb0M0SVJTYzVqQnFCcm9vQkRGSzJZNlZJREg5RnFYMk5wRkRvNFRPMnpqSVBaRThISlJHbGVjNzVoV3k5dFRQdGZtaU4zY0F1WmZSLVJVcHNE?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="governo eleva mistura de etanol na gasolina para 32% por seis meses"
        style="animation-delay:0ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 11:49 UTC</span>
+        <span class="news-time">14/07 16:36 UTC</span>
       </div>
-      <div class="news-title">Poll Reveals Record Voter Support for E15</div>
-      <div class="news-desc">Poll Reveals Record Voter Support for E15&amp;nbsp;&amp;nbsp;News Dakota…</div>
+      <div class="news-title">Governo eleva mistura de etanol na gasolina para 32% por seis meses</div>
+      <div class="news-desc">Governo eleva mistura de etanol na gasolina para 32% por seis meses&amp;nbsp;&amp;nbsp;Exame…</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · News Dakota</span>
+        <span class="news-source">🌐 Global · Exame</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1wSGI5SlM2RmxqT1NEd25sbUttNkVveUNfRWEtSE9VY2JzRFBRWFlnRVlzdFZHV20wRUJpY21HVDZwLTJ2SmZFRlZsT1g3ajAwc253TElOSEU5b0JmaF9QVGd2aWRyQWc?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="best robot vacuum deal: save $400 on eufy e25"
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMixwFBVV95cUxQUEtfRnhCbXNVQW5KQ2pqNDM5UENGcEZhUXBoZGFGRUlVN2djbUUxUFo3YzFRWUJTeHhzRFlwWGxjRGwtM2lqZGVjd3ZrSFg2WnROZ0FZVV9IeWpDR2pOaEE5czB1U2pOSDRhU0FnUWR5YmxpY1dueFJKYXB5aTlLdGJzOWFLUGFWY1FKYi1BUUpRd1BzNldmWkdxdDkxY2JtRjhFWmEyNk44XzRWZ3daUDNvV2RJQm5MbGpMMWVMZHQzOUlYdmow?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="&#x27;claims of poor mileage lack scientific backing&#x27;: ethanol body biepa defends e20 fuel"
        style="animation-delay:20ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 11:07 UTC</span>
+        <span class="news-time">14/07 16:03 UTC</span>
       </div>
-      <div class="news-title">Best robot vacuum deal: Save $400 on eufy E25</div>
-      <div class="news-desc">Best robot vacuum deal: Save $400 on eufy E25&amp;nbsp;&amp;nbsp;Mashable…</div>
+      <div class="news-title">&#x27;Claims of poor mileage lack scientific backing&#x27;: Ethanol body BIEPA defends E20 fuel</div>
+      <div class="news-desc">&#x27;Claims of poor mileage lack scientific backing&#x27;: Ethanol body BIEPA defends E20 fuel&amp;nbsp;&amp;nbsp;Deccan Herald…</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Mashable</span>
+        <span class="news-source">🇺🇸 EUA · Deccan Herald</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiuAFBVV95cUxPRmZOaWhhWkszZ2g4SGNRWENvOWdhRm9qZ0pCVXhsVy10NlJia1V3eGRsV2l0bXRqSTNwSC10MlRWRU5sNTN5R2FZM3JVSFdLWlN5SUVzRlRlYjAwLVNNMGZ2SVFkTmJteTlwRVFHUGl6Y19rYnZkVlZxU1NKSmtZTGYwR0tpRkh5ZHlHRE1BODBiNm1id1ZrTkRoRHNaVjNlU29zaFJpRzIwUzdlSXI5QWhiOTZNQWQy?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="governo decide sobre aumento da mistura de etanol na gasolina"
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMilAFBVV95cUxQQ3liYmtjV0NnZXNxZTJjUVdQb3lURk1DUG9XN05XSS1uU3NkTEppTFd5UkVZS28yeGlNOGlMTkQ3bGotbjBkczBTdm94YVZ6dGZhU0hYS3hETWI3RlpxZmllRm80NkE4TTAtTWtYWGx3N19NQl9YVDJXakRVSGhYOGdRT2NZNEt6VmtOSXp4d0tNc3p3?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="governo aprova aumento da mistura de etanol na gasolina"
        style="animation-delay:40ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 10:45 UTC</span>
+        <span class="news-time">14/07 15:47 UTC</span>
       </div>
-      <div class="news-title">Governo decide sobre aumento da mistura de etanol na gasolina</div>
-      <div class="news-desc">Governo decide sobre aumento da mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;band.com.br…</div>
+      <div class="news-title">Governo aprova aumento da mistura de etanol na gasolina</div>
+      <div class="news-desc">Governo aprova aumento da mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;Revista Oeste…</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · band.com.br</span>
+        <span class="news-source">🌐 Global · Revista Oeste</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi2gFBVV95cUxNSEFpWUZVelZDX0x4T0JtOW85RFpKZTVmcVphNWJBTGJLcTVhQzVDbVZvVHBpOE5vemlPYXhCN1k1TGxFNHd6clRxMWJTNTgtY3RQSFpkckNTZEFGckl1WVVYclZtcGtqcHJJTTJMUE1xenczRjVMcElXY3dxVlJKZFlQMEZKb3ozRVBJSEVkSHdodGJTMUVaY2ZTMmZTN3d3Y01rU0xWX3NjbDVCaFA1cVlEYkpfV0lUNzY3b1hfU0NJZDJYSlJOWi0yZkNUTjhDZFg3T2oyNkw4Zw?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="governo deve aumentar mistura de etanol na gasolina para 32%; veja quais carros podem ser afetados"
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMieEFVX3lxTFB6RWNWTVVnRDFudUJUc3pBakMtRWczUl85dlVXc3hZendsSnVkNXMxV1NQakl5Q3hwUGg2N1d6MHNJQi1Nc0wtZEdTQlRieUFDTWk4aWFqOWFtQ2I0dmVObEkwV2RuMkFWVVduaG1kVWFDQ1ZqRzQ1Tw?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="renovação energética: governo aumenta mistura de etanol na gasolina para 32%"
        style="animation-delay:60ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 10:41 UTC</span>
+        <span class="news-time">14/07 15:07 UTC</span>
       </div>
-      <div class="news-title">Governo deve aumentar mistura de etanol na gasolina para 32%; veja quais carros podem ser afetados</div>
-      <div class="news-desc">Governo deve aumentar mistura de etanol na gasolina para 32%; veja quais carros podem ser afetados&amp;nbsp;&amp;nbsp;Jornal Correio…</div>
+      <div class="news-title">Renovação energética: governo aumenta mistura de etanol na gasolina para 32%</div>
+      <div class="news-desc">Renovação energética: governo aumenta mistura de etanol na gasolina para 32%&amp;nbsp;&amp;nbsp;TVT News…</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Jornal Correio</span>
+        <span class="news-source">🌐 Global · TVT News</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMizAFBVV95cUxOUEtpMEg5cGZqSGJCWVpFRWctZ3NXVlhoQVpBREhtUVpiNDJsdHhnT3B1LUZrSDJGZHR1Q0YwWS1zQ1BFajBZNzJ4RmZTWjdDSHRGNF9uSmMwQWJncVFuNlJCc0haYkVWRkhNU1F2Nkh1Um14ZGstMUZRTFZCMEtYUHpXWFd1VXhhV1dIRFh2Wm1OcXlJQ0h3R0k0ZzQtWHpTU1g1M3RQZ1ZmYllMUi1QM3Z6RGljU1FERDBERVZqdEszMEJpRWhVRVhVbWM?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="mistura de etanol na gasolina pode subir para 32%; veja impactos"
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiwgFBVV95cUxOZjZKNHdJekxvOU93dFlRUnV5dVloUV9yWm8xdWZFVWVzdm5rNGl4SEFUd00xN0hwLXZtdmUwVjZFcE5mVWlsRUtNdGxoQ29McUpYOUI4MG1jRjZXci1jU3RMNlI0akhSVUxQR1h2THN6OTZXLTdXY09iemVuSHczUDBGdXVyUE85S3lQS2RkS1YtN1JiQUxRem0yVFA1MXVWRFNNYnpmU0hvLTgxN3VoYzJCbHJHejVMTm1OZWtCZWYxQQ?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="governo eleva mistura de etanol na gasolina para 32% por 180 dias"
        style="animation-delay:80ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 10:36 UTC</span>
+        <span class="news-time">14/07 14:59 UTC</span>
       </div>
-      <div class="news-title">Mistura de etanol na gasolina pode subir para 32%; veja impactos</div>
-      <div class="news-desc">Mistura de etanol na gasolina pode subir para 32%; veja impactos&amp;nbsp;&amp;nbsp;correiodamanha.com.br…</div>
+      <div class="news-title">Governo eleva mistura de etanol na gasolina para 32% por 180 dias</div>
+      <div class="news-desc">Governo eleva mistura de etanol na gasolina para 32% por 180 dias&amp;nbsp;&amp;nbsp;Movimento Econômico…</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · correiodamanha.com.br</span>
+        <span class="news-source">🌐 Global · Movimento Econômico</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMilAJBVV95cUxPUVduUVpNb1p1YVNQVFl0TGROeTFTTmt2dkxHU0dKMFRwVXNUcXlvUlROYUJNRWNMNTR5WW53czg2NmRxYzQ4eHJCM1hRQWM2NnVqWVFIYy1sb25IcGlTbXAxaXlNbG1DeDAzbmdlakhRMURuam5xNkF5MDdHNTFzMFlxMDRDVlBKdVBZX0J3d3pELUdrZWtJclg0ZHkwUWgwSEh1Y0EtSWVXNE1mTElBXzg3ejJDQmpBeXhLaU1EQ3FVcHJuUF9HVzZQVDJkdkRZTTA1enJkd0NKNUV1YWhUZU5ZT2JoRTJWMXlvWUlDUjR2bDJJbU5mYmZHN0JROFByb3RMVGY3OXZRUEdZcHBZaG9tWng?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="conselho nacional de política energética deve anunciar aumento da mistura de etanol na gasolina nesta terça; medida pode afetar motores mais antigos"
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMingFBVV95cUxOZUxTWHNKbVFwb0x1ZHFhdlZHVzQyRU5ab3BESWQzcW5pQWRDMS11d0VEdndEbWl2bzNXMWNQa1kyVnM3ekZkc09FazNfblpRUGtldmpObjBLaTRFMEtUa3dEWmhRa3k5bVVBd3VOLUtoR0xJZGFJYVlkeWoxcGRNaURiZzVQNnlfU2NfNlhCc0g5YjFhd2hfcldRQ2RCdw?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="brasil eleva temporariamente mistura de etanol na gasolina"
        style="animation-delay:100ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 10:31 UTC</span>
+        <span class="news-time">14/07 14:35 UTC</span>
       </div>
-      <div class="news-title">Conselho Nacional de Política Energética deve anunciar aumento da mistura de etanol na gasolina nesta terça; medida pode afetar motores mais antigos</div>
-      <div class="news-desc">Conselho Nacional de Política Energética deve anunciar aumento da mistura de etanol na gasolina nesta terça; medida pode afetar motores mais antigos&amp;nbsp;&amp;nbsp;Independente…</div>
+      <div class="news-title">Brasil eleva temporariamente mistura de etanol na gasolina</div>
+      <div class="news-desc">Brasil eleva temporariamente mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;InfoMoney…</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Independente</span>
+        <span class="news-source">🇧🇷 Brasil · InfoMoney</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMigAFBVV95cUxOZ0FkaUJTb0pDLWsxUktxNG9JdG4wWWdsRzBSMFczNnBfcHplc0Zma3ctSG9WYVh1dnV4SmF6ZGpFd3hpakd2cGZYTG1IVEdFdEFUUFhOQ3g4OHh2WWlvX3pIRGR5djRMZ3kyVU9SZktfVmRYZG5TNjJpQ1JYZDdvMg?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="brasil eleva mistura de etanol na gasolina para 32%; medida vale por ao menos 180 dias"
+       style="animation-delay:120ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">14/07 14:28 UTC</span>
+      </div>
+      <div class="news-title">Brasil eleva mistura de etanol na gasolina para 32%; medida vale por ao menos 180 dias</div>
+      <div class="news-desc">Brasil eleva mistura de etanol na gasolina para 32%; medida vale por ao menos 180 dias&amp;nbsp;&amp;nbsp;Motor Show…</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · Motor Show</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMioAFBVV95cUxPd29pQTZKOGNPTlFBcHgxb0FXSzFYV3VBTkh1ZXQ2b2ZWbFpVYk53ZkRqWHpGYzExQm5CNllmdk5LUWFkQmFvVWxRZlpDS21oaXFBN0FOWVQta3gtZmUwTUxVMGtRcXBJNzNjUFhfelZsWU9IdUpNVkFWNVhPN1lrd0RTTVRNYi1pc3ZQbDZ4TGIzMTIyUWFUNU5nYWdabk0x?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="governo aprova aumento da mistura de etanol na gasolina para 32%"
+       style="animation-delay:140ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">14/07 14:14 UTC</span>
+      </div>
+      <div class="news-title">Governo aprova aumento da mistura de etanol na gasolina para 32%</div>
+      <div class="news-desc">Governo aprova aumento da mistura de etanol na gasolina para 32%&amp;nbsp;&amp;nbsp;Brasil 247…</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · Brasil 247</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMimwFBVV95cUxOdnpyQ1pDQUlPSGVNTkNZVEYwdV9STXhUbHJ2cGZtbi0zbHEyRHZUUFozaTlPanE2ODRPZ2M3eFJGVnJzN1lLMmJWT0F5LXNlM3lvTE5fOUJyWWVsVUZ6MTVidjJQTkFWa0I0dlJRc2x0OVE2X3BLZEVKMlEwYXF4dC1OUGx1Vk5rRXUzbExLSm9rMmgtb0JUalI5OA?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="cnpe aprova aumento da mistura de etanol na gasolina para 32%"
+       style="animation-delay:160ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">14/07 14:00 UTC</span>
+      </div>
+      <div class="news-title">CNPE aprova aumento da mistura de etanol na gasolina para 32%</div>
+      <div class="news-desc">CNPE aprova aumento da mistura de etanol na gasolina para 32%&amp;nbsp;&amp;nbsp;Vero Notícias…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · Vero Notícias</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiekFVX3lxTE9OTjFqQjFvUEVFNG03bFpISTcyY1FjaE5Nb2szbVJmZVF2ZHFXS3NiS3FlVTU0UWo5c2Z3cVdBWFRjYVdOOHZySmRYQmRleWZ3ZTBjUU5kT0FvMEhhVXItOXdGMks0bldUcmMwTDR3aFVvLVIwMmYtMEtB?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="poll reveals record voter support for e15"
+       style="animation-delay:180ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">14/07 13:52 UTC</span>
+      </div>
+      <div class="news-title">Poll reveals record voter support for E15</div>
+      <div class="news-desc">Poll reveals record voter support for E15&amp;nbsp;&amp;nbsp;The Mighty 790 KFGO…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · The Mighty 790 KFGO</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiugFBVV95cUxPeW5rSmZWWHB5X2s0QnVyTHd6VWY4c1JKdl9ZNHdxSGdHYWhNY1QweWN1Q0dwd2c0ekhLbGFZT3h1SFFja0ZveEJ6OVl4M1l6WHpyQTlRQU9VYWlsOTFlemk0b1ZGaTR0UjlOYXNMUWZMNllqZzE4dGZoaU5meUlVUm5WVnlSVGtqVFdTc3dPamNiaGlqaHRRNThtbXViM0M2cXBGNEp2b205eVpSbEduWThiSnRIQnJ3S3fSAboBQVVfeXFMTllUVUUyN3BjWnlsMmYtVDhkd1UxdUNxdGcyVEZsMTJaZlVDZU56RTNlMFh1ZmhDMnMxZXlpcUU2WlppQlRFRUJVOXBWa0U4NTU0Z2ZsdmFvVzJWXzZvTVhfY2lSMHM2NEVsZ2VYd21zeG1JU2dUbDBtVkttZWh4VVFoaG5WNlNBajRuYjFxSU5aZHVadU1KQ21SNGx3N3Q4ZXFOTnk2cVMyWXRmaHo0QVJNQ2tLUnJELVB3?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="brasil aumenta mistura de etanol na gasolina para 32%"
+       style="animation-delay:200ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">14/07 13:52 UTC</span>
+      </div>
+      <div class="news-title">Brasil aumenta mistura de etanol na gasolina para 32%</div>
+      <div class="news-desc">Brasil aumenta mistura de etanol na gasolina para 32%&amp;nbsp;&amp;nbsp;Campo Grande News…</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · Campo Grande News</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMivwFBVV95cUxNVmtGT3hIZnNhSlBQVE5ITy1FdHptTHlGRHU2OENSRnVjb1d1MWotSEZ6QjJNS0Zza3E2bXFOUHRjb0QwR1VVY1hPYUNNeHdKR2lUSFJZTG1iMEpUZXUzenY3RDhIcC02SHBPcGJvTmhfNHg3R09Fb3ZaSWR0a1d1c1d3ejRjY0lBSFlmLVRGV2FwN3pIMFg5Q0lyWkNnN3NyWk9xbFhzVWFET3V5WFVJd1Q0eHdSbzgxTTF3bS1mYw?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="governo anuncia aumento na mistura de etanol na gasolina de 30% para 32%"
+       style="animation-delay:220ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">14/07 13:39 UTC</span>
+      </div>
+      <div class="news-title">Governo anuncia aumento na mistura de etanol na gasolina de 30% para 32%</div>
+      <div class="news-desc">Governo anuncia aumento na mistura de etanol na gasolina de 30% para 32%&amp;nbsp;&amp;nbsp;Folha de S.Paulo…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · Folha de S.Paulo</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxQRGNzaVFYSHZ0Nnd0NlJORGdtbWl1ejlhU3BySUlxS095VU1fejJGbTJiek9fMzM4VEFoM1ZnSEhnVjRjLXdyZjl4VVlQVldGdXFydzlWd0trc2gzWEpXUjVRNE9kcFk0c0RVSXJ0bVNNR2xFSlpaVGFvX0J2bjdvd3lONWFHOHZiaDVpWlRzcmplY3RWWWxVVlR0cnAtdGtFUnhEeVFFaVgyNVlBTk5ySXFTUzVNS1lMUGxZM1c3cHHSAc8BQVVfeXFMT0Nva0JOMUxGc29Ga2tYWDIwZ0dTYXd1T0JGMXZpWFhGV2NBSnBjZThzRTVYcGVTa3RISmJwUEROb1JkSUJGMHo4QkJINDRKREtBQ05MV3RubTVvM3gycENSTTMzRjM2OUFTd0VGM0lQT2tJNExuc1NibE5kSG9GeVNSTlR5RTlWLW1rNVNNNU9OVzRxenJWSWstNEx2WWVvb1h0aTMzMUYybUljQUxnTWlfZERSNVRkTWdNX0k4V2xHLVBDNXpXY0w5ZTBwUVNV?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="conselho aprova aumento temporário da mistura de etanol na gasolina para 32%"
+       style="animation-delay:240ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">14/07 13:38 UTC</span>
+      </div>
+      <div class="news-title">Conselho aprova aumento temporário da mistura de etanol na gasolina para 32%</div>
+      <div class="news-desc">Conselho aprova aumento temporário da mistura de etanol na gasolina para 32%&amp;nbsp;&amp;nbsp;CBN…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · CBN</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMivAFBVV95cUxNQldXQzc4TGVFUHRCWkQ0V1hWM3FCR1M1cjEwQjRycjNIRjBOdUd4UUxmNFV0VHBzRzloVEpSaTV4SU5DU3puWlBlZ2ZRRkhaLVY2blFYTTdqWHhVeVgwQ29OU1d0NEZpZEQyb3ctb0xFSHpfX05IaTczeW9fOVB4R2N4UXUxUUEzRDY4WFhWMFAtLUdIdGpSbWpQbzd1b2pzemVnMGRrbU5kaTFua3pRaFdSVU9XczBINHZoRw?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="governo aprova aumento para 32% da mistura de etanol na gasolina durante 180 dias"
+       style="animation-delay:260ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">14/07 13:33 UTC</span>
+      </div>
+      <div class="news-title">Governo aprova aumento para 32% da mistura de etanol na gasolina durante 180 dias</div>
+      <div class="news-desc">Governo aprova aumento para 32% da mistura de etanol na gasolina durante 180 dias&amp;nbsp;&amp;nbsp;Tribuna do Norte…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · Tribuna do Norte</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxNNkNHZDFzck5Jb1lISmN2M05sTWxGaXhyUXVudnhTckk0RlM5WW5nRDZ4bzhySTk0OEpGZEV0LUk4RTZWNDZxWG1OT1QwWU5qOENZc1RRMllJSGRzVlJLRXVFT2VKeU40bHAxaDN6eHZ2X21KYWxDX0ZibjNzVHk1VjFhZU16ZEtsV2xENk10Ql9NdERoTWlRZF9PakcxSjlvaHpzTUR2VkZGZw?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="graincorp outlines pathway for australia’s sustainable aviation fuel future"
+       style="animation-delay:280ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">14/07 12:45 UTC</span>
+      </div>
+      <div class="news-title">GrainCorp outlines pathway for Australia’s sustainable aviation fuel future</div>
+      <div class="news-desc">GrainCorp outlines pathway for Australia’s sustainable aviation fuel future&amp;nbsp;&amp;nbsp;Biofuels International Magazine…</div>
+      <div class="news-footer">
+        <span class="news-source">🇦🇺 Austrália · Biofuels International Magazine</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMitwFBVV95cUxQVEZZd1EzRkRDdThtalFaZ3l0LU10ZmlrMEJuSWVydFNMS1A5MjdaS3Vic2kwODE4bHJWWEo2VFdxaW15eGdISEhzTjd2b3A2cVlPZlVZYXdzOFM3b1NPWGtkeENHQ0RpSmROUGhsa2tvVzVCX3JvVWpkVENTVjE5c1FSRWdMRUYtT0pvZVZLSUtBcmNzdXUwVUpOaTdxVGNPNmdSMXhzUmNCWHpQcVVfNy14V3VJT00?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="most nda supporters reluctant to adopt e20 petrol: c-voter survey"
-       style="animation-delay:120ms">
+       style="animation-delay:300ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">14/07 10:27 UTC</span>
@@ -210,37 +357,9 @@
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiywFBVV95cUxQZVNRaVNZZFVDMTBfaWhXRmYyTGMzcTZ3WHpSbUs3TXdHaHZiU2FBdk01SHV4eTM1bHltVkM3RDhWdmlyWV9WRUs0dEt6bjRYNm1kMVIxVnBZandkSWtWQmxrNzNqZUJaUHl5T1B6ajJjVzBrNWxxeHVXalhQbVRybHFrV3ZRRmU5RlJGTzd6LVdURFdDWkxyRnJROVI2Zks5Q01McGN5RnpEby11dlNibkw0S2swVWdWTGZFck93ZktXNEV3VElZSDl1bw?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="conselho avalia elevar mistura de etanol na gasolina para 32%; medida pode reduzir preço nas bombas"
-       style="animation-delay:140ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 09:46 UTC</span>
-      </div>
-      <div class="news-title">Conselho avalia elevar mistura de etanol na gasolina para 32%; medida pode reduzir preço nas bombas</div>
-      <div class="news-desc">Conselho avalia elevar mistura de etanol na gasolina para 32%; medida pode reduzir preço nas bombas&amp;nbsp;&amp;nbsp;Alagoas Alerta…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Alagoas Alerta</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMixAFBVV95cUxNSkV3YXJvb0dwbGpTcExBOXlRcmlnT1piQWJYdHdSYWMyZEIwbjhTOGhyUDExVDJlQWxHMXZxSHpYTDQyb2RaWV9KeTRibnJ0aUJYV0k2V0ZxMU84dkg3YWM0UjlzYU84S19odVRUMDBaUV8wLXhhSGU2ZFN1UTFVcFBJS3hZYVZUdEpDdVNzSF9FV05BalkzM1I2aXpUbGo2NmVRNVNhNTZRdHhmZVB6WUZqVEtMcjd1VUtTeU1XM2N0bTB3?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="cnpe se reúne nesta terça (14) para decidir sobre aumento da mistura de etanol na gasolina"
-       style="animation-delay:160ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 09:30 UTC</span>
-      </div>
-      <div class="news-title">CNPE se reúne nesta terça (14) para decidir sobre aumento da mistura de etanol na gasolina</div>
-      <div class="news-desc">CNPE se reúne nesta terça (14) para decidir sobre aumento da mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;Rádio Itatiaia…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Rádio Itatiaia</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiowFBVV95cUxQU3Z1X1kxdVJ0WjZIdWE2UGstbXlSdGlMSXd4bjNZRVFmZXFsdjdhNWM5NlcwZ00tLTkwZm9KTXJoVTZuQlp3aG5ld2dVM3lHQVR2b0RLWXJydThwNlRkR2x4TmRyYl95Q3NMWUNnSkhlVmE5Y3dldi1RenJVWjhtZHJRX3dYbmExQ2JDZV9xTUxwWnU0NGtDSlNXSmtvNEl3WVE0?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="new catalysts boost sustainable aviation fuel production from butyl butyrate"
-       style="animation-delay:180ms">
+       style="animation-delay:320ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">14/07 09:24 UTC</span>
@@ -254,7 +373,7 @@
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMirAFBVV95cUxNdkV2V2szM0hlRG5UNlBrVzU0UW5RT1BCUV9IMjlpdFp2TFA2c2MtS3V5ZjVyWkhyLWQ0MlhUd0tla0hYMzRqT3J2U0Q5VWk3VTJDZE1SQV9MeXRRY202dEJZWEtma0R4ME1oX25jX3VQVVB1eFpkc0M4d3Fld2pkU1oxUThNRWRNRWRacEV2bnE0c0I3U21hTkpNcmlsejRiZlgySDFHZGxMaXFa?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="egypt begins feasibility study for domestic sustainable aviation fuel production"
-       style="animation-delay:200ms">
+       style="animation-delay:340ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">14/07 09:04 UTC</span>
@@ -266,37 +385,23 @@
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxNNkNHZDFzck5Jb1lISmN2M05sTWxGaXhyUXVudnhTckk0RlM5WW5nRDZ4bzhySTk0OEpGZEV0LUk4RTZWNDZxWG1OT1QwWU5qOENZc1RRMllJSGRzVlJLRXVFT2VKeU40bHAxaDN6eHZ2X21KYWxDX0ZibjNzVHk1VjFhZU16ZEtsV2xENk10Ql9NdERoTWlRZF9PakcxSjlvaHpzTUR2VkZGZw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="graincorp outlines pathway for australia’s sustainable aviation fuel future"
-       style="animation-delay:220ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">14/07 08:50 UTC</span>
-      </div>
-      <div class="news-title">GrainCorp outlines pathway for Australia’s sustainable aviation fuel future</div>
-      <div class="news-desc">GrainCorp outlines pathway for Australia’s sustainable aviation fuel future&amp;nbsp;&amp;nbsp;Biofuels International Magazine…</div>
-      <div class="news-footer">
-        <span class="news-source">🇦🇺 Austrália · Biofuels International Magazine</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiswFBVV95cUxNMkV1cEJVUHR1WklBQmVpbXRsTEg0WV83SURsa0RlY0tSemx3elhCWlhxa2JMWlZkdDZTMEFkR0kwb1EtWEJoTVdsdzBjS1kyTFVReXo4MEUtTHlPdHM1RkVseFozSzdwMWMzNkZqdXNHVU51Z205bDNQZ2N0M3lZRGNDbnJBdlRuUmpINlZROWJhYkdLVXlkU0U2WEVYcjRjUG1oOGpxMXIwYzdDZzlyMlpGVdIBuAFBVV95cUxNOVJwaTNxdWd5c3BCTWVWd2EyWGNVcGVzdmppNEZsWW9JN2ZPdkxZMDJxQkNGcUlJTDRZUm91cU56bXlhYmlTR1lDTFUzWDhnN09kUUpwVFpKeHhIUFIzS2RDbjNrV0NSMWt6VTg1YWZYSlRBcllvWlY1bFBpQVdZQnBWczJsREItM1VOUS0yS0VVVEtfcDR3UGs4NkRuSE5nTWVZLWNXRVFoUzVjWDd6bV9fTmVDTy1X?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="governo deve elevar mistura de etanol na gasolina para 32%"
-       style="animation-delay:240ms">
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1wSGI5SlM2RmxqT1NEd25sbUttNkVveUNfRWEtSE9VY2JzRFBRWFlnRVlzdFZHV20wRUJpY21HVDZwLTJ2SmZFRlZsT1g3ajAwc253TElOSEU5b0JmaF9QVGd2aWRyQWc?oc=5" target="_blank" rel="noopener"
+       data-cat="blend" data-title="best robot vacuum deal: save $400 on eufy e25"
+       style="animation-delay:360ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 08:37 UTC</span>
+        <span class="news-time">14/07 08:52 UTC</span>
       </div>
-      <div class="news-title">Governo deve elevar mistura de etanol na gasolina para 32%</div>
-      <div class="news-desc">Governo deve elevar mistura de etanol na gasolina para 32%&amp;nbsp;&amp;nbsp;Portal iG…</div>
+      <div class="news-title">Best robot vacuum deal: Save $400 on eufy E25</div>
+      <div class="news-desc">Best robot vacuum deal: Save $400 on eufy E25&amp;nbsp;&amp;nbsp;Mashable…</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Portal iG</span>
+        <span class="news-source">🌐 Global · Mashable</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMingFBVV95cUxQN29ZZC1LT3Jya1F1MmZ5S1JvLWVLNnp4NmNhY3ZybFN3b3U2SVFFWllCZzZ5SDBxdlQ4RzdMZFM5SXZKUGZ5UEtFUzZwbnB3TkJoT0RsenFsbTdUQzYyT3RqRmk2TTZHUTNzdUh5WFlFQ2tXeFNUa05La0ZYRmd1bUNJUm5USU9VTXlKSFF5MGlvOTdiTVdHcjJvSUNrUQ?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="sustainable aviation fuel: your path to greener credentials"
-       style="animation-delay:260ms">
+       style="animation-delay:380ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">14/07 08:27 UTC</span>
@@ -310,7 +415,7 @@
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMitwFBVV95cUxNNGRqLWE2S1ZsdGoyaVhneUM4Yy1FdlJWeUdjWXc2R25sRGMwcW5FQ2NXR2NSTVhONzBYNWtaUkdDSjhPbHpZWVdfa0Y4end3NDAwOS1xSnUtT0VtakREUzE2aFRXMC1YRXI1VnQxamQ2UldzRmR3eENFZ3hKemFuUW1xTXFMWVM1LXI5ZnpyT200QWpGT0x4c1RsallmMWdldDl3OXJHeGxqTDVNS0xudDMxZ3JVOU3SAb4BQVVfeXFMTjJKeldkZWc2NlRGS2k4dzd2czE3QlZGRmdRV18tSVBDblNhemxsbTlRQUMwa0h2N1JuNHlnWnZ1TDdoZXNSUXNYZnM3RlR4MGJNRUh2VjhiN3U3SnpwWmZJdThMeUUxc1hBTnBKV3liWUtBZ2hmdm5xVUh1NUxkdVhZZkw5aTQwY3U0TmZ6Z2o1YS0yY3hxTmFpWndLVmcwd0lhcjZvYVdqVHo1c0tNSzhBa0twRUNsMnZtUEhQQQ?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="what is the government’s defence on e20 fuel? | explained"
-       style="animation-delay:280ms">
+       style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">14/07 07:12 UTC</span>
@@ -322,9 +427,23 @@
         <span class="news-read">Ler →</span>
       </div>
     </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiigFBVV95cUxOdVZaZlFvTFhfdDEtSTRTLUVUV2ZwelBNNHd6amNuZ1BnOC1Dc1p0M0Jxc1J2ZWx1ZVg4UkpQdUkwQXAzWEtxMzZadFptLTVSNHRPUWp1dWhIZU1VazdWQm9KQTI2amc1VHZ5R0tHZ1BUZWx2NUN5Y1ZCMnFWUThtRzhFeXQ5N1pSX1E?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="civil aviation ministry launches saf roadmap workshop"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">14/07 06:25 UTC</span>
+      </div>
+      <div class="news-title">Civil Aviation Ministry launches SAF Roadmap Workshop</div>
+      <div class="news-desc">Civil Aviation Ministry launches SAF Roadmap Workshop&amp;nbsp;&amp;nbsp;Egypt Oil &amp; Gas…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · Egypt Oil &amp; Gas</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiuAFBVV95cUxQNXlNSE54T0hOU2JpeHVmcUtfd1dNS2ZpR3lKMmNPazV5eHo3WElaMnRMc041VFJkNnMzS3ZIek9iamtXWno4LVY0dkh1NENsUXFRT2VKXzhMU25rbTdOQVlpcDBBdC02WVJUOVlTZXM4S05vdS03UE5VMkVxM2Q5MTR0ZUxyUTh0dDNPeFdja0VZaWs1bkc2VmhfbDR6ZGRsSGdOR3FJRG1NY3BvLWZpRFk1VDRrT2F2?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="taiwan urged to build sustainable aviation fuel hub as 2035 feedstock crunch looms - eco-business"
-       style="animation-delay:300ms">
+       style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">14/07 05:54 UTC</span>
@@ -338,7 +457,7 @@
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMijgFBVV95cUxPbDVJN2x5SGZMdjhOT1dqSWdZdmpNRzR6WFpTbXcxd3A0TldRSUFjaTM0N2g0eldRNHViTHdMdjBiSFhUbEtoMzBaYVFOZG9ZUktyUElfMHJQeUlEU2NlVm10d2pnam92cFFSbi16T29UaHFRSFdIS2RIMk9PU0ZNQmpUTXpwRlY5bU1uZE9B?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="cobank: sorghum use in ethanol production doubles"
-       style="animation-delay:320ms">
+       style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">13/07 23:17 UTC</span>
@@ -352,7 +471,7 @@
     </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMiywFBVV95cUxOU05Qc3R0MGM4bjlrUnkxRTJoQkZHdDdJRjJFYXFGZ2xKOURhT2NPdzhCQzZzeTBVVE05YS1uMWh0NzMtVXBiNmNVbHdzYUx6TmFlUEdqUHppUmN5X2JiSTZiZF8wZTltelN6cmxkUklFc0xOc2tFTURvNmNRVll1eGtLVHNSdEZhTDN5QmswanhScUJhSHZ1WlN0QUEzTlgxbmNUWHo4eTdiOENkc2ZtUkNKTFo2XzJQOU1NS01TZkhBemxENHBNZXN3Zw?oc=5" target="_blank" rel="noopener"
        data-cat="saf" data-title="louisiana on verge of leading u.s. in renewable diesel, sustainable aviation fuel capacity"
-       style="animation-delay:340ms">
+       style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">13/07 20:31 UTC</span>
@@ -364,9 +483,9 @@
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQejBzYl9VNGR0eHNjSFZHZHhTTEJWcUczanVXZDRBSDN2N0VOTk84Y0JkQ1dGdjdyQlRTZlh3R0RTN190NkY2MkxBNVNKV2dIUjBMTkoxX1RsQWJUeDZLUWhrNEEzd0RxSDhiZk4zdFpvZDFDME02YllscE5DNS1ZZjFhcUkyeWdlbjlBSEhMYXRrcTU3MmdHOHg2RUwzWDhP?oc=5" target="_blank" rel="noopener"
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMiigFBVV95cUxQZE9EVnpocFpUekhTVm9zTzJxZWFwb3k4ZUlQRG1ybG5Ua182NE1MYjFkS19SeElQZ0Y5N1pHOGo5N3ltbFl3ZmJrWmdMY2ZoNmFVZHBzSFlNLVlJNldjRkRsWnlVVFJiYkszWGdyWjY0QWFfSVh3RmFLcm42T0czbnhNVVAtanI3V3c?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="new poll shows record voter support for e15"
-       style="animation-delay:360ms">
+       style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
         <span class="news-time">13/07 16:53 UTC</span>
@@ -375,20 +494,6 @@
       <div class="news-desc">New Poll Shows Record Voter Support for E15&amp;nbsp;&amp;nbsp;AgWired…</div>
       <div class="news-footer">
         <span class="news-source">🌐 Global · AgWired</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiTEFVX3lxTE5FeU1KZTF4aGpaWGJqUXR2bXRPb2NSZTBZY0FwdWVIUWhDZFNBcVV2dEhOUHM4QkJmOS1XcnZfYURZMG42RXVpR1p2TGQ?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="uk government releases pricing mechanism strategy and timelines to support saf production"
-       style="animation-delay:380ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">13/07 16:47 UTC</span>
-      </div>
-      <div class="news-title">UK government releases pricing mechanism strategy and timelines to support SAF production</div>
-      <div class="news-desc">UK government releases pricing mechanism strategy and timelines to support SAF production&amp;nbsp;&amp;nbsp;GreenAir News…</div>
-      <div class="news-footer">
-        <span class="news-source">🇬🇧 Reino Unido · GreenAir News</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -420,20 +525,6 @@
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMioAFBVV95cUxOUUxvVFlnR0RpZ25VRXJyYjlnTjRjOUJySVZDeUk1aWc2dThqN3VBZWlyVFQ0MWp6TjZybmVvZ0gyVG4zX1htRThTZ0JHeXBTdE1IMHZTZE5SbU1Mdk1Jb0tHbktlTTUyclJMNVNFOWZ2QzAwTVprVlhMTXAySHhZbndTZXhzd1hvek94QXFuM3dlN0dNaGZrd2tWVmZSd2hy?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="poll: 75% of voters back year-round e15 as senate returns from july 4th recess"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">13/07 16:13 UTC</span>
-      </div>
-      <div class="news-title">Poll: 75% of Voters Back Year-Round E15 as Senate Returns From July 4th Recess</div>
-      <div class="news-desc">Poll: 75% of Voters Back Year-Round E15 as Senate Returns From July 4th Recess&amp;nbsp;&amp;nbsp;DTN Progressive Farmer…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · DTN Progressive Farmer</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMivwFBVV95cUxONGJVcFo5OHJrWFQzSmxOQjFfbVpzdTZ5S2R0N3dvNTVqOERfTnBJSzVGWFRRQzhYRFV4U3BSYklubnhjR29xSGJWbGZRRkpUTzJqOTN0S1pkUXZOMktKMU5RMFRabmVhZm5ZUnpVS0tpbnVBS3pvei0ydTE3SmloQzJ4djhEenBWa3gzU2Z0T2FoLUdKRWlMWDQtZWFhT0xQamUxTlA2RFJUWExCR1k3VG9URHc1MmhwYkVxMjZhbw?oc=5" target="_blank" rel="noopener"
        data-cat="blend" data-title="new poll reveals record voter support for e15"
        style="animation-delay:400ms">
@@ -459,34 +550,6 @@
       <div class="news-desc">Biobunker: Como o Agro Brasileiro vai Mover os Navios do Mundo Sistema CNA/Senar&amp;nbsp;&amp;nbsp;Portal do Agronegócio…</div>
       <div class="news-footer">
         <span class="news-source">🇧🇷 Brasil · Portal do Agronegócio</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMirgFBVV95cUxNeS1Ma1JZamRYczU2OGdCaWZzVl9EMFY2SjNVNE8tUXZCbmNtU3ZqZEpCQVdIdGFfa3ZmUFRrdENGaTVNYWtlRVdlOE5LZWQ3VnNRSldMTWM4eGpwODhjcm1STkZEQTBveVpGel9YLVNiZjZ6Qm9HcEZwcjFtUWU2WjlJWDVPRzdnX3J5Rmw2LTRCOHlpQjJjZVRidnd0d1lKMmpIZzFJazlWaXZzUXc?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="governo deve elevar a mistura de etanol na gasolina de 30% para 35%"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">13/07 09:11 UTC</span>
-      </div>
-      <div class="news-title">Governo deve elevar a mistura de etanol na gasolina de 30% para 35%</div>
-      <div class="news-desc">Governo deve elevar a mistura de etanol na gasolina de 30% para 35%&amp;nbsp;&amp;nbsp;brasilagro.com.br…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · brasilagro.com.br</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMipwFBVV95cUxQcGpyWXhwYzE0WnBFbXZWeXRaUXVfQ2lHWlhHWTBYUWVtMVdxVVRuWE5mVU1DS0JyV1JZLXc1OXZRWWZFSlZSaGMtUXhwNjVYUWV4SmdJWkZFemxqbVhqNm12U1BHb1lNS1N6bG1odVpFOFdYTmhJcmFBUzdPbmdjMjdkRUlyUlNZNXVRSkRFdEl3RVhpVWZlZUlHNkRWMVpVMEhZNXhTWQ?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="mistura de etanol na gasolina gera alerta para impactos ao consumidor"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">13/07 08:46 UTC</span>
-      </div>
-      <div class="news-title">Mistura de etanol na gasolina gera alerta para impactos ao consumidor</div>
-      <div class="news-desc">Mistura de etanol na gasolina gera alerta para impactos ao consumidor&amp;nbsp;&amp;nbsp;O Estado CE…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · O Estado CE</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -588,48 +651,6 @@
         <span class="news-read">Ler →</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxNUUhrTmVUbzFNR0VuZTNiSTV0eVJackFMRjR2V2ZmRmtzcmpJSnJkM1hGbVU4RFpSbjlnVWgzN2F0RGNEZmZ1S3gwaEZkdk44NzU2ZlphNXlHMDFvaXBjZFp3TWU5SU5nYVp5T200LTBLdVhJZ1JVMkFvcmctN0NhdndTMTRQdkVrRVdjdmw4UHRVdVBSOEJXNHhmLTJvd3lHemZuNlAyS0gwdw?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="hugo: reunião sobre mistura de etanol na gasolina acontecerá na terça (14)"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">09/07 14:33 UTC</span>
-      </div>
-      <div class="news-title">Hugo: Reunião sobre mistura de etanol na gasolina acontecerá na terça (14)</div>
-      <div class="news-desc">Hugo: Reunião sobre mistura de etanol na gasolina acontecerá na terça (14)&amp;nbsp;&amp;nbsp;CNN Brasil…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · CNN Brasil</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiuwFBVV95cUxOQWI3SFhjT25aU0xQZFJ4bUVWcWI5QmNadlAzZGF1NFA1WWJmdDgtRG1LcTJETmRNNkFRVUhsWkNqbFFFc1Iwekx3OWZtVUk5QzBUbmxncHBCRXlrU2tuT3duVnhuWFYxd3JGdV9jR0dyR0M5Z2tnekJiTHJYRmpiWnVmSWJZSnZXNndlVm5iWldmdktOVElIcHNBckNSd1NrZlJlZlZpNGplSnc0LTZBZUNiWGdyQzJMeVZz?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="hugo motta anuncia reunião para ampliar mistura de etanol na gasolina"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">09/07 13:57 UTC</span>
-      </div>
-      <div class="news-title">Hugo Motta anuncia reunião para ampliar mistura de etanol na gasolina</div>
-      <div class="news-desc">Hugo Motta anuncia reunião para ampliar mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;Congresso em Foco…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Congresso em Foco</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi3gFBVV95cUxOWEZicUt5ekFGWjctZGJRdG94aGZTZWZvVloyNEE4Q0hYcV9OQ2Q2R3pkYTRWczJmNlE2UV9SWnduSEhmcXl5VGlDajRuWEVEbGpuRzlrSUtOOTFlWEltdWlReVBYNUQtRWN4WnhPU0xXOHFuNEJKSi13N0E0SUkyclA2ci1Jd1dla2daQjRUUTZKbFljUTg5M0VHQjJQU2czS0EwUDhvTXVrSl9JVThnQmhGMTVhcWpvc1poNWNIVWJMYlNydWtzM2gyWGFZZTloZ013a25vaGd2bGF4b2fSAewBQVVfeXFMTTh0OTNqZVF2REFkWTZsZ3R4YUdIR2JGckNGY1NaeUtURFZsVTdCZkd0Z2FBcG5VUVZ1cm9zOHRNd2FuN1RJRnR4RnZKN2N6YUZDU09NNnhnUjhHWFBZVzg1MFlXSExMQkRHeldwWks2a1JJaC1wWVVYb3ZSLUJCQnc1TTFwR0xzdHdNb2hSUWU4em1kcTFBMXdsamtMcW1lTVVuTlFYSGkwaTRnS1BTLVpCQ0lHZW9OV18tU0lJYkJJWElKVG1wdVhSdkg3VnNyYTBNaE5ZZDE4QkZyYXFjbWtwZXdpYU5sSGV1S1g?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="governo adia decisão sobre mistura de etanol na gasolina para evitar pressão de subvenção"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">09/07 11:41 UTC</span>
-      </div>
-      <div class="news-title">Governo adia decisão sobre mistura de etanol na gasolina para evitar pressão de subvenção</div>
-      <div class="news-desc">Governo adia decisão sobre mistura de etanol na gasolina para evitar pressão de subvenção&amp;nbsp;&amp;nbsp;Valor Econômico…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Valor Econômico</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
     <a class="news-card" href="https://news.google.com/rss/articles/CBMitAFBVV95cUxQZEd3amtZVHk1MmZ4cVRUR0tXVFNVOE5lWkF0MVg0VzRnbnJRRlA1UWQwMlJxTmlpMzU4ZnJMX19RTGx3R0RMTTJUUmdtc1pSVTl3bG0yUVpaalBlUWtyOGZBUWdXQmNmdlhsYXhhTlRqTkN3YW9XX2g3N1NvYTY4UkQxc1V2QW5XWkdNQ0s5ejY5Wjhrc0NGckU2RGItdkpEbC1VUEFnVGs1WmVBZjZpWE9ENF8?oc=5" target="_blank" rel="noopener"
        data-cat="bio" data-title="na cna, especialistas destacam potencial do brasil na produção de saf e biobunker"
        style="animation-delay:400ms">
@@ -641,6 +662,20 @@
       <div class="news-desc">Na CNA, especialistas destacam potencial do Brasil na produção de SAF e biobunker&amp;nbsp;&amp;nbsp;Portal CNA Brasil…</div>
       <div class="news-footer">
         <span class="news-source">🇧🇷 Brasil · Portal CNA Brasil</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMi7wFBVV95cUxPTGg1UFAySl9DaHlSbERBbUxSY3M5MnJDdjdtWC1hV1BmVUxWbjZYS0M1ZndVU3lGRWRMckJKek80eDg1LTJJemhZYTlPd2hOLS1RSGVmbGVTMG9nNy1CemJBeDBEazcyT2pJU3hWdlNvVEVEZHp4a0ZxY3g3NXNULUx1eW5zLWlxeTF2MHdObFdmUS1hTTZ3Y0F1ZF9yaGdRQ0VwaUtMM2RIeUhSV2xmLXB4dzNoYkFjYXZPVlp5a1RYUWY5MWRoNkpRVUFnc3ZXYi1nVzFxU0dOamlISWhWYTcyelloSkRueUNaRDR2cw?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="asean to integrate corsia findings in sustainable aviation roadmap due in 2026"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">09/07 07:00 UTC</span>
+      </div>
+      <div class="news-title">ASEAN to integrate CORSIA findings in sustainable aviation roadmap due in 2026</div>
+      <div class="news-desc">ASEAN to integrate CORSIA findings in sustainable aviation roadmap due in 2026&amp;nbsp;&amp;nbsp;S&amp;amp;P Global…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · S&amp;P Global</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -669,20 +704,6 @@
       <div class="news-desc">India is adding biofuels to petrol – but many drivers are unhappy&amp;nbsp;&amp;nbsp;BBC…</div>
       <div class="news-footer">
         <span class="news-source">🇮🇳 Índia · BBC</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiX0FVX3lxTE50ZG4tdEV3TWcxVjFMc0tiVzc0bVdtSnRUaWo2c2V3clBWSHVaelIwZXIydmx1ckNfS0pHbVRyWmQyU3Y1MjJNRHdTbldNMVUyWkd0amh6Qi1VZHQxX0kw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="feedstocks and processes for global-scale sustainable aviation fuel production"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">08/07 18:09 UTC</span>
-      </div>
-      <div class="news-title">Feedstocks and processes for global-scale sustainable aviation fuel production</div>
-      <div class="news-desc">Feedstocks and processes for global-scale sustainable aviation fuel production&amp;nbsp;&amp;nbsp;Nature…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Nature</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -739,20 +760,6 @@
       <div class="news-desc">4º Agroenergia – Transição Energética Sustentável - edição SAF e Biobunker&amp;nbsp;&amp;nbsp;Portal CNA Brasil…</div>
       <div class="news-footer">
         <span class="news-source">🇧🇷 Brasil · Portal CNA Brasil</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi6wFBVV95cUxPOHhGR18tdlRWcmdZd2JaWFlsMnAwM00yclB2clJZZjBXSDVDSTJRQUdKeFNwbjhWX216VUtpWG9BT2lmOUJqSEpQcnp0TW1jS08tNVdPZV9pZk9nMjhCUk1nWGVOaW5wZXUxTE12V3pmcW81dVNPWTdJLXVXSmNNLTZmYkV5dnlvWHRHcEc2d2VZTE9yaWREcHE1V3R3amo5WTZqYXl1ZDBRQnZuTnJjREdxT1F0Z20xX250VHB2bkNxU2tNTHpxVkhWc0ZCQXhRbWJYbXdCS3VndXBOcmZUQloxbjVFcjdKY3Zv?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="interview: boeing backs dual corsia-saf offset push amid asean supply crunch"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">08/07 02:06 UTC</span>
-      </div>
-      <div class="news-title">INTERVIEW: Boeing backs dual CORSIA-SAF offset push amid ASEAN supply crunch</div>
-      <div class="news-desc">INTERVIEW: Boeing backs dual CORSIA-SAF offset push amid ASEAN supply crunch&amp;nbsp;&amp;nbsp;S&amp;amp;P Global…</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · S&amp;P Global</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
@@ -1075,6 +1082,20 @@
       <div class="news-desc">U.S. marine biofuel hopes build despite uncertain global market&amp;nbsp;&amp;nbsp;Agri-Pulse…</div>
       <div class="news-footer">
         <span class="news-source">🇺🇸 EUA · Agri-Pulse</span>
+        <span class="news-read">Ler →</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://news.google.com/rss/articles/CBMivgFBVV95cUxNU1BmZXpOMFZzQnZhTGt0LUhla2U5SnVESVdaalFaT0IxSWNwREV6a3RFNG4xT2RHeHcyaWRDLUVnZHZ3dTNQQkRBNnBQM2oxLVRCcTkxZlJiX1Mta2JJNmR1QldXdWJ1Z1pfdWhpajNRaDRmbU1Ib0lGQWhTOU02X1pFNmNaNkFFb3NIc0l3NlVPYlgyZ1hkdEh2d21INXNMclViX0RuOElNb0VFY2FnVnFjMC02am9adFZtVmZB?oc=5" target="_blank" rel="noopener"
+       data-cat="saf" data-title="wsu study offers realistic look at the future of sustainable aviation fuel"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">26/05 07:00 UTC</span>
+      </div>
+      <div class="news-title">WSU study offers realistic look at the future of sustainable aviation fuel</div>
+      <div class="news-desc">WSU study offers realistic look at the future of sustainable aviation fuel&amp;nbsp;&amp;nbsp;WSU Insider…</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · WSU Insider</span>
         <span class="news-read">Ler →</span>
       </div>
     </a>
