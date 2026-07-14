@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mapa Global de Mandatos de Blending Etanol+Gasolina</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
+  /* ── NAVBAR ── */
+  .navbar{background:#161b22;border-bottom:1px solid #21262d;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
+  .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+  .nav-logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#2bc4a0,#065c3d);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .nav-logo-name{font-size:13px;font-weight:700;color:#e6edf3;letter-spacing:-.3px}
+  .nav-tabs{display:flex;gap:4px}
+  .nav-tab{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#7d8590;text-decoration:none;transition:all .15s;border:1px solid transparent}
+  .nav-tab:hover{color:#e6edf3;background:#1c2330}
+  .nav-tab.active{background:#1c2330;border-color:#30363d;color:#e6edf3}
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #0d1117;
+    --bg2:     #161b22;
+    --bg3:     #1c2330;
+    --border:  #21262d;
+    --border2: #30363d;
+    --text:    #e6edf3;
+    --text2:   #7d8590;
+    --text3:   #3d444d;
+
+    /* Status colors */
+    --c-vigente:   #1a9e6a;
+    --c-proposto:  #d4a017;
+    --c-piloto:    #1a6fa8;
+    --c-planejado: #8250df;
+    --c-sem:       #2d333b;
+    --c-ocean:     #0d1f35;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .header-left p {
+    font-size: 12px;
+    color: var(--text2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: var(--bg2);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .15s;
+    user-select: none;
+  }
+
+  .legend-item:hover { border-color: var(--text2); color: var(--text); }
+  .legend-item.active { color: var(--text); }
+  .legend-item.active[data-status="vigente"]   { border-color: var(--c-vigente);   background: rgba(26,158,106,.1); color: #3dd6a0; }
+  .legend-item.active[data-status="proposto"]  { border-color: var(--c-proposto);  background: rgba(212,160,23,.1); color: #f0c040; }
+  .legend-item.active[data-status="piloto"]    { border-color: var(--c-piloto);    background: rgba(26,111,168,.1); color: #4db8f0; }
+  .legend-item.active[data-status="planejado"] { border-color: var(--c-planejado); background: rgba(130,80,223,.1); color: #b083f0; }
+
+  .legend-dot {
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  /* ── MAP WRAP ── */
+  .map-wrap {
+    position: relative;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  #map-svg {
+    width: 100%;
+    display: block;
+  }
+
+  .country-path {
+    stroke: #1a2030;
+    stroke-width: .4px;
+    transition: opacity .15s;
+    cursor: pointer;
+  }
+
+  .country-path:hover { stroke: #fff; stroke-width: 1px; opacity: .85; }
+
+  /* ── TOOLTIP ── */
+  .tooltip {
+    position: fixed;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 500;
+    max-width: 220px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    display: none;
+  }
+
+  .tooltip-flag { font-size: 22px; margin-bottom: 6px; }
+  .tooltip-name { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .tooltip-status { font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .tooltip-blend  { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .tooltip-detail { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    padding: 16px 20px;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat:last-child { border-right: none; }
+  .stat-n { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+  .stat-l { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: .6px; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── TABLE ── */
+  .table-section { padding: 24px 28px; }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .table-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--text3);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .search-input {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    width: 200px;
+    transition: border-color .15s;
+  }
+
+  .search-input:focus { border-color: var(--c-vigente); }
+  .search-input::placeholder { color: var(--text3); }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  th:hover { color: var(--text2); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .1s;
+    cursor: pointer;
+  }
+
+  tbody tr:hover { background: var(--bg2); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td { padding: 11px 12px; font-size: 13px; }
+
+  .td-country { display: flex; align-items: center; gap: 10px; }
+  .td-flag    { font-size: 18px; flex-shrink: 0; }
+  .td-name    { font-weight: 500; color: var(--text); }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .s-vigente   { background: rgba(26,158,106,.1); color: #3dd6a0; border-color: var(--c-vigente); }
+  .s-proposto  { background: rgba(212,160,23,.1);  color: #f0c040; border-color: var(--c-proposto); }
+  .s-piloto    { background: rgba(26,111,168,.1);  color: #4db8f0; border-color: var(--c-piloto); }
+  .s-planejado { background: rgba(130,80,223,.1);  color: #b083f0; border-color: var(--c-planejado); }
+
+  .blend-pill {
+    display: inline-block;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+  }
+
+  .td-notes { font-size: 12px; color: var(--text2); max-width: 300px; }
+
+  .sort-arrow { margin-left: 4px; opacity: .4; }
+  .sort-arrow.active { opacity: 1; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.6);
+    z-index: 800;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute; top: 14px; right: 14px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 6px; width: 28px; height: 28px;
+    color: var(--text2); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .modal-flag { font-size: 36px; margin-bottom: 10px; }
+  .modal-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .modal-region { font-size: 12px; color: var(--text2); margin-bottom: 14px; }
+  .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .modal-row:last-of-type { border-bottom: none; }
+  .modal-key { font-size: 12px; color: var(--text2); }
+  .modal-val { font-size: 13px; font-weight: 500; text-align: right; }
+  .modal-notes { margin-top: 14px; padding: 12px; background: var(--bg3); border-radius: 8px; font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+  @media (max-width: 700px) {
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .header { padding: 16px; }
+    .table-section { padding: 16px; }
+    th, td { padding: 8px; }
+    .td-notes { display: none; }
+    .search-input { width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-mark">🛢️</div>
+    <span class="nav-logo-name">BioFuel Monitor</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="index.html">📰 Notícias</a>
+    <a class="nav-tab active" href="mapa-mandatos.html">🗺️ Mapa de Mandatos</a>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>🌍 Mapa Global de Mandatos — Blending Etanol+Gasolina</h1>
+    <p>Atualizado: Julho 2026 · Clique em um país para detalhes</p>
+  </div>
+  <div class="legend" id="legend">
+    <div class="legend-item active" data-status="vigente"   onclick="toggleFilter('vigente')">  <span class="legend-dot" style="background:#1a9e6a"></span>Em vigor</div>
+    <div class="legend-item active" data-status="proposto"  onclick="toggleFilter('proposto')"> <span class="legend-dot" style="background:#d4a017"></span>Proposto/Votação</div>
+    <div class="legend-item active" data-status="piloto"    onclick="toggleFilter('piloto')">   <span class="legend-dot" style="background:#1a6fa8"></span>Piloto/Parcial</div>
+    <div class="legend-item active" data-status="planejado" onclick="toggleFilter('planejado')"><span class="legend-dot" style="background:#8250df"></span>Planejado</div>
+  </div>
+</div>
+
+<!-- MAP -->
+<div class="map-wrap">
+  <svg id="map-svg" viewBox="0 0 960 500"></svg>
+</div>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip"></div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-n" style="color:#3dd6a0" id="s-vigente">0</div>
+    <div class="stat-l">Em vigor</div>
+  </div>
+  <div class="stat">
+    <div class="stat-n" style="color:#f0c040" id="s-proposto">0</div>
+    <div class="stat-l">Proposto/Votação</div>
+  </div>
+  <div class="stat">
+    <div class="stat-n" style="color:#4db8f0" id="s-piloto">0</div>
+    <div class="stat-l">Piloto/Parcial</div>
+  </div>
+  <div class="stat">
+    <div class="stat-n" style="color:#b083f0" id="s-planejado">0</div>
+    <div class="stat-l">Planejado</div>
+  </div>
+</div>
+
+<!-- TABLE -->
+<div class="table-section">
+  <div class="table-header">
+    <span class="table-title">Todos os países monitorados</span>
+    <input class="search-input" id="search" placeholder="🔍 Buscar país..." oninput="filterTable()"/>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th onclick="sortTable('name')">País <span class="sort-arrow active" id="arr-name">↑</span></th>
+        <th onclick="sortTable('status')">Status <span class="sort-arrow" id="arr-status"></span></th>
+        <th onclick="sortTable('blend')">Mandato <span class="sort-arrow" id="arr-blend"></span></th>
+        <th onclick="sortTable('year')">Ano <span class="sort-arrow" id="arr-year"></span></th>
+        <th class="td-notes">Observações</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const COUNTRIES = [
+  // AMÉRICAS
+  { id:"BRA", name:"Brasil",        flag:"🇧🇷", region:"Américas",    status:"vigente",   blend:"E30",  year:2025, notes:"E30 em vigor desde agosto de 2025 (alta de E27). Lei do Combustível do Futuro permite até E35. Discussão ativa para E32 — proposta já encaminhada ao CNPE. Pioneiro global do programa etanol desde 1975. Flex-fuel predomina na frota."  },
+  { id:"USA", name:"EUA",           flag:"🇺🇸", region:"Américas",    status:"vigente",   blend:"E10",  year:2007, notes:"E10 padrão nacional via Renewable Fuel Standard (RFS). E15 em expansão em 31 estados. Cota anual de etanol obrigatória." },
+  { id:"ARG", name:"Argentina",     flag:"🇦🇷", region:"Américas",    status:"vigente",   blend:"E12",  year:2021, notes:"Lei 27.640/2021 estabelece mínimo de 12% de etanol (E12). Alvo de 15% para 2024." },
+  { id:"COL", name:"Colômbia",      flag:"🇨🇴", region:"Américas",    status:"vigente",   blend:"E10",  year:2005, notes:"E10 obrigatório nas principais cidades. Programa nacional desde 2005." },
+  { id:"PRY", name:"Paraguai",      flag:"🇵🇾", region:"Américas",    status:"vigente",   blend:"E25",  year:2019, notes:"Mandato de 25% de etanol na gasolina. Etanol produzido de cana-de-açúcar." },
+  { id:"PER", name:"Peru",          flag:"🇵🇪", region:"Américas",    status:"vigente",   blend:"E7.8", year:2010, notes:"Mandato de 7,8% de etanol. Lei de Biocombustíveis de 2003." },
+  { id:"ECU", name:"Equador",       flag:"🇪🇨", region:"Américas",    status:"vigente",   blend:"E10",  year:2012, notes:"E10 obrigatório nas principais regiões costeiras." },
+  { id:"URY", name:"Uruguai",       flag:"🇺🇾", region:"Américas",    status:"vigente",   blend:"E5",   year:2009, notes:"Mandato de 5% de etanol na gasolina." },
+  { id:"CAN", name:"Canadá",        flag:"🇨🇦", region:"Américas",    status:"vigente",   blend:"E5",   year:2010, notes:"5% federal + mandatos provinciais de até 10% (BC, Ontario). Regulação federal via Canadian Renewable Fuels Regulations." },
+  { id:"JAM", name:"Jamaica",       flag:"🇯🇲", region:"Américas",    status:"vigente",   blend:"E10",  year:2015, notes:"E10 implementado com apoio do programa Inter-Americano de Biocombustíveis." },
+  { id:"MEX", name:"México",        flag:"🇲🇽", region:"Américas",    status:"piloto",    blend:"E5.5", year:2022, notes:"Mandato de 5,5% em fase de implementação. Desafios de infraestrutura e oferta limitam expansão." },
+  { id:"BOL", name:"Bolívia",       flag:"🇧🇴", region:"Américas",    status:"planejado", blend:"E12",  year:2026, notes:"Meta de 12% de etanol anunciada para 2026, dependente de ampliação da produção." },
+
+  // EUROPA
+  { id:"DEU", name:"Alemanha",      flag:"🇩🇪", region:"Europa",      status:"vigente",   blend:"E10",  year:2011, notes:"E10 (Super E10) padrão nacional. Diretiva EU RED II. Meta de 14% de renováveis no transporte até 2030." },
+  { id:"FRA", name:"França",        flag:"🇫🇷", region:"Europa",      status:"vigente",   blend:"E10",  year:2009, notes:"E10 amplamente disponível. Mandato crescente via Diretiva Europeia RED II/III." },
+  { id:"GBR", name:"Reino Unido",   flag:"🇬🇧", region:"Europa",      status:"vigente",   blend:"E10",  year:2021, notes:"E10 padrão desde setembro de 2021. Meta de E10 em toda a rede. Regulado pelo RTFO." },
+  { id:"NLD", name:"Países Baixos", flag:"🇳🇱", region:"Europa",      status:"vigente",   blend:"E10",  year:2013, notes:"E10 padrão na rede de postos." },
+  { id:"SWE", name:"Suécia",        flag:"🇸🇪", region:"Europa",      status:"vigente",   blend:"E10",  year:2014, notes:"E10 disponível amplamente. Alvo ambicioso: 30% de renováveis no transporte até 2030." },
+  { id:"ESP", name:"Espanha",       flag:"🇪🇸", region:"Europa",      status:"vigente",   blend:"E10",  year:2015, notes:"E10 disponível nas cadeias de postos. Regulado via transposição da RED II." },
+  { id:"POL", name:"Polônia",       flag:"🇵🇱", region:"Europa",      status:"vigente",   blend:"E10",  year:2013, notes:"E10 padrão nacional." },
+  { id:"ROU", name:"Romênia",       flag:"🇷🇴", region:"Europa",      status:"vigente",   blend:"E10",  year:2014, notes:"E10 conforme mandato europeu RED II." },
+  { id:"UKR", name:"Ucrânia",       flag:"🇺🇦", region:"Europa",      status:"vigente",   blend:"E5",   year:2016, notes:"E5 obrigatório. Grande produtor de milho para etanol." },
+
+  // ÁSIA
+  { id:"IND", name:"Índia",         flag:"🇮🇳", region:"Ásia",        status:"vigente",   blend:"E20",  year:2026, notes:"E20 obrigatório em todos os postos desde 1º de abril de 2026 — meta atingida 2 meses antes do prazo. Governo já publicou padrão IS 19850:2026 para E22, E25, E27 e E30. Indústria pede aumento gradual até E30. Meta E30+ para 2030."  },
+  { id:"PHL", name:"Filipinas",     flag:"🇵🇭", region:"Ásia",        status:"vigente",   blend:"E10",  year:2012, notes:"Biofuels Act de 2006. E10 em vigor desde 2012. Importações de etanol do Brasil e EUA." },
+  { id:"THA", name:"Tailândia",     flag:"🇹🇭", region:"Ásia",        status:"vigente",   blend:"E20",  year:2023, notes:"E20 disponível com subsídios do Oil Fuel Fund. Meta de tornar E20 o combustível padrão. Subsidios prorrogados até set/2026." },
+  { id:"VNM", name:"Vietnã",        flag:"🇻🇳", region:"Ásia",        status:"vigente",   blend:"E10",  year:2026, notes:"Mandato E10 em vigor desde junho de 2026 para toda a gasolina nacional. E5 RON92 permitido até 2030." },
+  { id:"CHN", name:"China",         flag:"🇨🇳", region:"Ásia",        status:"piloto",    blend:"E10",  year:2025, notes:"E10 reativado em pilotos nas províncias de Heilongjiang e Jilin (2024). Cobre ~50% das vendas de gasolina local em 2025. Escalonamento nacional condicionado à segurança alimentar." },,
+  { id:"IDN", name:"Indonésia",     flag:"🇮🇩", region:"Ásia",        status:"planejado", blend:"E10",  year:2028, notes:"Mandato E10 adiado para 2028 (era 2027) por falta de oferta de etanol. Piloto Pertamina Pertamax Green 95 (E5) em Jakarta e Surabaya. Meta de produzir 0,80 MM kl de bioetanol até 2028."  },
+  { id:"MYS", name:"Malásia",       flag:"🇲🇾", region:"Ásia",        status:"piloto",    blend:"E10",  year:2025, notes:"Piloto E10 em fase de testes em Selangor e KL. Meta de mandato nacional ainda em definição." },
+  { id:"PAK", name:"Paquistão",     flag:"🇵🇰", region:"Ásia",        status:"proposto",  blend:"E10",  year:2026, notes:"Política nacional de biocombustíveis em revisão. Discussão de mandato E10 no parlamento." },
+  { id:"KOR", name:"Coreia do Sul", flag:"🇰🇷", region:"Ásia",        status:"piloto",    blend:"E5",   year:2024, notes:"Piloto E5 em avalição. Mercado dominado por veículos de alta precisão — resistência técnica ao etanol." },
+  { id:"JPN", name:"Japão",         flag:"🇯🇵", region:"Ásia",        status:"piloto",    blend:"E3",   year:2022, notes:"Mistura via ETBE (não direta). Sem mandato de etanol hidratado. Foco maior em hidrogênio e HVO." },
+
+  // ÁFRICA
+  { id:"NGA", name:"Nigéria",       flag:"🇳🇬", region:"África",      status:"vigente",   blend:"E10",  year:2022, notes:"Política nacional de biocombustíveis de 2022. E10 obrigatório. Produção de etanol de cana." },
+  { id:"KEN", name:"Quênia",        flag:"🇰🇪", region:"África",      status:"vigente",   blend:"E10",  year:2019, notes:"E10 implementado em Nairóbi e regiões costeiras. Expansão progressiva para interior." },
+  { id:"ETH", name:"Etiópia",       flag:"🇪🇹", region:"África",      status:"vigente",   blend:"E5",   year:2018, notes:"E5 obrigatório. Um dos maiores produtores africanos de etanol de cana." },
+  { id:"MOZ", name:"Moçambique",    flag:"🇲🇿", region:"África",      status:"vigente",   blend:"E10",  year:2020, notes:"Mandato E10. Apoio do programa da União Europeia para biocombustíveis no sul da África." },
+  { id:"MWI", name:"Malawi",        flag:"🇲🇼", region:"África",      status:"vigente",   blend:"E10",  year:2014, notes:"Programa pioneiro na África subsaariana. Etanol da usina Ethanol Company of Malawi (ETHCO)." },
+  { id:"ZAF", name:"África do Sul", flag:"🇿🇦", region:"África",      status:"proposto",  blend:"E10",  year:2026, notes:"Mandato E10 aprovado legislativamente. Implementação aguardando regulamentação final. Grande produtor de etanol de milho e cana." },
+  { id:"ZWE", name:"Zimbábue",      flag:"🇿🇼", region:"África",      status:"vigente",   blend:"E10",  year:2013, notes:"E10 em vigor. Produção de etanol de cana-de-açúcar no Vale do Zambeze." },
+  { id:"SDN", name:"Sudão",         flag:"🇸🇩", region:"África",      status:"vigente",   blend:"E5",   year:2017, notes:"E5 obrigatório. Produção local limitada, parcialmente importado." },
+
+  // ORIENTE MÉDIO & OCEANIA
+  { id:"AUS", name:"Austrália",     flag:"🇦🇺", region:"Oceania",     status:"vigente",   blend:"E10",  year:2007, notes:"E10 (Unleaded 98) disponível em Queensland (mandato de 4%) e NSW (6%). Sem mandato federal unificado." },
+  { id:"NZL", name:"Nova Zelândia", flag:"🇳🇿", region:"Oceania",     status:"proposto",  blend:"E10",  year:2027, notes:"Consulta pública sobre mandato de biocombustíveis em andamento. Meta E10 para 2027 em discussão." },
+];
+
+// ── STATUS CONFIG ──
+const STATUS = {
+  vigente:   { label:"Em vigor",        color:"#1a9e6a", cls:"s-vigente"   },
+  proposto:  { label:"Proposto",        color:"#d4a017", cls:"s-proposto"  },
+  piloto:    { label:"Piloto/Parcial",  color:"#1a6fa8", cls:"s-piloto"    },
+  planejado: { label:"Planejado",       color:"#8250df", cls:"s-planejado" },
+};
+
+// ── STATE ──
+let activeFilters = new Set(["vigente","proposto","piloto","planejado"]);
+let sortKey  = "name";
+let sortDir  = 1;
+let searchQ  = "";
+let selectedCountry = null;
+
+// ── ISO ALPHA-3 → DATA MAP ──
+const byId = {};
+COUNTRIES.forEach(c => byId[c.id] = c);
+
+// ── UPDATE STATS ──
+function updateStats() {
+  ["vigente","proposto","piloto","planejado"].forEach(s => {
+    document.getElementById("s-"+s).textContent = COUNTRIES.filter(c => c.status === s).length;
+  });
+}
+
+// ── LEGEND FILTER TOGGLE ──
+function toggleFilter(status) {
+  if (activeFilters.has(status)) activeFilters.delete(status);
+  else activeFilters.add(status);
+  document.querySelector(`[data-status="${status}"]`).classList.toggle("active");
+  filterTable();
+  updateMapColors();
+}
+
+// ── SORT ──
+function sortTable(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = 1; }
+  document.querySelectorAll(".sort-arrow").forEach(a => { a.textContent = ""; a.classList.remove("active"); });
+  const arr = document.getElementById("arr-"+key);
+  arr.textContent = sortDir === 1 ? "↑" : "↓";
+  arr.classList.add("active");
+  renderTable();
+}
+
+// ── SEARCH ──
+function filterTable() {
+  searchQ = document.getElementById("search").value.toLowerCase();
+  renderTable();
+}
+
+// ── RENDER TABLE ──
+function renderTable() {
+  let data = COUNTRIES.filter(c => {
+    const matchFilter = activeFilters.has(c.status);
+    const matchSearch = !searchQ || c.name.toLowerCase().includes(searchQ) || c.blend.toLowerCase().includes(searchQ) || c.region.toLowerCase().includes(searchQ);
+    return matchFilter && matchSearch;
+  });
+
+  data.sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (typeof av === "string") return sortDir * av.localeCompare(bv);
+    return sortDir * (av - bv);
+  });
+
+  const tbody = document.getElementById("table-body");
+  tbody.innerHTML = data.map(c => {
+    const s = STATUS[c.status];
+    return `<tr onclick="openModal('${c.id}')">
+      <td><div class="td-country"><span class="td-flag">${c.flag}</span><span class="td-name">${c.name}</span></div></td>
+      <td><span class="status-badge ${s.cls}">${s.label}</span></td>
+      <td><span class="blend-pill">${c.blend}</span></td>
+      <td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px">${c.year}</td>
+      <td class="td-notes">${c.notes}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── MODAL ──
+function openModal(id) {
+  const c = byId[id];
+  if (!c) return;
+  const s = STATUS[c.status];
+  document.getElementById("modal-content").innerHTML = `
+    <div class="modal-flag">${c.flag}</div>
+    <div class="modal-name">${c.name}</div>
+    <div class="modal-region">${c.region}</div>
+    <div class="modal-row"><span class="modal-key">Status</span><span class="modal-val"><span class="status-badge ${s.cls}">${s.label}</span></span></div>
+    <div class="modal-row"><span class="modal-key">Mandato atual</span><span class="modal-val"><span class="blend-pill">${c.blend}</span></span></div>
+    <div class="modal-row"><span class="modal-key">Ano de referência</span><span class="modal-val" style="font-family:'JetBrains Mono',monospace">${c.year}</span></div>
+    <div class="modal-row"><span class="modal-key">Região</span><span class="modal-val">${c.region}</span></div>
+    <div class="modal-notes">${c.notes}</div>`;
+  document.getElementById("modal-overlay").classList.add("open");
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById("modal-overlay")) {
+    document.getElementById("modal-overlay").classList.remove("open");
+  }
+}
+
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+// ── MAP ──
+async function initMap() {
+  const world = await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
+  const projection = d3.geoNaturalEarth1()
+    .scale(153)
+    .translate([480, 260]);
+  const path = d3.geoPath().projection(projection);
+
+  const svg = d3.select("#map-svg");
+
+  // Ocean
+  svg.append("rect").attr("width","100%").attr("height","100%").attr("fill","#0d1f35");
+
+  const countries = topojson.feature(world, world.objects.countries);
+
+  // Build ISO numeric → alpha3 mapping
+  const numToAlpha = {
+    32:"ARG",36:"AUS",76:"BRA",124:"CAN",156:"CHN",170:"COL",
+    218:"ECU",231:"ETH",276:"DEU",356:"IND",360:"IDN",388:"JAM",
+    392:"JPN",404:"KEN",454:"MWI",458:"MYS",484:"MEX",508:"MOZ",
+    524:"NPL",528:"NLD",566:"NGA",586:"PKG",604:"PER",608:"PHL",
+    616:"POL",646:"RWA",682:"SAU",710:"ZAF",724:"ESP",752:"SWE",
+    762:"TJK",764:"THA",804:"UKR",826:"GBR",840:"USA",858:"URY",
+    862:"VEN",704:"VNM",716:"ZWE",729:"SDN",818:"EGY",
+    // fix Pakistan numeric
+    586:"PAK",
+    // more
+    156:"CHN",410:"KOR",554:"NZL",600:"PRY",630:"PRI",
+    233:"EST",246:"FIN",250:"FRA",380:"ITA",620:"PRT",642:"ROU",
+    703:"SVK",705:"SVN",
+  };
+
+  svg.selectAll(".country-path")
+    .data(countries.features)
+    .enter()
+    .append("path")
+    .attr("class","country-path")
+    .attr("d", path)
+    .attr("fill", d => getFill(numToAlpha[+d.id]))
+    .attr("data-id", d => numToAlpha[+d.id] || "")
+    .on("mousemove", function(event, d) {
+      const alpha = numToAlpha[+d.id];
+      const c = alpha ? byId[alpha] : null;
+      if (!c) { d3.select("#tooltip").style("display","none"); return; }
+      const s = STATUS[c.status];
+      const tt = document.getElementById("tooltip");
+      tt.style.display = "block";
+      tt.style.left = (event.clientX + 14) + "px";
+      tt.style.top  = (event.clientY - 10) + "px";
+      tt.innerHTML = `
+        <div class="tooltip-flag">${c.flag}</div>
+        <div class="tooltip-name">${c.name}</div>
+        <div class="tooltip-status"><span class="legend-dot" style="background:${s.color}"></span>${s.label}</div>
+        <div class="tooltip-blend">${c.blend}</div>
+        <div class="tooltip-detail">${c.notes.slice(0,100)}…</div>`;
+    })
+    .on("mouseleave", () => { d3.select("#tooltip").style("display","none"); })
+    .on("click", (event, d) => {
+      const alpha = numToAlpha[+d.id];
+      if (alpha && byId[alpha]) openModal(alpha);
+    });
+
+  // Borders
+  svg.append("path")
+    .datum(topojson.mesh(world, world.objects.countries, (a,b) => a !== b))
+    .attr("fill","none")
+    .attr("stroke","#1a2030")
+    .attr("stroke-width",.4)
+    .attr("d", path);
+}
+
+function getFill(alpha) {
+  if (!alpha || !byId[alpha]) return "#1e2530";
+  if (!activeFilters.has(byId[alpha].status)) return "#1e2530";
+  return STATUS[byId[alpha].status].color;
+}
+
+function updateMapColors() {
+  d3.selectAll(".country-path")
+    .attr("fill", d => getFill(d.__alpha));
+  // Re-bind alpha
+  d3.selectAll(".country-path")
+    .attr("fill", function() {
+      const alpha = d3.select(this).attr("data-id");
+      return getFill(alpha);
+    });
+}
+
+// ── INIT ──
+updateStats();
+renderTable();
+initMap();
+</script>
+</body>
+</html>
