@@ -312,7 +312,17 @@ def render_html(items):
   }}
   body{{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}}
 
-  .header{{padding:28px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}}
+  /* ── NAVBAR ── */
+  .navbar{{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}}
+  .nav-logo{{display:flex;align-items:center;gap:8px;text-decoration:none}}
+  .nav-logo-mark{{width:28px;height:28px;background:linear-gradient(135deg,#2bc4a0,#065c3d);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}}
+  .nav-logo-name{{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.3px}}
+  .nav-tabs{{display:flex;gap:4px}}
+  .nav-tab{{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all .15s;border:1px solid transparent}}
+  .nav-tab:hover{{color:var(--text);background:var(--bg3)}}
+  .nav-tab.active{{background:var(--bg3);border-color:var(--border2);color:var(--text)}}
+
+  .header{{padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}}
   .header-title{{font-size:24px;font-weight:700;line-height:1.25;letter-spacing:-.3px}}
   .updated{{font-size:12px;color:var(--text3);margin-top:6px}}
 
@@ -363,6 +373,17 @@ def render_html(items):
 </style>
 </head>
 <body>
+
+<nav class="navbar">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-mark">🛢️</div>
+    <span class="nav-logo-name">BioFuel Monitor</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab active" href="index.html">📰 Notícias</a>
+    <a class="nav-tab" href="mapa-mandatos.html">🗺️ Mapa de Mandatos</a>
+  </div>
+</nav>
 
 <div class="header">
   <div>
