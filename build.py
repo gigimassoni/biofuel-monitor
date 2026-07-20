@@ -153,7 +153,7 @@ def fetch_news() -> list:
     seen_titles = set()
 
     for search in SEARCHES:
-        print(f"  Buscando: {search['label']} ({search['lang']})...")
+        print(f"  Buscando: {search['label']}...")
         results = tavily_search(search["query"], MAX_PER_SEARCH)
 
         for r in results:
