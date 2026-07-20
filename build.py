@@ -182,11 +182,29 @@ def fetch_rss(query: str, max_results: int = 8) -> list:
         return []
 
 
+def resolve_url(url: str) -> str:
+    """Resolve URL de redirecionamento do Google News para a URL real do artigo."""
+    if "news.google.com" not in url:
+        return url
+    try:
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                          "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        })
+        # Segue o redirecionamento automaticamente
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            return resp.url
+    except Exception:
+        return url
+
+
 def tavily_extract(url: str) -> str:
     """Extrai o conteudo de uma URL usando Tavily."""
     if not TAVILY_API_KEY:
         return ""
-    payload = json.dumps({"urls": [url]}).encode("utf-8")
+    # Resolve URL real antes de extrair
+    real_url = resolve_url(url)
+    payload = json.dumps({"urls": [real_url]}).encode("utf-8")
     req = urllib.request.Request(
         "https://api.tavily.com/extract",
         data=payload,
@@ -202,8 +220,7 @@ def tavily_extract(url: str) -> str:
         results = data.get("results", [])
         if results:
             raw = results[0].get("raw_content", "") or ""
-            # Pega os primeiros 300 chars limpos
-            clean = re.sub(r"\s+", " ", re.sub(r"[#*\[\]]+", "", raw)).strip()
+            clean = re.sub(r"\s+", " ", re.sub(r"[#*\[\]|]+", "", raw)).strip()
             return clean[:280]
         return ""
     except Exception:
@@ -276,17 +293,23 @@ def fetch_news() -> list:
 
     print(f"  SAF: {len(saf_items)} | Biobunker: {len(bio_items)} | Blending: {len(blend_items)}")
 
-    # Ordena por data
-    for group in [saf_items, bio_items, blend_items]:
-        group.sort(key=lambda x: x.get("date_raw", ""), reverse=True)
+    def parse_date(date_str: str):
+        try:
+            from email.utils import parsedate_to_datetime
+            return parsedate_to_datetime(date_str)
+        except Exception:
+            return datetime.min.replace(tzinfo=timezone.utc)
 
-    # Intercala categorias
+    # Intercala: 1 SAF, 1 Bio, 1 Blend para garantir variedade
     interleaved = []
     max_len = max(len(saf_items), len(bio_items), len(blend_items), 1)
     for i in range(max_len):
         if i < len(saf_items):   interleaved.append(saf_items[i])
         if i < len(bio_items):   interleaved.append(bio_items[i])
         if i < len(blend_items): interleaved.append(blend_items[i])
+
+    # Ordena globalmente por data — mais recente primeiro
+    interleaved.sort(key=lambda x: parse_date(x.get("date_raw", "")), reverse=True)
 
     return interleaved
 
