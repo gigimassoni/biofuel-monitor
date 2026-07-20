@@ -1,1 +1,1 @@
-feedparser==6.0.11
+# Tavily usa urllib da stdlib — sem dependencias externas
