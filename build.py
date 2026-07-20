@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-BioFuel Monitor - busca noticias sobre SAF, Biobunker e Blending
-usando Tavily API e gera um arquivo index.html estatico.
+BioFuel Monitor - Raizen Novos Negocios
+Busca noticias sobre SAF, Biobunker e Blending usando Google News RSS
+para encontrar noticias relevantes e Tavily para extrair o conteudo.
 """
 
 import html
@@ -9,91 +10,101 @@ import json
 import os
 import re
 import urllib.request
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
+from urllib.parse import quote
 
 TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 
-SEARCHES = [
-    {
-        "cat": "saf",
-        "label": "SAF",
-        "query": "sustainable aviation fuel SAF production mandate airline news",
-    },
-    {
-        "cat": "bio",
-        "label": "Biobunker",
-        "query": "marine biofuel ethanol methanol shipping vessel bunker fuel decarbonization",
-    },
-    {
-        "cat": "blend",
-        "label": "Blending",
-        "query": "ethanol gasoline blending mandate E10 E15 E20 biofuel policy",
-    },
+# ── GOOGLE NEWS RSS QUERIES ──
+# Queries com aspas para maxima precisao no nicho
+RSS_SEARCHES = [
+
+    # SAF - Geral
+    {"cat": "saf", "query": '"sustainable aviation fuel"'},
+    {"cat": "saf", "query": '"SAF" "aviation fuel" mandate OR production OR airline'},
+    {"cat": "saf", "query": '"SAF" "ethanol" OR "alcohol to jet" OR "ATJ"'},
+    {"cat": "saf", "query": '"CORSIA" OR "ReFuelEU" "aviation fuel"'},
+    {"cat": "saf", "query": '"SAF" "HEFA" OR "Fischer-Tropsch" OR "power to liquid" OR "e-fuel"'},
+    {"cat": "saf", "query": '"sustainable aviation fuel" Brazil OR Raizen OR sugarcane OR ethanol'},
+
+    # Biobunker - Maritimo
+    {"cat": "bio", "query": '"marine biofuel" OR "bio-bunker" OR "biobunker"'},
+    {"cat": "bio", "query": '"ethanol" "shipping" OR "vessel" OR "bunker fuel"'},
+    {"cat": "bio", "query": '"CMA CGM" OR "Maersk" OR "MSC" OR "Hapag" biofuel OR ethanol bunker'},
+    {"cat": "bio", "query": '"IMO" "biofuel" OR "green fuel" shipping decarbonization'},
+    {"cat": "bio", "query": '"FuelEU Maritime" OR "IMO 2050" shipping biofuel'},
+
+    # Blending - Mandatos etanol+gasolina
+    {"cat": "blend", "query": '"ethanol blending mandate" OR "blending mandate" ethanol gasoline'},
+    {"cat": "blend", "query": '"E10" OR "E15" OR "E20" OR "E25" OR "E30" ethanol mandate'},
+    {"cat": "blend", "query": '"RenovaBio" OR "ANP" etanol mistura'},
+    {"cat": "blend", "query": '"ethanol" "blending" India OR Indonesia OR Vietnam OR Thailand OR Philippines'},
+    {"cat": "blend", "query": '"ethanol blend" Brazil OR Argentina OR Colombia mandate 2026'},
 ]
 
-MAX_PER_SEARCH = 10
+MAX_PER_QUERY = 8
 
-# Palavras que indicam ruido (nao sao noticias relevantes)
-NOISE_WORDS = [
-    "golf", "golfe", "bunker shot", "british open", "ryder cup",
-    "agenda", "calendar", "schedule", "week in technology",
-    "sign up to read", "start a free trial", "subscribe to",
-    "access newswire", "tradingview", "dow jones newswires",
-    "aviation week space technology", "inside mro", "engine leasing",
-    "capa airline leader summit",
+# Palavras que indicam ruido absoluto — nao tem nada a ver com o tema
+NOISE_TITLE = [
+    "golf", "golfe", "bunker shot", "british open", "ryder cup", "golf championship",
+    "arbitration report", "kluwer", "law review", "legal journal",
+    "week in technology", "aviation week space technology",
+    "engine leasing", "capa airline leader summit",
+    "football club", "futebol", "soccer club", "premier league",
+    "champions league", "serie a", "bundesliga", "la liga",
+    "flamengo", "corinthians", "palmeiras", "vasco", "botafogo",
+    "fluminense", "gremio", "cruzeiro", "athletico",
+    "midfielder", "striker", "transfer window", "manager sacked",
+    "sociedade anonima do futebol",
 ]
 
-# Palavras de futebol
-FOOTBALL_WORDS = [
-    "futebol", "football club", "soccer", "premier league", "champions league",
-    "flamengo", "corinthians", "palmeiras", "libertadores", "brasileirao",
-    "midfielder", "striker", "transfer", "manager sacked",
+NOISE_SUMMARY = [
+    "sign up to read", "free email subscription", "subscribe to access",
+    "start a free trial", "create an account to",
 ]
 
 COUNTRY_RULES = [
-    ("🇧🇷", "Brasil",          ["brasil", "brazil", "brazilian", "petrobras", "anp", "renovabio", "embraer", "raizen"]),
-    ("🇺🇸", "EUA",             ["united states", "u.s.", "usa", "american", "faa", "epa", "washington", "california", "boeing"]),
-    ("🇪🇺", "Uniao Europeia",  ["european union", "eu commission", "brussels", "refueleu"]),
-    ("🇬🇧", "Reino Unido",     ["uk", "united kingdom", "britain", "british", "london"]),
-    ("🇩🇪", "Alemanha",        ["germany", "german", "berlin", "lufthansa"]),
-    ("🇫🇷", "Franca",          ["france", "french", "paris", "total energies", "airbus"]),
+    ("🇧🇷", "Brasil",          ["brasil", "brazil", "brazilian", "petrobras", "anp", "renovabio", "embraer", "raizen", "sao paulo", "rio de janeiro"]),
+    ("🇺🇸", "EUA",             ["united states", " u.s.", "usa", "american", "faa", "epa", "washington", "california", "texas", "boeing", "delta", "united airlines", "american airlines"]),
+    ("🇪🇺", "Uniao Europeia",  ["european union", "eu commission", "brussels", "refueleu", "eu parliament", "europe"]),
+    ("🇬🇧", "Reino Unido",     ["uk", "united kingdom", "britain", "british", "london", "heathrow"]),
+    ("🇩🇪", "Alemanha",        ["germany", "german", "berlin", "lufthansa", "frankfurt"]),
+    ("🇫🇷", "Franca",          ["france", "french", "paris", "total energies", "airbus", "air france"]),
     ("🇳🇱", "Paises Baixos",   ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
-    ("🇨🇳", "China",           ["china", "chinese", "beijing", "sinopec"]),
-    ("🇯🇵", "Japao",           ["japan", "japanese", "tokyo"]),
-    ("🇮🇳", "India",           ["india", "indian", "delhi"]),
-    ("🇸🇬", "Singapura",       ["singapore", "singaporean"]),
-    ("🇦🇺", "Australia",       ["australia", "australian", "qantas"]),
-    ("🇨🇦", "Canada",          ["canada", "canadian"]),
-    ("🇦🇪", "Emirados Arabes", ["uae", "emirates", "dubai", "abu dhabi"]),
-    ("🇮🇩", "Indonesia",       ["indonesia", "indonesian", "jakarta"]),
-    ("🇻🇳", "Vietna",          ["vietnam", "vietnamese", "hanoi"]),
+    ("🇸🇬", "Singapura",       ["singapore", "singaporean", "changi"]),
+    ("🇨🇳", "China",           ["china", "chinese", "beijing", "sinopec", "shanghai"]),
+    ("🇯🇵", "Japao",           ["japan", "japanese", "tokyo", "ana holdings", "jal", "osaka"]),
+    ("🇮🇳", "India",           ["india", "indian", "delhi", "mumbai", "indianoil", "air india"]),
+    ("🇦🇺", "Australia",       ["australia", "australian", "qantas", "sydney", "melbourne"]),
+    ("🇨🇦", "Canada",          ["canada", "canadian", "toronto", "air canada", "vancouver"]),
+    ("🇦🇪", "Emirados Arabes", ["uae", "emirates", "dubai", "abu dhabi", "etihad"]),
+    ("🇮🇩", "Indonesia",       ["indonesia", "indonesian", "jakarta", "pertamina"]),
+    ("🇻🇳", "Vietna",          ["vietnam", "vietnamese", "hanoi", "ho chi minh"]),
     ("🇹🇭", "Tailandia",       ["thailand", "thai", "bangkok"]),
-    ("🇵🇭", "Filipinas",       ["philippines", "manila"]),
+    ("🇵🇭", "Filipinas",       ["philippines", "filipino", "manila"]),
+    ("🇰🇷", "Coreia do Sul",   ["south korea", "korean", "seoul", "korean air"]),
     ("🇳🇴", "Noruega",         ["norway", "norwegian"]),
     ("🇿🇦", "Africa do Sul",   ["south africa", "johannesburg"]),
     ("🇦🇷", "Argentina",       ["argentina", "buenos aires"]),
     ("🇨🇴", "Colombia",        ["colombia", "bogota"]),
     ("🇲🇾", "Malasia",         ["malaysia", "kuala lumpur", "petronas"]),
-    ("🇰🇷", "Coreia do Sul",   ["south korea", "korean", "seoul"]),
-    ("🇳🇬", "Nigeria",         ["nigeria", "nigerian", "lagos"]),
+    ("🇳🇬", "Nigeria",         ["nigeria", "lagos", "abuja"]),
+    ("🇮🇱", "Israel",          ["israel", "tel aviv"]),
+    ("🇨🇱", "Chile",           ["chile", "chilean", "santiago"]),
+    ("🇪🇸", "Espanha",         ["spain", "spanish", "madrid", "iberia", "repsol"]),
+    ("🇮🇹", "Italia",          ["italy", "italian", "rome", "eni", "milan"]),
 ]
 
 
 def is_noise(title: str, summary: str) -> bool:
-    text = f"{title} {summary}".lower()
-    # Palavras de ruido
-    if any(w in text for w in NOISE_WORDS):
+    title_l = title.lower()
+    summary_l = summary.lower()
+    if any(w in title_l for w in NOISE_TITLE):
         return True
-    # Futebol
-    if any(w in text for w in FOOTBALL_WORDS):
+    if any(w in summary_l for w in NOISE_SUMMARY):
         return True
-    # PDFs e paywalls
     if title.strip().startswith("[PDF]"):
-        return True
-    if "sign up" in text and "read" in text:
-        return True
-    # Muito markdown = pagina de indice
-    if summary.count("##") >= 3 or summary.count("* ") >= 5:
         return True
     return False
 
@@ -111,15 +122,13 @@ def normalize_title(title: str) -> str:
     return re.sub(r"\s+", " ", t)
 
 
-def fmt_date(iso: str) -> str:
-    if not iso:
+def fmt_date(date_str: str) -> str:
+    if not date_str:
         return "hoje"
     try:
-        iso_clean = iso.replace("Z", "+00:00")
-        if "T" in iso_clean:
-            d = datetime.fromisoformat(iso_clean)
-        else:
-            d = datetime.strptime(iso_clean[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        # RSS date format: "Mon, 19 Jul 2026 10:30:00 GMT"
+        from email.utils import parsedate_to_datetime
+        d = parsedate_to_datetime(date_str)
         diff = int((datetime.now(timezone.utc) - d).total_seconds() / 60)
         if diff < 60:
             return f"ha {diff}min"
@@ -129,26 +138,57 @@ def fmt_date(iso: str) -> str:
             return f"ha {diff // 1440}d"
         return d.strftime("%d/%m/%Y")
     except Exception:
-        return iso[:10] if iso else "hoje"
+        return "hoje"
 
 
-def tavily_search(query: str, max_results: int = 10) -> list:
-    if not TAVILY_API_KEY:
-        print("  AVISO: TAVILY_API_KEY nao encontrada.")
+def build_rss_url(query: str) -> str:
+    q = quote(query)
+    return f"https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en"
+
+
+def fetch_rss(query: str, max_results: int = 8) -> list:
+    url = build_rss_url(query)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    }
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            raw = resp.read()
+        root = ET.fromstring(raw)
+        items = []
+        for item in root.findall(".//item")[:max_results]:
+            title = item.findtext("title") or ""
+            link  = item.findtext("link") or ""
+            desc  = item.findtext("description") or ""
+            date  = item.findtext("pubDate") or ""
+            # Clean title: remove " - Source" suffix
+            title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
+            # Extract source from description
+            source = ""
+            m = re.search(r"<font[^>]*>([^<]+)</font>", desc)
+            if m:
+                source = m.group(1).strip()
+            items.append({
+                "title": title,
+                "url": link,
+                "date": date,
+                "source": source,
+            })
+        return items
+    except Exception as e:
+        print(f"    AVISO RSS: {e}")
         return []
 
-    payload = json.dumps({
-        "query": query,
-        "max_results": max_results,
-        "search_depth": "basic",
-        "topic": "news",
-        "days": 3,
-        "include_answer": False,
-        "include_raw_content": False,
-    }).encode("utf-8")
 
+def tavily_extract(url: str) -> str:
+    """Extrai o conteudo de uma URL usando Tavily."""
+    if not TAVILY_API_KEY:
+        return ""
+    payload = json.dumps({"urls": [url]}).encode("utf-8")
     req = urllib.request.Request(
-        "https://api.tavily.com/search",
+        "https://api.tavily.com/extract",
         data=payload,
         headers={
             "Content-Type": "application/json",
@@ -156,32 +196,36 @@ def tavily_search(query: str, max_results: int = 10) -> list:
         },
         method="POST",
     )
-
     try:
-        with urllib.request.urlopen(req, timeout=20) as resp:
+        with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-        return data.get("results", [])
-    except Exception as e:
-        print(f"  AVISO: Erro na busca Tavily: {e}")
-        return []
+        results = data.get("results", [])
+        if results:
+            raw = results[0].get("raw_content", "") or ""
+            # Pega os primeiros 300 chars limpos
+            clean = re.sub(r"\s+", " ", re.sub(r"[#*\[\]]+", "", raw)).strip()
+            return clean[:280]
+        return ""
+    except Exception:
+        return ""
 
 
 def fetch_news() -> list:
-    all_items = []
-    seen_urls = set()
+    saf_items, bio_items, blend_items = [], [], []
+    seen_urls   = set()
     seen_titles = set()
 
-    saf_items, bio_items, blend_items = [], [], []
+    for search in RSS_SEARCHES:
+        cat   = search["cat"]
+        query = search["query"]
+        print(f"  [{cat.upper()}] {query[:60]}...")
 
-    for search in SEARCHES:
-        print(f"  Buscando: {search['label']}...")
-        results = tavily_search(search["query"], MAX_PER_SEARCH)
-        print(f"    Retornou {len(results)} resultados")
+        rss_items = fetch_rss(query, MAX_PER_QUERY)
+        print(f"    Retornou {len(rss_items)} itens")
 
-        for r in results:
-            url   = r.get("url", "")
-            title = r.get("title", "").strip()
-            summary = r.get("content", "").strip()
+        for r in rss_items:
+            url   = r["url"]
+            title = r["title"]
 
             if not url or not title:
                 continue
@@ -192,42 +236,51 @@ def fetch_news() -> list:
             if norm in seen_titles:
                 continue
 
-            if is_noise(title, summary):
+            if is_noise(title, ""):
                 print(f"    [RUIDO] {title[:70]}")
                 continue
 
             seen_urls.add(url)
             seen_titles.add(norm)
 
+            # Extrai resumo via Tavily
+            print(f"    [EXTRACT] {title[:60]}")
+            summary = tavily_extract(url)
+
+            if is_noise(title, summary):
+                print(f"    [RUIDO pos-extract] {title[:60]}")
+                seen_urls.discard(url)
+                seen_titles.discard(norm)
+                continue
+
             flag, country = detect_country(title, summary)
-            pub_date = r.get("published_date", "")
 
             item = {
                 "title":    title,
-                "summary":  summary[:220],
+                "summary":  summary,
                 "url":      url,
-                "source":   r.get("source", ""),
-                "date_str": fmt_date(pub_date),
-                "date_raw": pub_date,
-                "category": search["cat"],
+                "source":   r["source"],
+                "date_str": fmt_date(r["date"]),
+                "date_raw": r["date"],
+                "category": cat,
                 "flag":     flag,
                 "country":  country,
             }
 
-            if search["cat"] == "saf":
+            if cat == "saf":
                 saf_items.append(item)
-            elif search["cat"] == "bio":
+            elif cat == "bio":
                 bio_items.append(item)
             else:
                 blend_items.append(item)
 
     print(f"  SAF: {len(saf_items)} | Biobunker: {len(bio_items)} | Blending: {len(blend_items)}")
 
-    # Ordena cada grupo por data
+    # Ordena por data
     for group in [saf_items, bio_items, blend_items]:
         group.sort(key=lambda x: x.get("date_raw", ""), reverse=True)
 
-    # Intercala: 1 SAF, 1 Bio, 1 Blend, 1 SAF...
+    # Intercala categorias
     interleaved = []
     max_len = max(len(saf_items), len(bio_items), len(blend_items), 1)
     for i in range(max_len):
@@ -253,7 +306,7 @@ def render_html(items: list) -> str:
     cards_html = ""
     for idx, item in enumerate(items):
         delay = min(idx * 20, 400)
-        desc = f'<div class="news-desc">{html.escape(item["summary"][:200])}...</div>' if item["summary"] else ""
+        desc = f'<div class="news-desc">{html.escape(item["summary"][:250])}...</div>' if item["summary"] else ""
         cards_html += f"""
     <a class="news-card" href="{html.escape(item['url'])}" target="_blank" rel="noopener"
        data-cat="{item['category']}" data-title="{html.escape(item['title'].lower())}"
@@ -429,13 +482,13 @@ function renderCards() {{
 
 
 def main():
-    if not TAVILY_API_KEY:
-        print("ERRO: Variavel TAVILY_API_KEY nao encontrada.")
-        exit(1)
+    print("BioFuel Monitor - iniciando...")
 
-    print("Iniciando busca com Tavily...")
+    if not TAVILY_API_KEY:
+        print("AVISO: TAVILY_API_KEY nao encontrada. Resumos nao serao extraidos.")
+
     items = fetch_news()
-    print(f"Total de noticias apos filtros: {len(items)}")
+    print(f"Total final: {len(items)} noticias")
 
     output = render_html(items)
     with open("index.html", "w", encoding="utf-8") as f:
