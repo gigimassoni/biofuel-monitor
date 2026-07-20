@@ -1,265 +1,265 @@
 #!/usr/bin/env python3
 """
-BioFuel Monitor — busca notícias sobre SAF, Biobunker e Blending
-no Google News e gera um arquivo index.html estático.
-
-Roda sozinho via GitHub Actions todo dia, sem precisar de chave de API.
+BioFuel Monitor — busca noticias sobre SAF, Biobunker e Blending
+usando Tavily API e gera um arquivo index.html estatico.
+Roda automaticamente via GitHub Actions todo dia.
 """
 
-import feedparser
 import html
+import json
+import os
 import re
 import urllib.request
 from datetime import datetime, timezone
-from urllib.parse import quote
 
-# Google News blocks requests without a browser-like User-Agent
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                  "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-}
+TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 
-# ── Configuração dos temas e queries de busca ──
-# Cada tema tem buscas separadas em inglês (mundo) e português (Brasil),
-# para cobrir tanto fontes internacionais quanto nacionais.
-FEEDS = [
-    # ───────── SAF (Sustainable Aviation Fuel) ─────────
+# Queries por tema — Tavily entende linguagem natural
+SEARCHES = [
+    # SAF - Cobertura geral mundial
     {
         "cat": "saf",
         "label": "SAF",
+        "query": "latest news sustainable aviation fuel SAF airlines production investment 2026",
         "lang": "en",
-        "query": (
-            '"sustainable aviation fuel" OR "SAF mandate" OR "aviation biofuel" '
-            'OR "SAF ATJ" OR "alcohol to jet" OR "SAF production" OR "jet biofuel"'
-        ),
     },
+    # SAF - Mandatos e regulacao por pais
     {
         "cat": "saf",
         "label": "SAF",
-        "lang": "pt",
-        "query": (
-            '"combustível sustentável de aviação" OR "SAF aviação" OR "querosene sustentável" '
-            'OR "etanol para aviação" OR "biocombustível de aviação" OR "SAF combustível"'
-        ),
+        "query": "SAF blending mandate country regulation policy update news Europe Asia Americas 2026",
+        "lang": "en",
+    },
+    # SAF - CORSIA e politica internacional
+    {
+        "cat": "saf",
+        "label": "SAF",
+        "query": "CORSIA ReFuelEU SAF mandate aviation decarbonization carbon offset news 2026",
+        "lang": "en",
+    },
+    # SAF - Tecnologia e producao
+    {
+        "cat": "saf",
+        "label": "SAF",
+        "query": "SAF ATJ HEFA alcohol to jet power to liquid e-fuel sustainable aviation fuel plant investment news",
+        "lang": "en",
+    },
+    # SAF - Brasil e America Latina
+    {
+        "cat": "saf",
+        "label": "SAF",
+        "query": "sustainable aviation fuel Brazil Latin America SAF ethanol sugarcane Petrobras Embraer news 2026",
+        "lang": "en",
     },
 
-    # ───────── Biobunker (combustível marítimo sustentável) ─────────
+    # Biobunker - Cobertura geral mundial
     {
         "cat": "bio",
         "label": "Biobunker",
+        "query": "latest news marine biofuel biobunker green shipping fuel decarbonization IMO 2026",
         "lang": "en",
-        "query": (
-            '"biobunker" OR "marine biofuel" OR "bio-bunker" OR "green shipping fuel" '
-            'OR "ethanol shipping fuel" OR "IMO biofuel" OR "IMO decarbonization" '
-            'OR "maritime ethanol fuel" OR "shipping ethanol"'
-        ),
     },
+    # Biobunker - Etanol maritimo e combustiveis alternativos
     {
         "cat": "bio",
         "label": "Biobunker",
-        "lang": "pt",
-        "query": (
-            '"biobunker" OR "combustível marítimo sustentável" OR "etanol marítimo" '
-            'OR "etanol para navios" OR "descarbonização marítima" OR "IMO biocombustível"'
-        ),
+        "query": "shipping ethanol methanol ammonia hydrogen green fuel vessel bunker news ports 2026",
+        "lang": "en",
+    },
+    # Biobunker - Regulacao IMO e paises
+    {
+        "cat": "bio",
+        "label": "Biobunker",
+        "query": "IMO 2050 decarbonization shipping regulation green fuel mandate carbon neutral vessel news",
+        "lang": "en",
     },
 
-    # ───────── Blending (mandatos de mistura — etanol na gasolina) ─────────
+    # Blending - Cobertura geral mundial
     {
         "cat": "blend",
         "label": "Blending",
+        "query": "latest news ethanol blending mandate gasoline E10 E15 E20 E25 E30 biofuel policy countries 2026",
         "lang": "en",
-        "query": (
-            '"ethanol blending mandate" OR "ethanol gasoline blend" OR "E10" OR "E15" OR "E20" OR "E25" '
-            'OR "ethanol blending requirement" OR "gasoline ethanol mandate"'
-        ),
     },
+    # Blending - Asia e mercados emergentes
     {
         "cat": "blend",
         "label": "Blending",
-        "lang": "pt",
-        "query": (
-            '"mistura de etanol na gasolina" OR "mandato de mistura etanol" OR "mistura obrigatória etanol" '
-            'OR "RenovaBio mistura etanol" OR "percentual de etanol na gasolina" '
-            'OR "ANP mistura etanol"'
-        ),
-    },
-
-    # ───────── Regulação internacional (CORSIA / mandatos de SAF por país) ─────────
-    {
-        "cat": "saf",
-        "label": "SAF",
+        "query": "ethanol blending mandate India Indonesia Vietnam Thailand Philippines China policy update news 2026",
         "lang": "en",
-        "query": '"CORSIA" OR "ReFuelEU aviation" OR "national SAF mandate" OR "SAF policy"',
+    },
+    # Blending - Americas e Europa
+    {
+        "cat": "blend",
+        "label": "Blending",
+        "query": "ethanol gasoline blend mandate Brazil USA Argentina Colombia Europe RenovaBio ANP update 2026",
+        "lang": "en",
     },
 ]
 
-MAX_PER_FEED = 12
+MAX_PER_SEARCH = 8
 
-
-def build_feed_url(query: str, lang: str = "en") -> str:
-    q = quote(query)
-    if lang == "pt":
-        return f"https://news.google.com/rss/search?q={q}&hl=pt-BR&gl=BR&ceid=BR:pt-419"
-    return f"https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en"
-
-
-def clean_title(title: str) -> str:
-    # Google News titles often end with " - Source Name"
-    return re.sub(r" - [^-]{2,60}$", "", title).strip()
-
-
-def extract_source(title: str, entry) -> str:
-    if hasattr(entry, "source") and getattr(entry.source, "title", None):
-        return entry.source.title
-    m = re.search(r" - ([^-]+)$", title)
-    return m.group(1).strip() if m else "Fonte desconhecida"
-
-
-def fmt_date(parsed_time) -> str:
-    if not parsed_time:
-        return ""
-    dt = datetime(*parsed_time[:6], tzinfo=timezone.utc)
-    return dt.strftime("%d/%m %H:%M UTC")
-
-
-# Palavras que indicam que a notícia é sobre futebol (SAF = Sociedade Anônima
-# do Futebol no Brasil), e não sobre Sustainable Aviation Fuel.
 FOOTBALL_BLOCKLIST = [
-    "futebol", "clube", "campeonato", "técnico", "jogador", "estádio",
-    "libertadores", "brasileirão", "copa", "futebolístic", "atlético",
+    "futebol", "clube", "campeonato", "tecnico", "jogador", "estadio",
+    "libertadores", "brasileirao", "copa do mundo", "futebolistic",
     "flamengo", "corinthians", "palmeiras", "vasco", "botafogo",
-    "fluminense", "grêmio", "internacional", "cruzeiro", "athletico",
-    "bahia", "fortaleza", "vitória", "soccer", "football club",
-    "midfielder", "striker", "manager sacked", "premier league",
-    "champions league", "transfer window",
+    "fluminense", "gremio", "cruzeiro", "athletico", "fortaleza",
+    "soccer", "football club", "midfielder", "striker", "transfer window",
+    "premier league", "champions league", "la liga", "serie a",
+]
+
+COUNTRY_RULES = [
+    ("🇧🇷", "Brasil",         ["brasil", "brazil", "brazilian", "petrobras", "anp", "renovabio",
+                                "embraer", "raizen", "ubrabio", "sao paulo", "rio de janeiro"]),
+    ("🇺🇸", "EUA",            ["united states", "u.s.", "usa", "american", "faa", "epa",
+                                "washington", "california", "texas", "boeing", "delta air"]),
+    ("🇪🇺", "Uniao Europeia", ["european union", "eu commission", "brussels", "refueleu", "eu parliament"]),
+    ("🇬🇧", "Reino Unido",    ["uk", "united kingdom", "britain", "british", "london"]),
+    ("🇩🇪", "Alemanha",       ["germany", "german", "berlin", "lufthansa"]),
+    ("🇫🇷", "Franca",         ["france", "french", "paris", "total energies", "airbus"]),
+    ("🇳🇱", "Paises Baixos",  ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
+    ("🇨🇳", "China",          ["china", "chinese", "beijing", "sinopec"]),
+    ("🇯🇵", "Japao",          ["japan", "japanese", "tokyo", "ana holdings", "jal"]),
+    ("🇮🇳", "India",          ["india", "indian", "delhi", "indianoil"]),
+    ("🇸🇬", "Singapura",      ["singapore", "singaporean"]),
+    ("🇦🇺", "Australia",      ["australia", "australian", "qantas", "sydney"]),
+    ("🇨🇦", "Canada",         ["canada", "canadian", "toronto", "air canada"]),
+    ("🇦🇪", "Emirados Arabes",["uae", "emirates", "dubai", "abu dhabi"]),
+    ("🇮🇩", "Indonesia",      ["indonesia", "indonesian", "jakarta"]),
+    ("🇻🇳", "Vietna",         ["vietnam", "vietnamese", "hanoi", "ho chi minh"]),
+    ("🇹🇭", "Tailandia",      ["thailand", "thai", "bangkok"]),
+    ("🇵🇭", "Filipinas",      ["philippines", "filipino", "manila"]),
+    ("🇰🇷", "Coreia do Sul",  ["south korea", "korean", "seoul"]),
+    ("🇳🇴", "Noruega",        ["norway", "norwegian"]),
+    ("🇿🇦", "Africa do Sul",  ["south africa", "johannesburg"]),
+    ("🇦🇷", "Argentina",      ["argentina", "buenos aires"]),
+    ("🇨🇴", "Colombia",       ["colombia", "colombian", "bogota"]),
+    ("🇲🇾", "Malasia",        ["malaysia", "malaysian", "kuala lumpur", "petronas"]),
 ]
 
 
 def is_football_noise(title: str, summary: str) -> bool:
     text = f"{title} {summary}".lower()
-    return any(word in text for word in FOOTBALL_BLOCKLIST)
-
-
-# ── Detecção de país pelo conteúdo da notícia ──
-# Cada país tem: bandeira, nome de exibição, e palavras-chave que o identificam
-# (nomes do país, gentílicos, órgãos/empresas nacionais relevantes ao setor).
-COUNTRY_RULES = [
-    ("🇧🇷", "Brasil",        ["brasil", "brazil", "brazilian", "petrobras", "anp ", "renovabio",
-                               "embraer", "raízen", "ubrabio", "abraba", "são paulo", "rio de janeiro"]),
-    ("🇺🇸", "EUA",           ["united states", " u.s.", "usa", "american", "faa", "epa ",
-                               "washington", "california", "texas", "boeing", "delta air"]),
-    ("🇪🇺", "União Europeia", ["european union", "eu commission", "brussels", "refueleu", "eu parliament"]),
-    ("🇬🇧", "Reino Unido",    ["uk ", "united kingdom", "britain", "british", "london"]),
-    ("🇩🇪", "Alemanha",       ["germany", "german", "berlin", "lufthansa"]),
-    ("🇫🇷", "França",         ["france", "french", "paris", "total energies", "airbus"]),
-    ("🇳🇱", "Países Baixos",  ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
-    ("🇪🇸", "Espanha",        ["spain", "spanish", "madrid", "repsol"]),
-    ("🇨🇳", "China",          ["china", "chinese", "beijing", "sinopec"]),
-    ("🇯🇵", "Japão",          ["japan", "japanese", "tokyo", "ana holdings", "jal "]),
-    ("🇮🇳", "Índia",          ["india", "indian", "delhi", "indianoil"]),
-    ("🇸🇬", "Singapura",      ["singapore", "singaporean"]),
-    ("🇦🇺", "Austrália",      ["australia", "australian", "qantas", "sydney"]),
-    ("🇨🇦", "Canadá",         ["canada", "canadian", "toronto", "air canada"]),
-    ("🇦🇪", "Emirados Árabes", ["uae", "emirates", "dubai", "abu dhabi"]),
-    ("🇸🇦", "Arábia Saudita", ["saudi arabia", "saudi", "aramco"]),
-    ("🇮🇩", "Indonésia",      ["indonesia", "indonesian", "jakarta"]),
-    ("🇰🇷", "Coreia do Sul",  ["south korea", "korean", "seoul"]),
-    ("🇻🇳", "Vietnã",         ["vietnam", "vietnamese", "hanoi", "ho chi minh"]),
-    ("🇹🇭", "Tailândia",      ["thailand", "thai ", "bangkok"]),
-    ("🇲🇾", "Malásia",        ["malaysia", "malaysian", "kuala lumpur", "petronas"]),
-    ("🇵🇭", "Filipinas",      ["philippines", "filipino", "manila"]),
-    ("🇵🇰", "Paquistão",      ["pakistan", "pakistani", "islamabad", "karachi"]),
-    ("🇧🇩", "Bangladesh",     ["bangladesh", "dhaka"]),
-    ("🇹🇼", "Taiwan",         ["taiwan", "taiwanese", "taipei"]),
-    ("🇲🇽", "México",         ["mexico", "mexican"]),
-    ("🇦🇷", "Argentina",      ["argentina", "argentine", "buenos aires"]),
-    ("🇮🇹", "Itália",         ["italy", "italian", "rome", "eni "]),
-    ("🇳🇴", "Noruega",        ["norway", "norwegian"]),
-]
+    return any(w in text for w in FOOTBALL_BLOCKLIST)
 
 
 def detect_country(title: str, summary: str):
     text = f" {title} {summary} ".lower()
     for flag, name, keywords in COUNTRY_RULES:
-        for kw in keywords:
-            if kw in text:
-                return flag, name
+        if any(k in text for k in keywords):
+            return flag, name
     return "🌐", "Global"
 
 
 def normalize_title(title: str) -> str:
-    """Normaliza o título para detectar notícias duplicadas vindas de fontes diferentes."""
-    t = title.lower().strip()
-    t = re.sub(r"[^\w\s]", "", t)   # remove pontuação
-    t = re.sub(r"\s+", " ", t)      # espaços múltiplos
-    return t
+    t = re.sub(r"[^\w\s]", "", title.lower().strip())
+    return re.sub(r"\s+", " ", t)
 
 
-def fetch_news():
+def fmt_date(iso: str) -> str:
+    if not iso:
+        return ""
+    try:
+        d = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+        diff = int((datetime.now(timezone.utc) - d).total_seconds() / 60)
+        if diff < 60:
+            return f"ha {diff}min"
+        if diff < 1440:
+            return f"ha {diff // 60}h"
+        return d.strftime("%d/%m")
+    except Exception:
+        return ""
+
+
+def tavily_search(query: str, max_results: int = 8) -> list:
+    if not TAVILY_API_KEY:
+        print("  AVISO: TAVILY_API_KEY nao encontrada.")
+        return []
+
+    payload = json.dumps({
+        "query": query,
+        "max_results": max_results,
+        "search_depth": "basic",
+        "include_answer": False,
+        "include_raw_content": False,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://api.tavily.com/search",
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {TAVILY_API_KEY}",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data.get("results", [])
+    except Exception as e:
+        print(f"  AVISO: Erro na busca Tavily: {e}")
+        return []
+
+
+def fetch_news() -> list:
     all_items = []
     seen_urls = set()
     seen_titles = set()
 
-    for feed_cfg in FEEDS:
-        url = build_feed_url(feed_cfg["query"], feed_cfg.get("lang", "en"))
-        req = urllib.request.Request(url, headers=HEADERS)
-        try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                raw_data = resp.read()
-            parsed = feedparser.parse(raw_data)
-        except Exception as e:
-            print(f"  Aviso: falha ao buscar feed '{feed_cfg['label']}': {e}")
-            continue
+    for search in SEARCHES:
+        print(f"  Buscando: {search['label']} ({search['lang']})...")
+        results = tavily_search(search["query"], MAX_PER_SEARCH)
 
-        for entry in parsed.entries[:MAX_PER_FEED]:
-            link = entry.get("link", "")
-            if not link or link in seen_urls:
+        for r in results:
+            url = r.get("url", "")
+            title = r.get("title", "").strip()
+            summary = r.get("content", "").strip()
+
+            if not url or not title:
+                continue
+            if url in seen_urls:
                 continue
 
-            raw_title = entry.get("title", "Sem título")
-            title = clean_title(raw_title)
             norm = normalize_title(title)
             if norm in seen_titles:
                 continue
 
-            summary = entry.get("summary", "")
-            summary = re.sub(r"<[^>]+>", "", summary).strip()
-
-            # Filtra ruído de "SAF" = Sociedade Anônima do Futebol
-            if feed_cfg["cat"] == "saf" and is_football_noise(title, summary):
+            if search["cat"] == "saf" and is_football_noise(title, summary):
+                print(f"    [FILTRADO - futebol] {title[:60]}")
                 continue
 
-            seen_urls.add(link)
+            seen_urls.add(url)
             seen_titles.add(norm)
 
-            source = extract_source(raw_title, entry)
             flag, country = detect_country(title, summary)
+            pub_date = r.get("published_date", "")
 
             all_items.append({
                 "title": title,
                 "summary": summary[:220],
-                "url": link,
-                "source": source,
-                "date_str": fmt_date(entry.get("published_parsed")),
-                "date_sort": entry.get("published_parsed") or (0,) * 9,
-                "category": feed_cfg["cat"],
+                "url": url,
+                "source": r.get("source", ""),
+                "date_str": fmt_date(pub_date),
+                "date_raw": pub_date,
+                "category": search["cat"],
                 "flag": flag,
                 "country": country,
             })
 
-    # Sort newest first
-    all_items.sort(key=lambda x: x["date_sort"], reverse=True)
+    # Sort by date, newest first
+    all_items.sort(key=lambda x: x.get("date_raw", ""), reverse=True)
     return all_items
 
 
-def render_html(items):
-    now = datetime.now(timezone.utc).strftime("%d/%m/%Y às %H:%M UTC")
+def render_html(items: list) -> str:
+    now = datetime.now(timezone.utc).strftime("%d/%m/%Y as %H:%M UTC")
 
     counts = {
-        "all": len(items),
-        "saf": sum(1 for i in items if i["category"] == "saf"),
-        "bio": sum(1 for i in items if i["category"] == "bio"),
+        "all":   len(items),
+        "saf":   sum(1 for i in items if i["category"] == "saf"),
+        "bio":   sum(1 for i in items if i["category"] == "bio"),
         "blend": sum(1 for i in items if i["category"] == "blend"),
     }
 
@@ -267,19 +267,24 @@ def render_html(items):
 
     cards_html = ""
     for i, item in enumerate(items):
+        delay = min(i * 20, 400)
+        desc_html = (
+            f'<div class="news-desc">{html.escape(item["summary"][:200])}...</div>'
+            if item["summary"] else ""
+        )
         cards_html += f"""
     <a class="news-card" href="{html.escape(item['url'])}" target="_blank" rel="noopener"
        data-cat="{item['category']}" data-title="{html.escape(item['title'].lower())}"
-       style="animation-delay:{min(i*20,400)}ms">
+       style="animation-delay:{delay}ms">
       <div class="news-top">
         <span class="news-badge {item['category']}">{labels[item['category']]}</span>
         <span class="news-time">{html.escape(item['date_str'])}</span>
       </div>
       <div class="news-title">{html.escape(item['title'])}</div>
-      {f'<div class="news-desc">{html.escape(item["summary"])}…</div>' if item['summary'] else ''}
+      {desc_html}
       <div class="news-footer">
         <span class="news-source">{item['flag']} {html.escape(item['country'])} · {html.escape(item['source'])}</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>"""
 
@@ -287,16 +292,16 @@ def render_html(items):
         cards_html = """
     <div class="empty">
       <div class="empty-icon">📭</div>
-      <div class="empty-title">Nenhuma notícia encontrada</div>
-      <div class="empty-desc">A próxima atualização automática roda em breve.</div>
+      <div class="empty-title">Nenhuma noticia encontrada</div>
+      <div class="empty-desc">Verifique a chave Tavily no GitHub Secrets e tente novamente.</div>
     </div>"""
 
-    template = f"""<!DOCTYPE html>
+    return f"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>BioFuel Monitor — SAF · Biobunker · Blending</title>
+<title>BioFuel Monitor</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
   *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
@@ -311,8 +316,6 @@ def render_html(items):
     --r:14px;
   }}
   body{{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}}
-
-  /* ── NAVBAR ── */
   .navbar{{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}}
   .nav-logo{{display:flex;align-items:center;gap:8px;text-decoration:none}}
   .nav-logo-mark{{width:28px;height:28px;background:linear-gradient(135deg,#2bc4a0,#065c3d);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}}
@@ -321,21 +324,18 @@ def render_html(items):
   .nav-tab{{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all .15s;border:1px solid transparent}}
   .nav-tab:hover{{color:var(--text);background:var(--bg3)}}
   .nav-tab.active{{background:var(--bg3);border-color:var(--border2);color:var(--text)}}
-
   .header{{padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}}
   .header-title{{font-size:24px;font-weight:700;line-height:1.25;letter-spacing:-.3px}}
   .updated{{font-size:12px;color:var(--text3);margin-top:6px}}
-
   .search-wrap{{padding:0 20px 16px}}
   .search-box{{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}}
   .search-box input{{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px}}
   .search-box input::placeholder{{color:var(--text3)}}
-
   .stats{{padding:0 20px;display:flex;flex-direction:column;gap:10px;margin-bottom:20px}}
   .stat-card{{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:all .15s}}
   .stat-card:hover{{border-color:var(--border2)}}
-  .stat-card.active-saf  {{border-color:var(--saf);  background:var(--saf-bg)}}
-  .stat-card.active-bio  {{border-color:var(--bio);  background:var(--bio-bg)}}
+  .stat-card.active-saf  {{border-color:var(--saf);background:var(--saf-bg)}}
+  .stat-card.active-bio  {{border-color:var(--bio);background:var(--bio-bg)}}
   .stat-card.active-blend{{border-color:var(--blend);background:var(--blend-bg)}}
   .stat-card.active-all  {{border-color:var(--accent);background:rgba(43,196,160,0.08)}}
   .stat-head{{display:flex;align-items:center;gap:8px;margin-bottom:6px}}
@@ -343,21 +343,18 @@ def render_html(items):
   .stat-label{{font-size:12px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text2)}}
   .stat-num{{font-size:34px;font-weight:700;line-height:1;margin-bottom:2px}}
   .stat-sub{{font-size:12px;color:var(--text3)}}
-
   .filters{{padding:0 20px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}}
   .filters::-webkit-scrollbar{{display:none}}
   .chip{{padding:7px 18px;border-radius:20px;font-size:13px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}}
   .chip.a{{background:var(--accent);border-color:var(--accent);color:#fff}}
-
   .news-wrap{{padding:0 20px;display:flex;flex-direction:column;gap:10px}}
-
   @keyframes fadeUp{{from{{opacity:0;transform:translateY(6px)}}to{{opacity:1;transform:translateY(0)}}}}
   .news-card{{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-decoration:none;color:inherit;display:block;transition:border-color .15s;animation:fadeUp .2s ease both}}
   .news-card:hover{{border-color:var(--border2)}}
   .news-top{{display:flex;align-items:center;gap:8px;margin-bottom:10px}}
   .news-badge{{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid}}
-  .news-badge.saf  {{color:var(--saf);  border-color:var(--saf);  background:var(--saf-bg)}}
-  .news-badge.bio  {{color:var(--bio);  border-color:var(--bio);  background:var(--bio-bg)}}
+  .news-badge.saf  {{color:var(--saf);border-color:var(--saf);background:var(--saf-bg)}}
+  .news-badge.bio  {{color:var(--bio);border-color:var(--bio);background:var(--bio-bg)}}
   .news-badge.blend{{color:var(--blend);border-color:var(--blend);background:var(--blend-bg)}}
   .news-time{{font-size:11px;color:var(--text3);margin-left:auto}}
   .news-title{{font-size:14px;font-weight:500;line-height:1.45;margin-bottom:8px}}
@@ -365,7 +362,6 @@ def render_html(items):
   .news-footer{{display:flex;align-items:center;gap:8px;flex-wrap:wrap}}
   .news-source{{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:75%}}
   .news-read{{font-size:11px;color:var(--accent-l);margin-left:auto}}
-
   .empty{{padding:60px 20px;text-align:center;color:var(--text2)}}
   .empty-icon{{font-size:40px;margin-bottom:14px;opacity:.3}}
   .empty-title{{font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px}}
@@ -380,14 +376,15 @@ def render_html(items):
     <span class="nav-logo-name">BioFuel Monitor</span>
   </a>
   <div class="nav-tabs">
-    <a class="nav-tab active" href="index.html">📰 Notícias</a>
+    <a class="nav-tab active" href="index.html">📰 Noticias</a>
     <a class="nav-tab" href="mapa-mandatos.html">🗺️ Mapa de Mandatos</a>
+    <a class="nav-tab" href="mapa-saf.html">✈️ SAF</a>
   </div>
 </nav>
 
 <div class="header">
   <div>
-    <div class="header-title">Ferramenta de monitoramento de notícias para novos mercados</div>
+    <div class="header-title">Ferramenta de monitoramento de noticias para novos mercados</div>
     <div class="updated">Atualizado em {now}</div>
   </div>
 </div>
@@ -402,15 +399,15 @@ def render_html(items):
 <div class="stats">
   <div class="stat-card" id="sc-saf" onclick="setFilter('saf')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--saf)"></span><span class="stat-label">SAF</span></div>
-    <div class="stat-num">{counts['saf']}</div><div class="stat-sub">notícias</div>
+    <div class="stat-num">{counts['saf']}</div><div class="stat-sub">noticias</div>
   </div>
   <div class="stat-card" id="sc-bio" onclick="setFilter('bio')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--bio)"></span><span class="stat-label">Biobunker</span></div>
-    <div class="stat-num">{counts['bio']}</div><div class="stat-sub">notícias</div>
+    <div class="stat-num">{counts['bio']}</div><div class="stat-sub">noticias</div>
   </div>
   <div class="stat-card" id="sc-blend" onclick="setFilter('blend')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--blend)"></span><span class="stat-label">Blending</span></div>
-    <div class="stat-num">{counts['blend']}</div><div class="stat-sub">notícias</div>
+    <div class="stat-num">{counts['blend']}</div><div class="stat-sub">noticias</div>
   </div>
   <div class="stat-card active-all" id="sc-all" onclick="setFilter('all')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--accent)"></span><span class="stat-label">Total</span></div>
@@ -430,7 +427,6 @@ def render_html(items):
 
 <script>
 let activeFilter = 'all';
-
 function setFilter(f) {{
   activeFilter = f;
   ['all','saf','bio','blend'].forEach(k=>{{
@@ -439,32 +435,33 @@ function setFilter(f) {{
   }});
   renderCards();
 }}
-
 function renderCards() {{
   const q = document.getElementById('search-input').value.toLowerCase();
-  const cards = document.querySelectorAll('.news-card');
-  cards.forEach(c => {{
-    const matchesFilter = activeFilter === 'all' || c.dataset.cat === activeFilter;
-    const matchesSearch = !q || c.dataset.title.includes(q);
-    c.style.display = (matchesFilter && matchesSearch) ? 'block' : 'none';
+  document.querySelectorAll('.news-card').forEach(c => {{
+    const mf = activeFilter === 'all' || c.dataset.cat === activeFilter;
+    const ms = !q || c.dataset.title.includes(q);
+    c.style.display = (mf && ms) ? 'block' : 'none';
   }});
 }}
 </script>
 </body>
 </html>"""
 
-    return template
-
 
 def main():
-    print("Buscando notícias...")
+    if not TAVILY_API_KEY:
+        print("ERRO: Variavel TAVILY_API_KEY nao encontrada.")
+        print("Adicione a chave em: GitHub repo > Settings > Secrets > TAVILY_API_KEY")
+        exit(1)
+
+    print("Iniciando busca com Tavily...")
     items = fetch_news()
-    print(f"Encontradas {len(items)} notícias.")
+    print(f"Total de noticias encontradas: {len(items)}")
 
     output = render_html(items)
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(output)
-    print("Arquivo index.html gerado com sucesso.")
+    print("index.html gerado com sucesso!")
 
 
 if __name__ == "__main__":
