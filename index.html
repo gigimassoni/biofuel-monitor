@@ -26,8 +26,8 @@
   .nav-tab{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all .15s;border:1px solid transparent}
   .nav-tab:hover{color:var(--text);background:var(--bg3)}
   .nav-tab.active{background:var(--bg3);border-color:var(--border2);color:var(--text)}
-  .header{padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-  .header-title{font-size:24px;font-weight:700;line-height:1.25;letter-spacing:-.3px}
+  .header{padding:20px 20px 16px}
+  .header-title{font-size:22px;font-weight:700;line-height:1.25;letter-spacing:-.3px}
   .updated{font-size:12px;color:var(--text3);margin-top:6px}
   .search-wrap{padding:0 20px 16px}
   .search-box{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
@@ -79,16 +79,14 @@
   </a>
   <div class="nav-tabs">
     <a class="nav-tab active" href="index.html">📰 Noticias</a>
-    <a class="nav-tab" href="mapa-mandatos.html">🗺️ Mapa de Mandatos</a>
+    <a class="nav-tab" href="mapa-mandatos.html">🗺️ Blending</a>
     <a class="nav-tab" href="mapa-saf.html">✈️ SAF</a>
   </div>
 </nav>
 
 <div class="header">
-  <div>
-    <div class="header-title">Ferramenta de monitoramento de noticias para novos mercados</div>
-    <div class="updated">Atualizado em 20/07/2026 as 00:50 UTC</div>
-  </div>
+  <div class="header-title">Ferramenta de monitoramento de noticias para novos mercados</div>
+  <div class="updated">Atualizado em 20/07/2026 as 00:56 UTC</div>
 </div>
 
 <div class="search-wrap">
@@ -101,19 +99,19 @@
 <div class="stats">
   <div class="stat-card" id="sc-saf" onclick="setFilter('saf')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--saf)"></span><span class="stat-label">SAF</span></div>
-    <div class="stat-num">5</div><div class="stat-sub">noticias</div>
+    <div class="stat-num">2</div><div class="stat-sub">noticias</div>
   </div>
   <div class="stat-card" id="sc-bio" onclick="setFilter('bio')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--bio)"></span><span class="stat-label">Biobunker</span></div>
-    <div class="stat-num">7</div><div class="stat-sub">noticias</div>
+    <div class="stat-num">9</div><div class="stat-sub">noticias</div>
   </div>
   <div class="stat-card" id="sc-blend" onclick="setFilter('blend')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--blend)"></span><span class="stat-label">Blending</span></div>
-    <div class="stat-num">3</div><div class="stat-sub">noticias</div>
+    <div class="stat-num">8</div><div class="stat-sub">noticias</div>
   </div>
   <div class="stat-card active-all" id="sc-all" onclick="setFilter('all')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--accent)"></span><span class="stat-label">Total</span></div>
-    <div class="stat-num">15</div><div class="stat-sub">—</div>
+    <div class="stat-num">19</div><div class="stat-sub">—</div>
   </div>
 </div>
 
@@ -125,191 +123,23 @@
 </div>
 
 <div class="news-wrap" id="news-area">
-    <a class="news-card" href="https://aviationweek.com/aerospace/emerging-technologies/week-technology-july-20-24-2026" target="_blank" rel="noopener"
-       data-cat="saf" data-title="the week in technology, july 20-24, 2026 - aviation week"
+    <a class="news-card" href="https://www.forbes.com/sites/energyinnovation/2026/07/19/indias-fuel-security-risk-is-a-billion-dollar-aviation-fuel-opportunity/" target="_blank" rel="noopener"
+       data-cat="saf" data-title="india’s fuel security risk is a billion-dollar aviation fuel opportunity - forbes"
        style="animation-delay:0ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
         <span class="news-time">Sun, 19 Ju</span>
       </div>
-      <div class="news-title">The Week In Technology, July 20-24, 2026 - Aviation Week</div>
-      <div class="news-desc">* Aviation Week &amp; Space Technology - Inside MRO. * Engine Leasing, Trading &amp; Finance Americas. * CAPA Airline Leader Summit - Airlines in Transition. * CAPA Airline Leader Summit - Americas. * CAPA Ai...</div>
+      <div class="news-title">India’s Fuel Security Risk Is A Billion-Dollar Aviation Fuel Opportunity - Forbes</div>
+      <div class="news-desc"># India’s Fuel Security Risk Is A Billion-Dollar Aviation Fuel Opportunity. That weakness could become an opportunity by combining India&#x27;s abundant agricultural residue with it&#x27;s ultra-cheap solar and...</div>
       <div class="news-footer">
-        <span class="news-source">🇦🇺 Australia · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://apnews.com/article/british-open-cameron-young-runnerup-13792cd603f870d09f3951d4c4091a3b" target="_blank" rel="noopener"
-       data-cat="bio" data-title="cameron young waited and waited some more. then another british open slipped from his grasp - ap news"
-       style="animation-delay:20ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">Cameron Young waited and waited some more. Then another British Open slipped from his grasp - AP News</div>
-      <div class="news-desc">Cameron Young of the United States reacts after playing out of a bunker on the 18th green during the final day of the British Open Golf championships at Royal Birkdale golf club, in Southport, England...</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://www.tradingview.com/news/reuters.com,2026-07-19:newsml_ACSd6zxba:0/" target="_blank" rel="noopener"
-       data-cat="blend" data-title="news by access newswire on tradingview, 2026-07-19 - tradingview"
-       style="animation-delay:40ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">News by ACCESS Newswire on TradingView, 2026-07-19 - TradingView</div>
-      <div class="news-desc">Image 2: ACCESS NewswireImage 3: ACCESS Newswire. Sign up to read this news. ## Latest news. * Image 4 Dow Jones Newswires Start a free trial to read this news. Dow Jones Newswires Start a free trial ...</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://aviationweek.com/mro/supply-chain/aviation-aftermarket-weathering-geopolitical-uncertainty-well" target="_blank" rel="noopener"
-       data-cat="saf" data-title="aviation aftermarket is weathering geopolitical uncertainty well - aviation week"
-       style="animation-delay:60ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">Aviation Aftermarket Is Weathering Geopolitical Uncertainty Well - Aviation Week</div>
-      <div class="news-desc">* Aviation Week &amp; Space Technology - Inside MRO. * Engine Leasing Trading &amp; Finance Europe. * Engine Leasing, Trading &amp; Finance Americas. * CAPA Airline Leader Summit - Airlines in Transition. * CAPA ...</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://maritime-executive.com/article/fayard-shipyard-under-pressure-for-repairing-russia-serving-lng-carriers" target="_blank" rel="noopener"
-       data-cat="bio" data-title="fayard shipyard under pressure for repairing russia-serving lng carriers - the maritime executive"
-       style="animation-delay:80ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">Fayard Shipyard Under Pressure for Repairing Russia-Serving LNG Carriers - The Maritime Executive</div>
-      <div class="news-desc">Denmark’s Fayard Shipyard has dismissed mounting political pushback for its continued servicing of Russian Arctic LNG tankers. Fayard is reportedly the last EU shipyard still offering maintenance serv...</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://mishtalk.com/economics/hello-america-the-price-of-gasoline-tops-4-00-tomorrow/" target="_blank" rel="noopener"
-       data-cat="blend" data-title="hello america, the price of gasoline tops $4.00 tomorrow - mishtalk"
-       style="animation-delay:100ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">Hello America, the Price of Gasoline Tops $4.00 Tomorrow - MishTalk</div>
-      <div class="news-desc"># Hello America, the Price of Gasoline Tops $4.00 Tomorrow. 19 comments on Hello America, the Price of Gasoline Tops $4.00 Tomorrow. If you think this is a small price to pay, then thank Trump. &gt; July...</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://aviationweek.com/air-transport/aircraft-propulsion/boeing-bca-ceo-says-stability-first-then-optimization" target="_blank" rel="noopener"
-       data-cat="saf" data-title="boeing bca ceo says stability first, then optimization - aviation week"
-       style="animation-delay:120ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">Boeing BCA CEO Says Stability First, Then Optimization - Aviation Week</div>
-      <div class="news-desc">* Aviation Week &amp; Space Technology - Inside MRO. * CAPA Airline Leader Summit - Airlines in Transition. * CAPA Airline Leader Summit - Americas. * CAPA Airline Leader Summit - Asia &amp; Sustainability Aw...</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://www.marinelink.com/blogs/blog/cpc-caspian-pipeline-consortium-suspends-oil-loadings-after-105103" target="_blank" rel="noopener"
-       data-cat="bio" data-title="cpc: caspian pipeline consortium suspends oil loadings after drone attacks on tanks - marine news magazine"
-       style="animation-delay:140ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">CPC: Caspian Pipeline Consortium suspends oil loadings after drone attacks on tanks - Marine News Magazine</div>
-      <div class="news-desc">Posted to Maritime Reporter on July 19, 2026. CPC said on Sunday that two oil tankers had been? attacked off the coast of Russia&#x27;s Black Sea, adding that? CPC reported that the ASIA and NISSOS-IOS tan...</div>
-      <div class="news-footer">
-        <span class="news-source">🇬🇧 Reino Unido · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://www.skynews.com.au/australia-news/todays-news-headlines-pauline-hanson-criticises-migration-policy/video/761d4d8a951b7fc474b88518c6ff83c6?amp" target="_blank" rel="noopener"
-       data-cat="blend" data-title="today’s news headlines: pauline hanson criticises migration policy - sky news australia"
-       style="animation-delay:160ms">
-      <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">Today’s News Headlines: Pauline Hanson criticises migration policy - Sky News Australia</div>
-      <div class="news-desc"># Today’s News Headlines: Pauline Hanson criticises migration policy. One Nation Leader Pauline Hanson blames mass migration for many issues Australians face, funeral for former broadcaster and politi...</div>
-      <div class="news-footer">
-        <span class="news-source">🇦🇺 Australia · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://aviationweek.com/aerospace/advanced-air-mobility/eve-back-air-next-phase-announces-new-lois" target="_blank" rel="noopener"
-       data-cat="saf" data-title="eve ‘back in the air’ for next phase, announces new lois - aviation week"
-       style="animation-delay:180ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">Eve ‘Back In The Air’ For Next Phase, Announces New LOIs - Aviation Week</div>
-      <div class="news-desc">* Aviation Week &amp; Space Technology - Inside MRO. * CAPA Airline Leader Summit - Airlines in Transition. * CAPA Airline Leader Summit - Americas. * CAPA Airline Leader Summit - Australia Pacific. * CAP...</div>
-      <div class="news-footer">
-        <span class="news-source">🇦🇺 Australia · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://www.reuters.com/business/energy/gulf-crude-exports-jump-july-shipments-slowing-renewed-hostilities-data-shows-2026-07-19/" target="_blank" rel="noopener"
-       data-cat="bio" data-title="gulf crude exports jump in july but shipments slowing on renewed hostilities, data shows - reuters"
-       style="animation-delay:200ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">Gulf crude exports jump in July but shipments slowing on renewed hostilities, data shows - Reuters</div>
-      <div class="news-desc">Exclusive news, data and analytics for financial market professionals Learn more about Refinitiv. ## Browse World. ## Browse Business. Image 3: Vessels at the Strait of Hormuz, as seen from Musandam. ...</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://aviationweek.com/air-transport/aircraft-propulsion/embraer-new-industries-grow-regional-jet-markets" target="_blank" rel="noopener"
-       data-cat="saf" data-title="embraer: new industries grow regional jet markets - aviation week"
-       style="animation-delay:220ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">Embraer: New Industries Grow Regional Jet Markets - Aviation Week</div>
-      <div class="news-desc">* Aviation Week &amp; Space Technology - Inside MRO. * CAPA Airline Leader Summit - Airlines in Transition. * CAPA Airline Leader Summit - Americas. * CAPA Airline Leader Summit - Latin America &amp; Caribbea...</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · </span>
-        <span class="news-read">Ler &#8594;</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://www.global-agriculture.com/global-agriculture/carb-guidance-brings-regulatory-clarity-for-soy-based-biofuels/" target="_blank" rel="noopener"
-       data-cat="bio" data-title="carb guidance brings regulatory clarity for soy-based biofuels - global agriculture"
-       style="animation-delay:240ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">Sun, 19 Ju</span>
-      </div>
-      <div class="news-title">CARB Guidance Brings Regulatory Clarity for Soy-Based Biofuels - Global Agriculture</div>
-      <div class="news-desc">Home » Global Agriculture » CARB Guidance Brings Regulatory Clarity for Soy-Based Biofuels. # CARB Guidance Brings Regulatory Clarity for Soy-Based Biofuels. ****19** July 2026, **US**:** The American...</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-source">🇮🇳 India · </span>
         <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
     <a class="news-card" href="https://legalblogs.wolterskluwer.com/arbitration-blog/kluwerarbitration-ita-arbitration-report-volume-no-xxiv-issue-no-2-february-2026/" target="_blank" rel="noopener"
        data-cat="bio" data-title="kluwerarbitration ita arbitration report, volume no. xxiv, issue no. 2 (february 2026) - wolters kluwer"
-       style="animation-delay:260ms">
+       style="animation-delay:20ms">
       <div class="news-top">
         <span class="news-badge bio">Biobunker</span>
         <span class="news-time">Sun, 19 Ju</span>
@@ -321,15 +151,239 @@
         <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://www.jpost.com/business-and-innovation/article-902924" target="_blank" rel="noopener"
-       data-cat="bio" data-title="thousands of meta users worldwide report facebook, instagram issues, cause uknown - the jerusalem post"
+    <a class="news-card" href="https://mishtalk.com/economics/hello-america-the-price-of-gasoline-tops-4-00-tomorrow/" target="_blank" rel="noopener"
+       data-cat="blend" data-title="hello america, the price of gasoline tops $4.00 tomorrow - mishtalk"
+       style="animation-delay:40ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">Sun, 19 Ju</span>
+      </div>
+      <div class="news-title">Hello America, the Price of Gasoline Tops $4.00 Tomorrow - MishTalk</div>
+      <div class="news-desc"># Hello America, the Price of Gasoline Tops $4.00 Tomorrow. 19 comments on Hello America, the Price of Gasoline Tops $4.00 Tomorrow. If you think this is a small price to pay, then thank Trump. &gt; July...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.icelandreview.com/news/eu-backs-extension-of-icelands-aviation-emissions-exemption/" target="_blank" rel="noopener"
+       data-cat="saf" data-title="eu backs extension of iceland’s aviation emissions exemption - iceland review"
+       style="animation-delay:60ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time">Fri, 17 Ju</span>
+      </div>
+      <div class="news-title">EU Backs Extension of Iceland’s Aviation Emissions Exemption - Iceland Review</div>
+      <div class="news-desc"># EU Backs Extension of Iceland’s Aviation Emissions Exemption. The European Commission and the Icelandic government have agreed in principle to extend Iceland’s special exemption under the EU Emissio...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://maritime-executive.com/corporate/zim-line-and-msc-add-jaxport-to-asia-container-service-rotation" target="_blank" rel="noopener"
+       data-cat="bio" data-title="zim line and msc add jaxport to asia container service rotation - the maritime executive"
+       style="animation-delay:80ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time">Sat, 18 Ju</span>
+      </div>
+      <div class="news-title">ZIM Line and MSC add JAXPORT to Asia Container Service Rotation - The Maritime Executive</div>
+      <div class="news-desc"># ZIM Line and MSC add JAXPORT to Asia Container Service Rotation. The Jacksonville Port Authority (JAXPORT) welcomes the Sapphire, the first vessel to call Jacksonville as part of the ZCP-Amberjack c...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.global-agriculture.com/global-agriculture/carb-guidance-brings-regulatory-clarity-for-soy-based-biofuels/" target="_blank" rel="noopener"
+       data-cat="blend" data-title="carb guidance brings regulatory clarity for soy-based biofuels - global agriculture"
+       style="animation-delay:100ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">Sun, 19 Ju</span>
+      </div>
+      <div class="news-title">CARB Guidance Brings Regulatory Clarity for Soy-Based Biofuels - Global Agriculture</div>
+      <div class="news-desc">Home » Global Agriculture » CARB Guidance Brings Regulatory Clarity for Soy-Based Biofuels. # CARB Guidance Brings Regulatory Clarity for Soy-Based Biofuels. ****19** July 2026, **US**:** The American...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://maritime-executive.com/corporate/fuel-quality-report-finds-iso-compliant-fuels-are-causing-problems" target="_blank" rel="noopener"
+       data-cat="bio" data-title="fuel quality report finds iso-compliant fuels are causing problems - the maritime executive"
+       style="animation-delay:120ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time">Sat, 18 Ju</span>
+      </div>
+      <div class="news-title">Fuel Quality Report Finds ISO-Compliant Fuels are Causing Problems - The Maritime Executive</div>
+      <div class="news-desc"># Fuel Quality Report Finds ISO-Compliant Fuels are Causing Problems. ### New analysis reveals that the biggest fuel quality risks are no longer confined to off-specification fuels, with some complian...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.timesrepublican.com/opinion/columnists/2026/07/fighting-for-our-corn-growers-and-for-iowa-agriculture/" target="_blank" rel="noopener"
+       data-cat="blend" data-title="fighting for our corn growers and for iowa agriculture - times republican"
+       style="animation-delay:140ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">Sat, 18 Ju</span>
+      </div>
+      <div class="news-title">Fighting for our corn growers and for Iowa agriculture - Times Republican</div>
+      <div class="news-desc">Since our states’ founding in 1846, Iowa’s corn farmers have fed our families, fueled our economies, and strengthened our nation’s security. Representing the largest corn-producing district in the nat...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.kyivpost.com/post/80593" target="_blank" rel="noopener"
+       data-cat="bio" data-title="sanctioned russian shadow fleet tanker spills oil near oman coast - kyiv post"
+       style="animation-delay:160ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time">Sat, 18 Ju</span>
+      </div>
+      <div class="news-title">Sanctioned Russian Shadow Fleet Tanker Spills Oil Near Oman Coast - Kyiv Post</div>
+      <div class="news-desc"># Sanctioned Russian Shadow Fleet Tanker Spills Oil Near Oman Coast. **In brief:** Satellite imagery indicates that the Caroline Bezengi, a sanctioned Russian shadow fleet tanker, is spilling oil in a...</div>
+      <div class="news-footer">
+        <span class="news-source">🇬🇧 Reino Unido · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.bbc.com/news/articles/ckgv0zd497zo" target="_blank" rel="noopener"
+       data-cat="blend" data-title="eu proposes slowing down cuts to carbon emissions for businesses - bbc"
+       style="animation-delay:180ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">Fri, 17 Ju</span>
+      </div>
+      <div class="news-title">EU proposes slowing down cuts to carbon emissions for businesses - BBC</div>
+      <div class="news-desc"># EU proposes slowing down cuts to carbon emissions for businesses. The European Union has unveiled proposals that would slow cuts to businesses&#x27; greenhouse gas emissions limits, as part of a major cl...</div>
+      <div class="news-footer">
+        <span class="news-source">🇪🇺 Uniao Europeia · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://maritime-executive.com/corporate/repsol-supplies-first-bioethanol-to-maersk-in-the-port-of-barcelona" target="_blank" rel="noopener"
+       data-cat="bio" data-title="repsol supplies first bioethanol to maersk in the port of barcelona - the maritime executive"
+       style="animation-delay:200ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time">Sat, 18 Ju</span>
+      </div>
+      <div class="news-title">Repsol Supplies First Bioethanol to Maersk in the Port of Barcelona - The Maritime Executive</div>
+      <div class="news-desc"># Repsol Supplies First Bioethanol to Maersk in the Port of Barcelona. Repsol has successfully supplied 2,800 tons of bioethanol to a Maersk container vessel, Antonia Maersk, in the first bunkering op...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.marinelink.com/blogs/blog/grainsus-soybeans-are-up-as-soyoil-soars-black-sea-tensions-105100" target="_blank" rel="noopener"
+       data-cat="blend" data-title="grains-us soybeans are up, as soyoil soars. black sea tensions boost wheat and corn - marine news magazine"
+       style="animation-delay:220ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">Fri, 17 Ju</span>
+      </div>
+      <div class="news-title">GRAINS-US soybeans are up, as soyoil soars. Black Sea tensions boost wheat and corn - Marine News Magazine</div>
+      <div class="news-desc">Posted to Maritime Reporter on July 17, 2026. Analysts said that U.S. soybean futures rose above $12 per bushel again on Friday, as soyoil? surged nearly 3% to reach a six-week peak on the back of ris...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.theguardian.com/australia-news/2026/jul/17/distillery-owner-could-face-only-three-months-in-jail-over-alleged-poisoning-australian-teenagers" target="_blank" rel="noopener"
+       data-cat="bio" data-title="australia updates travel advice for laos as charges announced over mass methanol poisoning - the guardian"
+       style="animation-delay:240ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time">Fri, 17 Ju</span>
+      </div>
+      <div class="news-title">Australia updates travel advice for Laos as charges announced over mass methanol poisoning - The Guardian</div>
+      <div class="news-desc"># Australia updates travel advice for Laos as charges announced over mass methanol poisoning. The Australian government has increased its travel alert level for Laos, advising travellers to “exercise ...</div>
+      <div class="news-footer">
+        <span class="news-source">🇦🇺 Australia · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://propakistani.pk/2026/07/17/national-refinery-expects-1-2-billion-upgrade-soon/" target="_blank" rel="noopener"
+       data-cat="blend" data-title="national refinery expects $1.2 billion upgrade soon - propakistani"
+       style="animation-delay:260ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">Fri, 17 Ju</span>
+      </div>
+      <div class="news-title">National Refinery Expects $1.2 Billion Upgrade Soon - ProPakistani</div>
+      <div class="news-desc">National Refinery Limited (NRL) expects the government’s long-awaited refinery policy to be finalized soon, with most outstanding issues already resolved, according to Chief Executive Officer Asad Has...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.edie.net/from-ambition-to-action-delivering-net-zero-in-hard-to-abate-sectors/" target="_blank" rel="noopener"
+       data-cat="bio" data-title="from ambition to action: delivering net-zero in hard-to-abate sectors - edie.net"
        style="animation-delay:280ms">
       <div class="news-top">
         <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">Sun, 19 Ju</span>
+        <span class="news-time">Fri, 17 Ju</span>
       </div>
-      <div class="news-title">Thousands of Meta users worldwide report Facebook, Instagram issues, cause uknown - The Jerusalem Post</div>
-      <div class="news-desc"># Thousands of Meta users worldwide report Facebook, Instagram issues, cause uknown. ## The source of Meta&#x27;s disruption was not immediately clear, though users reported login failures, inaccessible ac...</div>
+      <div class="news-title">From ambition to action: Delivering net-zero in hard-to-abate sectors - edie.net</div>
+      <div class="news-desc"># From ambition to action: Delivering net-zero in hard-to-abate sectors. Mohamed Bousseta, chief executive of the Green Energy Park, explores what it will take to turn climate ambition into action in ...</div>
+      <div class="news-footer">
+        <span class="news-source">🇬🇧 Reino Unido · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.fleetowner.com/perspectives/ideaxchange/blog/55391466/fuel-management-strategies-that-help-fleets-reduce-costs-and-improve-efficiency" target="_blank" rel="noopener"
+       data-cat="blend" data-title="beyond the pump: how to build a line-item fuel strategy - fleetowner"
+       style="animation-delay:300ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">Fri, 17 Ju</span>
+      </div>
+      <div class="news-title">Beyond the pump: How to build a line-item fuel strategy - FleetOwner</div>
+      <div class="news-desc">Fleets can improve fuel performance by connecting data, preventive maintenance, driver habits, and procurement decisions into one strategy. * Treat fuel efficiency as a year-round strategy tied to pro...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.marinelink.com/news/usiran-attacks-escalation-chokes-hormuz-541304" target="_blank" rel="noopener"
+       data-cat="bio" data-title="us-iran attacks escalation chokes hormuz shipping - marine news magazine"
+       style="animation-delay:320ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time">Fri, 17 Ju</span>
+      </div>
+      <div class="news-title">US-Iran Attacks Escalation Chokes Hormuz Shipping - Marine News Magazine</div>
+      <div class="news-desc">Just three commodity vessels crossed the Strait of Hormuz on Thursday, the fewest daily transits since May, shipping data showed, with most ships halting or making U-turns after recent Iranian attacks...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.agriculture.com/partners-corn-growers-urge-doj-investigation-into-collusive-fertilizer-industry-practices-12021366" target="_blank" rel="noopener"
+       data-cat="blend" data-title="corn growers urge doj investigation into ‘collusive’ fertilizer industry practices - successful farming"
+       style="animation-delay:340ms">
+      <div class="news-top">
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time">Fri, 17 Ju</span>
+      </div>
+      <div class="news-title">Corn Growers Urge DOJ Investigation Into ‘Collusive’ Fertilizer Industry Practices - Successful Farming</div>
+      <div class="news-desc">Farmers from across the country are urging the federal government to expedite an investigation of the fertilizer industry as they struggle with “impossibly high input costs.”. In the letter sent to le...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.marinelink.com/blogs/blog/strait-of-hormuz-transits-drop-as-us-and-iran-escalate-their-105098" target="_blank" rel="noopener"
+       data-cat="bio" data-title="strait of hormuz transits drop as us and iran escalate their attacks across gulf - marine news magazine"
+       style="animation-delay:360ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time">Fri, 17 Ju</span>
+      </div>
+      <div class="news-title">Strait of Hormuz Transits Drop as US and Iran escalate their attacks across Gulf - Marine News Magazine</div>
+      <div class="news-desc">Posted to Maritime Reporter on July 17, 2026. Shipping data shows that only three commodity ships crossed the Strait of Hormuz Thursday. This is the lowest number of transits since last May. Most vess...</div>
       <div class="news-footer">
         <span class="news-source">🇺🇸 EUA · </span>
         <span class="news-read">Ler &#8594;</span>
