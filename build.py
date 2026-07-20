@@ -74,12 +74,20 @@ COUNTRY_RULES = [
 ]
 
 
+def is_noise(title: str, summary: str) -> bool:
+    """Filtra paginas de indice, PDFs e conteudo com markdown bruto."""
+    if title.startswith("[PDF]"):
+        return True
+    # Resumo com muito markdown = pagina de indice, nao noticia
+    md_count = summary.count("##") + summary.count("####")
+    if md_count >= 3:
+        return True
+    return False
+
+
 def is_football_noise(title: str, summary: str) -> bool:
     text = f"{title} {summary}".lower()
     return any(w in text for w in FOOTBALL_BLOCKLIST)
-
-
-def detect_country(title: str, summary: str):
     text = f" {title} {summary} ".lower()
     for flag, name, keywords in COUNTRY_RULES:
         if any(k in text for k in keywords):
@@ -94,9 +102,8 @@ def normalize_title(title: str) -> str:
 
 def fmt_date(iso: str) -> str:
     if not iso:
-        return ""
+        return "hoje"
     try:
-        # Tavily returns dates like "2026-07-18T10:30:00" or "2026-07-18"
         iso_clean = iso.replace("Z", "+00:00")
         if "T" in iso_clean:
             d = datetime.fromisoformat(iso_clean)
@@ -112,7 +119,7 @@ def fmt_date(iso: str) -> str:
             return f"ha {days}d"
         return d.strftime("%d/%m/%Y")
     except Exception:
-        return iso[:10] if iso else ""
+        return iso[:10] if iso else "hoje"
 
 
 def tavily_search(query: str, max_results: int = 8) -> list:
@@ -123,7 +130,9 @@ def tavily_search(query: str, max_results: int = 8) -> list:
     payload = json.dumps({
         "query": query,
         "max_results": max_results,
-        "search_depth": "advanced",
+        "search_depth": "basic",
+        "topic": "news",
+        "days": 1,
         "include_answer": False,
         "include_raw_content": False,
     }).encode("utf-8")
@@ -168,6 +177,10 @@ def fetch_news() -> list:
 
             norm = normalize_title(title)
             if norm in seen_titles:
+                continue
+
+            if is_noise(title, summary):
+                print(f"    [FILTRADO - ruido] {title[:60]}")
                 continue
 
             if search["cat"] == "saf" and is_football_noise(title, summary):
