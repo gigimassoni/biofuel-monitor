@@ -16,88 +16,24 @@ TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 
 # Queries por tema — Tavily entende linguagem natural
 SEARCHES = [
-    # SAF - Cobertura geral mundial
     {
         "cat": "saf",
         "label": "SAF",
-        "query": "latest news sustainable aviation fuel SAF airlines production investment 2026",
-        "lang": "en",
+        "query": "sustainable aviation fuel SAF news worldwide latest",
     },
-    # SAF - Mandatos e regulacao por pais
-    {
-        "cat": "saf",
-        "label": "SAF",
-        "query": "SAF blending mandate country regulation policy update news Europe Asia Americas 2026",
-        "lang": "en",
-    },
-    # SAF - CORSIA e politica internacional
-    {
-        "cat": "saf",
-        "label": "SAF",
-        "query": "CORSIA ReFuelEU SAF mandate aviation decarbonization carbon offset news 2026",
-        "lang": "en",
-    },
-    # SAF - Tecnologia e producao
-    {
-        "cat": "saf",
-        "label": "SAF",
-        "query": "SAF ATJ HEFA alcohol to jet power to liquid e-fuel sustainable aviation fuel plant investment news",
-        "lang": "en",
-    },
-    # SAF - Brasil e America Latina
-    {
-        "cat": "saf",
-        "label": "SAF",
-        "query": "sustainable aviation fuel Brazil Latin America SAF ethanol sugarcane Petrobras Embraer news 2026",
-        "lang": "en",
-    },
-
-    # Biobunker - Cobertura geral mundial
     {
         "cat": "bio",
         "label": "Biobunker",
-        "query": "latest news marine biofuel biobunker green shipping fuel decarbonization IMO 2026",
-        "lang": "en",
+        "query": "marine biofuel ethanol bunker shipping decarbonization news worldwide latest",
     },
-    # Biobunker - Etanol maritimo e combustiveis alternativos
-    {
-        "cat": "bio",
-        "label": "Biobunker",
-        "query": "shipping ethanol methanol ammonia hydrogen green fuel vessel bunker news ports 2026",
-        "lang": "en",
-    },
-    # Biobunker - Regulacao IMO e paises
-    {
-        "cat": "bio",
-        "label": "Biobunker",
-        "query": "IMO 2050 decarbonization shipping regulation green fuel mandate carbon neutral vessel news",
-        "lang": "en",
-    },
-
-    # Blending - Cobertura geral mundial
     {
         "cat": "blend",
         "label": "Blending",
-        "query": "latest news ethanol blending mandate gasoline E10 E15 E20 E25 E30 biofuel policy countries 2026",
-        "lang": "en",
-    },
-    # Blending - Asia e mercados emergentes
-    {
-        "cat": "blend",
-        "label": "Blending",
-        "query": "ethanol blending mandate India Indonesia Vietnam Thailand Philippines China policy update news 2026",
-        "lang": "en",
-    },
-    # Blending - Americas e Europa
-    {
-        "cat": "blend",
-        "label": "Blending",
-        "query": "ethanol gasoline blend mandate Brazil USA Argentina Colombia Europe RenovaBio ANP update 2026",
-        "lang": "en",
+        "query": "ethanol gasoline blending mandate news worldwide latest",
     },
 ]
 
-MAX_PER_SEARCH = 8
+MAX_PER_SEARCH = 10
 
 FOOTBALL_BLOCKLIST = [
     "futebol", "clube", "campeonato", "tecnico", "jogador", "estadio",
@@ -160,15 +96,23 @@ def fmt_date(iso: str) -> str:
     if not iso:
         return ""
     try:
-        d = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+        # Tavily returns dates like "2026-07-18T10:30:00" or "2026-07-18"
+        iso_clean = iso.replace("Z", "+00:00")
+        if "T" in iso_clean:
+            d = datetime.fromisoformat(iso_clean)
+        else:
+            d = datetime.strptime(iso_clean[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
         diff = int((datetime.now(timezone.utc) - d).total_seconds() / 60)
         if diff < 60:
             return f"ha {diff}min"
         if diff < 1440:
             return f"ha {diff // 60}h"
-        return d.strftime("%d/%m")
+        if diff < 10080:
+            days = diff // 1440
+            return f"ha {days}d"
+        return d.strftime("%d/%m/%Y")
     except Exception:
-        return ""
+        return iso[:10] if iso else ""
 
 
 def tavily_search(query: str, max_results: int = 8) -> list:
@@ -179,7 +123,7 @@ def tavily_search(query: str, max_results: int = 8) -> list:
     payload = json.dumps({
         "query": query,
         "max_results": max_results,
-        "search_depth": "basic",
+        "search_depth": "advanced",
         "include_answer": False,
         "include_raw_content": False,
     }).encode("utf-8")
@@ -248,9 +192,25 @@ def fetch_news() -> list:
                 "country": country,
             })
 
-    # Sort by date, newest first
-    all_items.sort(key=lambda x: x.get("date_raw", ""), reverse=True)
-    return all_items
+    # Intercala categorias para que SAF, Biobunker e Blending apareçam misturados
+    # (evita que SAF domine o topo por ter mais buscas)
+    saf_items   = [i for i in all_items if i["category"] == "saf"]
+    bio_items   = [i for i in all_items if i["category"] == "bio"]
+    blend_items = [i for i in all_items if i["category"] == "blend"]
+
+    # Ordena cada grupo por data
+    for group in [saf_items, bio_items, blend_items]:
+        group.sort(key=lambda x: x.get("date_raw", ""), reverse=True)
+
+    # Intercala: 1 SAF, 1 Bio, 1 Blend, 1 SAF, 1 Bio, 1 Blend...
+    interleaved = []
+    max_len = max(len(saf_items), len(bio_items), len(blend_items))
+    for i in range(max_len):
+        if i < len(saf_items):   interleaved.append(saf_items[i])
+        if i < len(bio_items):   interleaved.append(bio_items[i])
+        if i < len(blend_items): interleaved.append(blend_items[i])
+
+    return interleaved
 
 
 def render_html(items: list) -> str:
