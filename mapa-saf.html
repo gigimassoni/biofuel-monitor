@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mapa Global de Mandatos de SAF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;
+    --border:#21262d;--border2:#30363d;
+    --text:#e6edf3;--text2:#7d8590;--text3:#3d444d;
+    --c-vigor:#0e7fc2;
+    --c-roadmap:#8250df;
+    --c-hibrido:#1a9e6a;
+    --c-voluntario:#d4a017;
+    --c-nenhum:#c23d0e;
+  }
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh}
+
+  /* NAVBAR */
+  .navbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
+  .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+  .nav-logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#2bc4a0,#065c3d);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .nav-logo-name{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+  .nav-tabs{display:flex;gap:4px}
+  .nav-tab{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all .15s;border:1px solid transparent}
+  .nav-tab:hover{color:var(--text);background:var(--bg3)}
+  .nav-tab.active{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+
+  /* HEADER */
+  .header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .header-left h1{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:4px}
+  .header-left p{font-size:12px;color:var(--text2);font-family:'JetBrains Mono',monospace}
+
+  /* LEGEND */
+  .legend{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .legend-item{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg2);font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;user-select:none}
+  .legend-item:hover{border-color:var(--text2);color:var(--text)}
+  .legend-item.active[data-status="volumetrico"]{border-color:#0e7fc2;background:rgba(14,127,194,.1); color:#4db8f0}
+  .legend-item.active[data-status="hibrido"]   {border-color:#1a9e6a;background:rgba(26,158,106,.1); color:#3dd6a0}
+  .legend-item.active[data-status="emissoes"]  {border-color:#8250df;background:rgba(130,80,223,.1); color:#b083f0}
+  .legend-item.active[data-status="voluntario"]{border-color:#d4a017;background:rgba(212,160,23,.1);color:#f0c040}
+  .legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+  /* MAP */
+  .map-wrap{background:var(--bg);border-bottom:1px solid var(--border)}
+  #map-svg{width:100%;display:block}
+  .country-path{stroke:#1a2030;stroke-width:.4px;transition:opacity .15s;cursor:pointer}
+  .country-path:hover{stroke:#fff;stroke-width:1px;opacity:.85}
+
+  /* TOOLTIP */
+  .tooltip{position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;font-size:13px;pointer-events:none;z-index:500;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none}
+  .tt-flag{font-size:22px;margin-bottom:6px}
+  .tt-name{font-weight:600;color:var(--text);margin-bottom:4px}
+  .tt-status{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .tt-target{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .tt-detail{font-size:11px;color:var(--text2);line-height:1.5}
+
+  /* STATS */
+  .stats-bar{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border)}
+  .stat{padding:14px 16px;border-right:1px solid var(--border)}
+  .stat:last-child{border-right:none}
+  .stat-n{font-size:26px;font-weight:700;line-height:1;margin-bottom:4px}
+  .stat-l{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;font-family:'JetBrains Mono',monospace}
+
+  /* TABLE */
+  .table-section{padding:20px 24px}
+  .table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .table-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:'JetBrains Mono',monospace}
+  .search-input{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--text);font-size:13px;outline:none;width:200px;transition:border-color .15s}
+  .search-input:focus{border-color:var(--c-vigor)}
+  .search-input::placeholder{color:var(--text3)}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:8px 12px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;cursor:pointer;white-space:nowrap;user-select:none}
+  th:hover{color:var(--text2)}
+  tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+  tbody tr:hover{background:var(--bg2)}
+  tbody tr:last-child{border-bottom:none}
+  td{padding:11px 12px;font-size:13px;vertical-align:top}
+  .td-country{display:flex;align-items:center;gap:10px}
+  .td-flag{font-size:18px;flex-shrink:0}
+  .td-name{font-weight:500;color:var(--text)}
+  .status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;border:1px solid;white-space:nowrap}
+  .s-volumetrico{background:rgba(14,127,194,.1); color:#4db8f0;border-color:#0e7fc2}
+  .s-hibrido   {background:rgba(26,158,106,.1); color:#3dd6a0;border-color:#1a9e6a}
+  .s-emissoes  {background:rgba(130,80,223,.1); color:#b083f0;border-color:#8250df}
+  .s-voluntario{background:rgba(212,160,23,.1); color:#f0c040;border-color:#d4a017}
+  .target-pill{display:inline-block;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text);white-space:nowrap}
+  .sort-arrow{margin-left:4px;opacity:.4}
+  .sort-arrow.active{opacity:1}
+  .td-notes{font-size:12px;color:var(--text2);max-width:320px;line-height:1.5}
+  .tipo-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1px solid;font-family:'JetBrains Mono',monospace;display:inline-block;margin-bottom:4px}
+  .t-volumetrico{color:#4db8f0;border-color:#0e7fc2;background:rgba(14,127,194,.08)}
+  .t-hibrido    {color:#3dd6a0;border-color:#1a9e6a;background:rgba(26,158,106,.08)}
+  .t-emissoes   {color:#f0c040;border-color:#d4a017;background:rgba(212,160,23,.08)}
+  .t-voluntario {color:#f07050;border-color:#c23d0e;background:rgba(194,61,14,.08)}
+  .t-nenhum     {color:#7d8590;border-color:#3d444d;background:transparent}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:800;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:24px;max-width:480px;width:100%;position:relative;max-height:90vh;overflow-y:auto}
+  .modal-close{position:absolute;top:14px;right:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;width:28px;height:28px;color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .modal-flag{font-size:36px;margin-bottom:10px}
+  .modal-name{font-size:20px;font-weight:700;margin-bottom:6px}
+  .modal-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);gap:16px}
+  .modal-row:last-of-type{border-bottom:none}
+  .modal-key{font-size:12px;color:var(--text2);flex-shrink:0}
+  .modal-val{font-size:13px;font-weight:500;text-align:right}
+  .modal-desc{margin-top:14px;padding:14px;background:var(--bg3);border-radius:10px;font-size:13px;color:var(--text2);line-height:1.65}
+
+  @media(max-width:700px){
+    .stats-bar{grid-template-columns:repeat(3,1fr)}
+    .header{padding:14px 16px}
+    .table-section{padding:14px 16px}
+    th,td{padding:8px}
+    .search-input{width:130px}
+    .td-notes{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-mark">🛢️</div>
+    <span class="nav-logo-name">BioFuel Monitor</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="index.html">📰 Noticias</a>
+    <a class="nav-tab" href="mapa-mandatos.html">🗺️ Blending</a>
+    <a class="nav-tab active" href="mapa-saf.html">✈️ SAF</a>
+  </div>
+</nav>
+
+<div class="header">
+  <div class="header-left">
+    <h1>✈️ Mapa Global de Mandatos de SAF</h1>
+    <p>Atualizado: Julho 2026 · Clique em um pais para detalhes</p>
+  </div>
+  <div class="legend" id="legend">
+    <div class="legend-item active" data-status="volumetrico" onclick="toggleFilter('volumetrico')"><span class="legend-dot" style="background:#0e7fc2"></span>Volumetrico</div>
+    <div class="legend-item active" data-status="hibrido"     onclick="toggleFilter('hibrido')">   <span class="legend-dot" style="background:#1a9e6a"></span>Hibrido</div>
+    <div class="legend-item active" data-status="emissoes"    onclick="toggleFilter('emissoes')">  <span class="legend-dot" style="background:#8250df"></span>Por reducao de emissoes</div>
+    <div class="legend-item active" data-status="voluntario"         onclick="toggleFilter('voluntario')">       <span class="legend-dot" style="background:#d4a017"></span>Voluntario/Meta</div>
+  </div>
+</div>
+
+<div class="map-wrap">
+  <svg id="map-svg" viewBox="0 0 960 500"></svg>
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-n" style="color:#4db8f0" id="s-volumetrico">0</div><div class="stat-l">Volumetrico</div></div>
+  <div class="stat"><div class="stat-n" style="color:#3dd6a0" id="s-hibrido">0</div><div class="stat-l">Hibrido</div></div>
+  <div class="stat"><div class="stat-n" style="color:#b083f0" id="s-emissoes">0</div><div class="stat-l">Por reducao de emissoes</div></div>
+  <div class="stat"><div class="stat-n" style="color:#f0c040" id="s-voluntario">0</div><div class="stat-l">Voluntario/Meta</div></div>
+</div>
+
+<div class="table-section">
+  <div class="table-header">
+    <span class="table-title">Todos os paises monitorados</span>
+    <input class="search-input" id="search" placeholder="Buscar pais..." oninput="filterTable()"/>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th onclick="sortTable('name')">Pais <span class="sort-arrow active" id="arr-name">↑</span></th>
+        <th onclick="sortTable('status')">Status <span class="sort-arrow" id="arr-status"></span></th>
+        <th onclick="sortTable('meta2030')">Meta 2030 <span class="sort-arrow" id="arr-meta2030"></span></th>
+        <th class="td-notes">Descricao</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+const COUNTRIES = [
+  {
+    id:"EUU", name:"Uniao Europeia", flag:"🇪🇺", region:"Europa",
+    status:"volumetrico", tipo:"volumetrico", mandato:"ReFuelEU Aviation",
+    inicio:2025, meta2025:"2%", meta2030:"6%", meta2040:"34%", meta2050:"70%",
+    desc:"A UE adota um sistema baseado em percentuais obrigatorios de mistura de SAF no combustivel de aviacao. Todos os aeroportos europeus com mais de 800 mil passageiros por ano precisam garantir que uma parcela minima do combustivel fornecido seja SAF. O mandato conta ainda com um submandato especifico para e-SAF (combustiveis sinteticos): 0,7% em 2030, com crescimento gradual ate 35% em 2050."
+  },
+  {
+    id:"GBR", name:"Reino Unido", flag:"🇬🇧", region:"Europa",
+    status:"hibrido", tipo:"hibrido", mandato:"UK SAF Mandate",
+    inicio:2025, meta2025:"2%", meta2030:"10%", meta2040:"22%", meta2050:"—",
+    desc:"O Reino Unido adota um modelo hibrido: alem de uma meta percentual de mistura de SAF, aplica um mecanismo de reducao de emissoes baseado em intensidade de carbono (CI). Os certificados de conformidade sao concedidos de acordo com a reducao de CO2 proporcionada pelo combustivel — quanto menor a intensidade de carbono do SAF, mais valioso ele se torna para cumprir a obrigacao regulatoria. Inclui submandato de e-SAF (Power-to-Liquid) de 0,2% a partir de 2028. O uso de HEFA sera progressivamente limitado: de 71% em 2030 a 35% em 2040. Regulado pelo RTFO."
+  },
+  {
+    id:"NOR", name:"Noruega", flag:"🇳🇴", region:"Europa",
+    status:"volumetrico", tipo:"volumetrico", mandato:"Norwegian SAF Mandate",
+    inicio:2020, meta2025:"0.5%", meta2030:"6%", meta2040:"—", meta2050:"—",
+    desc:"A Noruega foi a pioneira global em mandatos de SAF, introduzindo a obrigatoriedade de mistura em 2020. O mandato e volumetrico e se alinha progressivamente com as metas da ReFuelEU para 2025 em diante. O pais tem foco especial em SAF de tecnologias avancadas e e-SAF."
+  },
+  {
+    id:"SGP", name:"Singapura", flag:"🇸🇬", region:"Asia",
+    status:"volumetrico", tipo:"volumetrico", mandato:"SAF Levy Framework / SAFCo",
+    inicio:2026, meta2025:"—", meta2030:"3-5%", meta2040:"—", meta2050:"—",
+    desc:"Singapura implementou um modelo unico: uma taxa (SAF Levy) cobrada de passageiros, cargas e operadores aereos permite ao governo centralizar a compra de SAF por meio da SAFCo (entidade estatal). O mandato de 1% entrou em vigor em outubro de 2026 para todos os voos com partida do Aeroporto de Changi. A meta e escalar para 3 a 5% ate 2030, dependendo da disponibilidade global e dos precos do SAF."
+  },
+  {
+    id:"BRA", name:"Brasil", flag:"🇧🇷", region:"Americas",
+    status:"emissoes", tipo:"emissoes", mandato:"Programa Combustivel do Futuro",
+    inicio:2027, meta2025:"—", meta2030:"3%", meta2040:"—", meta2050:"—",
+    desc:"O Brasil adotou uma abordagem baseada em reducao de emissoes — e nao em um percentual obrigatorio de mistura de SAF. A Lei do Combustivel do Futuro exige que os operadores aereos reduzam gradualmente as emissoes de gases de efeito estufa a partir de 2027: 1% em 2027, subindo progressivamente ate 10% em 2037. Considerando que o SAF tem potencial de reducao de emissoes entre 70% e 80%, o cumprimento da meta exigira volumes crescentes de SAF ao longo do tempo."
+  },
+  {
+    id:"CAN", name:"Canada", flag:"🇨🇦", region:"Americas",
+    status:"volumetrico", tipo:"hibrido", mandato:"B.C. SAF Mandate",
+    inicio:2026, meta2025:"—", meta2030:"3%", meta2040:"—", meta2050:"—",
+    desc:"A Columbia Britanica (British Columbia) tornou-se a primeira jurisdicao da America do Norte a implementar um mandato obrigatorio de SAF, sendo pioneira no continente. Alem da exigencia volumetrica (1% em 2028, 2% em 2029, 3% em 2030), a provincia tambem determina que o combustivel de aviacao abastecido localmente alcance uma reducao de 10% na intensidade de carbono (CI) ate 2030 — requisito que pode ser atendido por meio do uso de SAF fisico."
+  },
+  {
+    id:"IND", name:"India", flag:"🇮🇳", region:"Asia",
+    status:"volumetrico", tipo:"volumetrico", mandato:"SAF Blending Mandate (planejado)",
+    inicio:2027, meta2025:"—", meta2030:"5%", meta2040:"—", meta2050:"—",
+    desc:"A India planeja introduzir um mandato nacional de mistura de SAF de forma gradual a partir de 2027, com o objetivo de acelerar a descarbonizacao do setor de aviacao e estimular a producao domestica de combustiveis sustentaveis. O mandato sera aplicado inicialmente a voos internacionais: 1% em 2027, 2% em 2028 e 5% em 2030. O pais possui grande potencial de producao de SAF a partir de residuos agricolas e biomassa."
+  },
+  {
+    id:"JPN", name:"Japao", flag:"🇯🇵", region:"Asia",
+    status:"volumetrico", tipo:"volumetrico", mandato:"Meta nacional 2030",
+    inicio:2030, meta2025:"—", meta2030:"10%", meta2040:"—", meta2050:"—",
+    desc:"O Japao anunciou uma meta de 10% de SAF para todos os voos com partida do pais ate 2030, embora ela ainda nao tenha sido formalmente adotada como mandato legal. O governo esta incentivando o mercado por meio de credito tributario de 30 ienes por litro de SAF produzido domesticamente. A primeira refinaria de SAF de grande porte entrou em operacao no pais em 2025."
+  },
+  {
+    id:"KOR", name:"Coreia do Sul", flag:"🇰🇷", region:"Asia",
+    status:"volumetrico", tipo:"volumetrico", mandato:"Mandato SAF Voos Internacionais",
+    inicio:2027, meta2025:"—", meta2030:"3-5%", meta2040:"—", meta2050:"—",
+    desc:"A Coreia do Sul introduziu um mandato de SAF que exige que todos os voos internacionais com partida do pais utilizem SAF na mistura de combustivel a partir de 2027. O governo oferece incentivos adicionais, incluindo beneficios fiscais e apoio a investimentos em producao domestica de SAF. O mandato e financiado por meio de uma sobretaxa na passagem aerea. Meta: 1% em 2027, subindo ate 10% em 2035."
+  },
+  {
+    id:"MYS", name:"Malasia", flag:"🇲🇾", region:"Asia",
+    status:"volumetrico", tipo:"volumetrico", mandato:"National Energy Transition Roadmap (NETR) 2023",
+    inicio:2027, meta2025:"—", meta2030:"—", meta2040:"—", meta2050:"47%",
+    desc:"A Malasia estabeleceu, por meio do National Energy Transition Roadmap (NETR) de 2023, uma meta de longo prazo para aumentar a participacao do SAF no setor de aviacao como parte da estrategia nacional de descarbonizacao e transicao energetica. A meta e escalar de 1% em 2027 para 47% em 2050. Os detalhes do mandato obrigatorio ainda estao em definicao, com a Petronas como principal parceira de producao."
+  },
+  {
+    id:"IDN", name:"Indonesia", flag:"🇮🇩", region:"Asia",
+    status:"volumetrico", tipo:"volumetrico", mandato:"Mandato SAF Voos Internacionais (planejado)",
+    inicio:2027, meta2025:"—", meta2030:"2.5%", meta2040:"12.5%", meta2050:"30%",
+    desc:"A Indonesia planeja implementar um mandato de mistura de SAF inicialmente para voos internacionais a partir de 2027. O programa preve um aumento gradual da participacao de SAF ate 2050, apoiando as metas de descarbonizacao da aviacao e o desenvolvimento da industria nacional de biocombustiveis. Meta: 1% em 2027, 2,5% em 2030, 12,5% em 2040 e 30% em 2050."
+  },
+  {
+    id:"CHN", name:"China", flag:"🇨🇳", region:"Asia",
+    status:"volumetrico", tipo:"volumetrico", mandato:"15th Five-Year Plan (2026-2030) - previsto",
+    inicio:2030, meta2025:"—", meta2030:"15%", meta2040:"—", meta2050:"—",
+    desc:"Espera-se que a China introduza um mandato de mistura de SAF durante o 15 Plano Quinquenal (2026-2030). Os detalhes finais ainda nao foram divulgados, mas o governo sinaliza que o pais podera estabelecer metas entre as mais ambiciosas da Asia ate 2030. Estimativa de mercado: aproximadamente 15% de SAF ate 2030, o que representaria uma demanda de 7,2 milhoes de toneladas."
+  },
+  {
+    id:"THA", name:"Tailandia", flag:"🇹🇭", region:"Asia",
+    status:"volumetrico", tipo:"volumetrico", mandato:"Mandato SAF (planejado)",
+    inicio:2026, meta2025:"—", meta2030:"1-2%", meta2040:"—", meta2050:"—",
+    desc:"A Tailandia esta implementando um mandato de SAF obrigatorio desde janeiro de 2026, inicialmente restrito a tecnologia HEFA (conforme norma ASTM D7566). A meta e escalar de 1% em 2026 para 1-2% em 2030 e ate 8% em 2036. O pais possui base robusta de producao de biocombustiveis, principalmente a partir de oleo de palma e residuos agricolas."
+  },
+  {
+    id:"CHL", name:"Chile", flag:"🇨🇱", region:"Americas",
+    status:"voluntario", tipo:"nenhum", mandato:"SAF Roadmap 2050",
+    inicio:2030, meta2025:"—", meta2030:"—", meta2040:"—", meta2050:"50%",
+    desc:"O Chile pretende alcancar uma participacao de 50% de SAF nos voos domesticos e internacionais ate 2050. O SAF Roadmap 2050 tambem preve a construcao de uma planta domestica de SAF em escala comercial ate 2030. O foco e em Power-to-Liquid (PtL) e hidrogenio verde, aproveitando a abundante energia solar do Atacama. Ainda nao existe mandato obrigatorio."
+  },
+  {
+    id:"ARE", name:"Emirados Arabes", flag:"🇦🇪", region:"Oriente Medio",
+    status:"voluntario", tipo:"voluntario", mandato:"General Policy for SAF (2023)",
+    inicio:2031, meta2025:"—", meta2030:"—", meta2040:"—", meta2050:"—",
+    desc:"Por meio da General Policy for Sustainable Aviation Fuel, publicada em dezembro de 2023, os Emirados Arabes estabeleceram uma meta voluntaria para fornecimento de SAF produzido localmente nas companhias aereas nacionais nos aeroportos do pais. Meta: 1% de SAF produzido localmente ate 2031. A Emirates e a Etihad estao entre as maiores compradoras voluntarias de SAF do mundo. A Masdar investe em PtL e SAF de algas."
+  },
+  {
+    id:"TUR", name:"Turquia", flag:"🇹🇷", region:"Europa",
+    status:"voluntario", tipo:"volumetrico", mandato:"Regulamentacao nacional em desenvolvimento",
+    inicio:2025, meta2025:"1%", meta2030:"5%", meta2040:"—", meta2050:"—",
+    desc:"A Turquia esta desenvolvendo uma regulamentacao nacional para SAF. Embora os detalhes finais ainda nao tenham sido publicados, a proposta indica uma meta de mistura de 1% em 2025 e 5% em 2030. A Turkish Airlines e uma das maiores compradoras voluntarias de SAF do mundo. O pais busca alinhar-se as tendencias regulatorias internacionais."
+  },
+  {
+    id:"USA", name:"EUA", flag:"🇺🇸", region:"Americas",
+    status:"voluntario", tipo:"nenhum", mandato:"SAF Grand Challenge (meta aspiracional)",
+    inicio:2030, meta2025:"—", meta2030:"—", meta2040:"—", meta2050:"—",
+    desc:"Os EUA nao possuem mandato nacional obrigatorio de mistura de SAF. O principal instrumento e o SAF Grand Challenge, lancado durante o governo Biden, que estabeleceu uma meta aspiracional de produzir 3 bilhoes de galoes (9,1 Mt) de SAF ate 2030 e substituir 100% do combustivel de aviacao convencional por SAF ate 2050. O alcance dessas metas depende de incentivos federais (credito fiscal 45Z de ate US$ 1,75 por galao), politicas estaduais e compromissos voluntarios do setor aereo. Nao existe percentual nacional obrigatorio de mistura."
+  },
+  {
+    id:"AUS", name:"Australia", flag:"🇦🇺", region:"Oceania",
+    status:"voluntario", tipo:"nenhum", mandato:"Estrategia nacional de SAF (2024)",
+    inicio:2024, meta2025:"—", meta2030:"10%", meta2040:"—", meta2050:"—",
+    desc:"A Australia publicou sua Estrategia Nacional de SAF em 2024, com incentivos fiscais para producao. Nao ha mandato federal obrigatorio. O objetivo aspiracional e de 10% de SAF domestico ate 2030. A Qantas tem compromissos voluntarios de compra de SAF. O pais possui grande potencial de producao a partir de residuos agricolas e oleaginosas."
+  },
+  {
+    id:"ZAF", name:"Africa do Sul", flag:"🇿🇦", region:"Africa",
+    status:"voluntario", tipo:"nenhum", mandato:"CORSIA (participante)",
+    inicio:2027, meta2025:"—", meta2030:"—", meta2040:"—", meta2050:"—",
+    desc:"A Africa do Sul e participante do CORSIA (fase obrigatoria a partir de 2027), mas nao possui mandato nacional de SAF. A South African Airways explora SAF de residuos de milho. O pais tem potencial de se tornar um hub de producao de SAF para o continente africano, com vantagens em biomassa e energia renovavel."
+  },
+];
+
+const STATUS = {
+  volumetrico: {label:"Volumetrico",            color:"#0e7fc2", cls:"s-volumetrico"},
+  hibrido:     {label:"Hibrido",                color:"#1a9e6a", cls:"s-hibrido"},
+  emissoes:    {label:"Por reducao de emissoes",color:"#8250df", cls:"s-emissoes"},
+  voluntario:  {label:"Voluntario/Meta",        color:"#d4a017", cls:"s-voluntario"},
+};
+
+const TIPO = {
+  volumetrico: {label:"Volumetrico",       cls:"t-volumetrico"},
+  hibrido:     {label:"Hibrido",           cls:"t-hibrido"},
+  emissoes:    {label:"Por emissoes (GEE)",cls:"t-emissoes"},
+  voluntario:  {label:"Voluntario",        cls:"t-voluntario"},
+  nenhum:      {label:"Sem mandato",       cls:"t-nenhum"},
+};
+
+const EU_MEMBERS = [40,56,100,191,196,203,208,233,246,250,300,348,372,380,428,440,442,470,528,616,620,642,703,705,724,752];
+
+const NUM_TO_ALPHA = {
+  36:"AUS",76:"BRA",124:"CAN",152:"CHL",156:"CHN",356:"IND",360:"IDN",
+  392:"JPN",410:"KOR",458:"MYS",528:"NLD",578:"NOR",702:"SGP",710:"ZAF",
+  764:"THA",784:"ARE",792:"TUR",826:"GBR",840:"USA",
+};
+
+let activeFilters = new Set(Object.keys(STATUS));
+let sortKey="name", sortDir=1, searchQ="";
+const byId = {};
+COUNTRIES.forEach(c => byId[c.id]=c);
+
+function updateStats(){
+  ["volumetrico","hibrido","emissoes","voluntario"].forEach(s=>{
+    const el = document.getElementById("s-"+s);
+    if(el) el.textContent = COUNTRIES.filter(c=>c.status===s).length;
+  });
+}
+
+function toggleFilter(s){
+  if(activeFilters.has(s)) activeFilters.delete(s);
+  else activeFilters.add(s);
+  document.querySelector(`[data-status="${s}"]`).classList.toggle("active");
+  filterTable();
+  updateMapColors();
+}
+
+function sortTable(key){
+  if(sortKey===key) sortDir*=-1; else{sortKey=key;sortDir=1;}
+  document.querySelectorAll(".sort-arrow").forEach(a=>{a.textContent="";a.classList.remove("active")});
+  const arr=document.getElementById("arr-"+key);
+  if(arr){arr.textContent=sortDir===1?"↑":"↓";arr.classList.add("active");}
+  renderTable();
+}
+
+function filterTable(){
+  searchQ=document.getElementById("search").value.toLowerCase();
+  renderTable();
+}
+
+function renderTable(){
+  let data=COUNTRIES.filter(c=>activeFilters.has(c.status)&&(!searchQ||c.name.toLowerCase().includes(searchQ)||c.region.toLowerCase().includes(searchQ)));
+  data.sort((a,b)=>{
+    let av=a[sortKey]||"",bv=b[sortKey]||"";
+    if(typeof av==="string") return sortDir*av.localeCompare(bv);
+    return sortDir*(av-bv);
+  });
+  const tbody=document.getElementById("table-body");
+  tbody.innerHTML=data.map(c=>{
+    const s=STATUS[c.status];
+    return `<tr onclick="openModal('${c.id}')">
+      <td><div class="td-country"><span class="td-flag">${c.flag}</span><span class="td-name">${c.name}</span></div></td>
+      <td><span class="status-badge ${s.cls}">${s.label}</span></td>
+      <td><span class="target-pill">${c.meta2030||"—"}</span></td>
+      <td class="td-notes">${c.desc.slice(0,120)}...</td>
+    </tr>`;
+  }).join("");
+}
+
+function openModal(id){
+  const c=byId[id];if(!c)return;
+  const s=STATUS[c.status];
+  document.getElementById("modal-content").innerHTML=`
+    <div class="modal-flag">${c.flag}</div>
+    <div class="modal-name">${c.name}</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <span class="status-badge ${s.cls}">${s.label}</span>    </div>
+    <div class="modal-row"><span class="modal-key">Mandato/Programa</span><span class="modal-val">${c.mandato}</span></div>
+    <div class="modal-row"><span class="modal-key">Inicio previsto</span><span class="modal-val" style="font-family:'JetBrains Mono',monospace">${c.inicio}</span></div>
+    <div class="modal-row"><span class="modal-key">Meta 2025</span><span class="modal-val"><span class="target-pill">${c.meta2025||"—"}</span></span></div>
+    <div class="modal-row"><span class="modal-key">Meta 2030</span><span class="modal-val"><span class="target-pill">${c.meta2030||"—"}</span></span></div>
+    <div class="modal-row"><span class="modal-key">Meta 2040</span><span class="modal-val"><span class="target-pill">${c.meta2040||"—"}</span></span></div>
+    <div class="modal-row"><span class="modal-key">Meta 2050</span><span class="modal-val"><span class="target-pill">${c.meta2050||"—"}</span></span></div>
+    <div class="modal-row"><span class="modal-key">Regiao</span><span class="modal-val">${c.region}</span></div>
+    <div class="modal-desc">${c.desc}</div>`;
+  document.getElementById("modal-overlay").classList.add("open");
+}
+
+function closeModal(e){
+  if(!e||e.target===document.getElementById("modal-overlay"))
+    document.getElementById("modal-overlay").classList.remove("open");
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+
+function getFill(alpha){
+  if(!alpha || !byId[alpha]) return "#1e2530";
+  const c = byId[alpha];
+  if(!activeFilters.has(c.status)) return "#1e2530";
+  const s = STATUS[c.status];
+  if(!s) return "#1e2530";
+  return s.color;
+}
+
+function updateMapColors(){
+  d3.selectAll(".country-path").attr("fill",function(){
+    const alpha = d3.select(this).attr("data-alpha");
+    return getFill(alpha);
+  });
+}
+
+async function initMap(){
+  try{
+    const world=await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
+    const proj=d3.geoNaturalEarth1().scale(153).translate([480,260]);
+    const path=d3.geoPath().projection(proj);
+    const svg=d3.select("#map-svg");
+    svg.append("rect").attr("width","100%").attr("height","100%").attr("fill","#0d1f35");
+    const countries=topojson.feature(world,world.objects.countries);
+    svg.selectAll(".country-path")
+      .data(countries.features).enter()
+      .append("path")
+      .attr("class","country-path")
+      .attr("d", path)
+      .attr("data-alpha",d=>{
+        const num=+d.id;
+        if(EU_MEMBERS.includes(num)) return "EUU";
+        return NUM_TO_ALPHA[num]||"";
+      })
+      .attr("fill",d=>{
+        const num=+d.id;
+        if(EU_MEMBERS.includes(num)) return getFill("EUU");
+        return getFill(NUM_TO_ALPHA[num]);
+      })
+      .on("mousemove",function(event,d){
+        const num=+d.id;
+        let id=EU_MEMBERS.includes(num)?"EUU":NUM_TO_ALPHA[num];
+        const c=id?byId[id]:null;
+        if(!c){d3.select("#tooltip").style("display","none");return;}
+        const s=STATUS[c.status];
+        const tt=document.getElementById("tooltip");
+        tt.style.display="block";
+        tt.style.left=(event.clientX+14)+"px";
+        tt.style.top=(event.clientY-10)+"px";
+        tt.innerHTML=`<div class="tt-flag">${c.flag}</div>
+          <div class="tt-name">${c.name}</div>
+          <div class="tt-status"><span class="legend-dot" style="background:${s.color}"></span>${s.label}</div>
+          <div class="tt-target">Meta 2030: ${c.meta2030||"—"}</div>
+          <div class="tt-detail">${c.desc.slice(0,120)}...</div>`;
+      })
+      .on("mouseleave",()=>d3.select("#tooltip").style("display","none"))
+      .on("click",(event,d)=>{
+        const num=+d.id;
+        let id=EU_MEMBERS.includes(num)?"EUU":NUM_TO_ALPHA[num];
+        if(id&&byId[id]) openModal(id);
+      });
+    svg.append("path")
+      .datum(topojson.mesh(world,world.objects.countries,(a,b)=>a!==b))
+      .attr("fill","none").attr("stroke","#1a2030").attr("stroke-width",.4).attr("d",path);
+  }catch(e){
+    console.error("Erro ao carregar mapa:",e);
+    const svg=document.getElementById("map-svg");
+    svg.innerHTML=`<text x="480" y="250" text-anchor="middle" fill="#7d8590" font-size="14" font-family="Inter,sans-serif">Mapa indisponivel — verifique sua conexao com a internet</text>`;
+  }
+}
+
+updateStats();
+renderTable();
+initMap();
+</script>
+</body>
+</html>
