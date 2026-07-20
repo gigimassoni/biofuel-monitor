@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-BioFuel Monitor — busca noticias sobre SAF, Biobunker e Blending
+BioFuel Monitor - busca noticias sobre SAF, Biobunker e Blending
 usando Tavily API e gera um arquivo index.html estatico.
-Roda automaticamente via GitHub Actions todo dia.
 """
 
 import html
@@ -14,80 +13,89 @@ from datetime import datetime, timezone
 
 TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 
-# Queries por tema — Tavily entende linguagem natural
 SEARCHES = [
     {
         "cat": "saf",
         "label": "SAF",
-        "query": "sustainable aviation fuel SAF news worldwide latest",
+        "query": "sustainable aviation fuel SAF production mandate airline news",
     },
     {
         "cat": "bio",
         "label": "Biobunker",
-        "query": "marine biofuel ethanol bunker shipping decarbonization news worldwide latest",
+        "query": "marine biofuel ethanol methanol shipping vessel bunker fuel decarbonization",
     },
     {
         "cat": "blend",
         "label": "Blending",
-        "query": "ethanol gasoline blending mandate news worldwide latest",
+        "query": "ethanol gasoline blending mandate E10 E15 E20 biofuel policy",
     },
 ]
 
 MAX_PER_SEARCH = 10
 
-FOOTBALL_BLOCKLIST = [
-    "futebol", "clube", "campeonato", "tecnico", "jogador", "estadio",
-    "libertadores", "brasileirao", "copa do mundo", "futebolistic",
-    "flamengo", "corinthians", "palmeiras", "vasco", "botafogo",
-    "fluminense", "gremio", "cruzeiro", "athletico", "fortaleza",
-    "soccer", "football club", "midfielder", "striker", "transfer window",
-    "premier league", "champions league", "la liga", "serie a",
+# Palavras que indicam ruido (nao sao noticias relevantes)
+NOISE_WORDS = [
+    "golf", "golfe", "bunker shot", "british open", "ryder cup",
+    "agenda", "calendar", "schedule", "week in technology",
+    "sign up to read", "start a free trial", "subscribe to",
+    "access newswire", "tradingview", "dow jones newswires",
+    "aviation week space technology", "inside mro", "engine leasing",
+    "capa airline leader summit",
+]
+
+# Palavras de futebol
+FOOTBALL_WORDS = [
+    "futebol", "football club", "soccer", "premier league", "champions league",
+    "flamengo", "corinthians", "palmeiras", "libertadores", "brasileirao",
+    "midfielder", "striker", "transfer", "manager sacked",
 ]
 
 COUNTRY_RULES = [
-    ("🇧🇷", "Brasil",         ["brasil", "brazil", "brazilian", "petrobras", "anp", "renovabio",
-                                "embraer", "raizen", "ubrabio", "sao paulo", "rio de janeiro"]),
-    ("🇺🇸", "EUA",            ["united states", "u.s.", "usa", "american", "faa", "epa",
-                                "washington", "california", "texas", "boeing", "delta air"]),
-    ("🇪🇺", "Uniao Europeia", ["european union", "eu commission", "brussels", "refueleu", "eu parliament"]),
-    ("🇬🇧", "Reino Unido",    ["uk", "united kingdom", "britain", "british", "london"]),
-    ("🇩🇪", "Alemanha",       ["germany", "german", "berlin", "lufthansa"]),
-    ("🇫🇷", "Franca",         ["france", "french", "paris", "total energies", "airbus"]),
-    ("🇳🇱", "Paises Baixos",  ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
-    ("🇨🇳", "China",          ["china", "chinese", "beijing", "sinopec"]),
-    ("🇯🇵", "Japao",          ["japan", "japanese", "tokyo", "ana holdings", "jal"]),
-    ("🇮🇳", "India",          ["india", "indian", "delhi", "indianoil"]),
-    ("🇸🇬", "Singapura",      ["singapore", "singaporean"]),
-    ("🇦🇺", "Australia",      ["australia", "australian", "qantas", "sydney"]),
-    ("🇨🇦", "Canada",         ["canada", "canadian", "toronto", "air canada"]),
-    ("🇦🇪", "Emirados Arabes",["uae", "emirates", "dubai", "abu dhabi"]),
-    ("🇮🇩", "Indonesia",      ["indonesia", "indonesian", "jakarta"]),
-    ("🇻🇳", "Vietna",         ["vietnam", "vietnamese", "hanoi", "ho chi minh"]),
-    ("🇹🇭", "Tailandia",      ["thailand", "thai", "bangkok"]),
-    ("🇵🇭", "Filipinas",      ["philippines", "filipino", "manila"]),
-    ("🇰🇷", "Coreia do Sul",  ["south korea", "korean", "seoul"]),
-    ("🇳🇴", "Noruega",        ["norway", "norwegian"]),
-    ("🇿🇦", "Africa do Sul",  ["south africa", "johannesburg"]),
-    ("🇦🇷", "Argentina",      ["argentina", "buenos aires"]),
-    ("🇨🇴", "Colombia",       ["colombia", "colombian", "bogota"]),
-    ("🇲🇾", "Malasia",        ["malaysia", "malaysian", "kuala lumpur", "petronas"]),
+    ("🇧🇷", "Brasil",          ["brasil", "brazil", "brazilian", "petrobras", "anp", "renovabio", "embraer", "raizen"]),
+    ("🇺🇸", "EUA",             ["united states", "u.s.", "usa", "american", "faa", "epa", "washington", "california", "boeing"]),
+    ("🇪🇺", "Uniao Europeia",  ["european union", "eu commission", "brussels", "refueleu"]),
+    ("🇬🇧", "Reino Unido",     ["uk", "united kingdom", "britain", "british", "london"]),
+    ("🇩🇪", "Alemanha",        ["germany", "german", "berlin", "lufthansa"]),
+    ("🇫🇷", "Franca",          ["france", "french", "paris", "total energies", "airbus"]),
+    ("🇳🇱", "Paises Baixos",   ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
+    ("🇨🇳", "China",           ["china", "chinese", "beijing", "sinopec"]),
+    ("🇯🇵", "Japao",           ["japan", "japanese", "tokyo"]),
+    ("🇮🇳", "India",           ["india", "indian", "delhi"]),
+    ("🇸🇬", "Singapura",       ["singapore", "singaporean"]),
+    ("🇦🇺", "Australia",       ["australia", "australian", "qantas"]),
+    ("🇨🇦", "Canada",          ["canada", "canadian"]),
+    ("🇦🇪", "Emirados Arabes", ["uae", "emirates", "dubai", "abu dhabi"]),
+    ("🇮🇩", "Indonesia",       ["indonesia", "indonesian", "jakarta"]),
+    ("🇻🇳", "Vietna",          ["vietnam", "vietnamese", "hanoi"]),
+    ("🇹🇭", "Tailandia",       ["thailand", "thai", "bangkok"]),
+    ("🇵🇭", "Filipinas",       ["philippines", "manila"]),
+    ("🇳🇴", "Noruega",         ["norway", "norwegian"]),
+    ("🇿🇦", "Africa do Sul",   ["south africa", "johannesburg"]),
+    ("🇦🇷", "Argentina",       ["argentina", "buenos aires"]),
+    ("🇨🇴", "Colombia",        ["colombia", "bogota"]),
+    ("🇲🇾", "Malasia",         ["malaysia", "kuala lumpur", "petronas"]),
+    ("🇰🇷", "Coreia do Sul",   ["south korea", "korean", "seoul"]),
+    ("🇳🇬", "Nigeria",         ["nigeria", "nigerian", "lagos"]),
 ]
 
 
 def is_noise(title: str, summary: str) -> bool:
-    """Filtra paginas de indice, PDFs e conteudo com markdown bruto."""
-    if title.startswith("[PDF]"):
+    text = f"{title} {summary}".lower()
+    # Palavras de ruido
+    if any(w in text for w in NOISE_WORDS):
         return True
-    # Resumo com muito markdown = pagina de indice, nao noticia
-    md_count = summary.count("##") + summary.count("####")
-    if md_count >= 3:
+    # Futebol
+    if any(w in text for w in FOOTBALL_WORDS):
+        return True
+    # PDFs e paywalls
+    if title.strip().startswith("[PDF]"):
+        return True
+    if "sign up" in text and "read" in text:
+        return True
+    # Muito markdown = pagina de indice
+    if summary.count("##") >= 3 or summary.count("* ") >= 5:
         return True
     return False
-
-
-def is_football_noise(title: str, summary: str) -> bool:
-    text = f"{title} {summary}".lower()
-    return any(w in text for w in FOOTBALL_BLOCKLIST)
 
 
 def detect_country(title: str, summary: str):
@@ -118,14 +126,13 @@ def fmt_date(iso: str) -> str:
         if diff < 1440:
             return f"ha {diff // 60}h"
         if diff < 10080:
-            days = diff // 1440
-            return f"ha {days}d"
+            return f"ha {diff // 1440}d"
         return d.strftime("%d/%m/%Y")
     except Exception:
         return iso[:10] if iso else "hoje"
 
 
-def tavily_search(query: str, max_results: int = 8) -> list:
+def tavily_search(query: str, max_results: int = 10) -> list:
     if not TAVILY_API_KEY:
         print("  AVISO: TAVILY_API_KEY nao encontrada.")
         return []
@@ -135,7 +142,7 @@ def tavily_search(query: str, max_results: int = 8) -> list:
         "max_results": max_results,
         "search_depth": "basic",
         "topic": "news",
-        "days": 1,
+        "days": 3,
         "include_answer": False,
         "include_raw_content": False,
     }).encode("utf-8")
@@ -164,12 +171,15 @@ def fetch_news() -> list:
     seen_urls = set()
     seen_titles = set()
 
+    saf_items, bio_items, blend_items = [], [], []
+
     for search in SEARCHES:
         print(f"  Buscando: {search['label']}...")
         results = tavily_search(search["query"], MAX_PER_SEARCH)
+        print(f"    Retornou {len(results)} resultados")
 
         for r in results:
-            url = r.get("url", "")
+            url   = r.get("url", "")
             title = r.get("title", "").strip()
             summary = r.get("content", "").strip()
 
@@ -183,11 +193,7 @@ def fetch_news() -> list:
                 continue
 
             if is_noise(title, summary):
-                print(f"    [FILTRADO - ruido] {title[:60]}")
-                continue
-
-            if search["cat"] == "saf" and is_football_noise(title, summary):
-                print(f"    [FILTRADO - futebol] {title[:60]}")
+                print(f"    [RUIDO] {title[:70]}")
                 continue
 
             seen_urls.add(url)
@@ -196,31 +202,34 @@ def fetch_news() -> list:
             flag, country = detect_country(title, summary)
             pub_date = r.get("published_date", "")
 
-            all_items.append({
-                "title": title,
-                "summary": summary[:220],
-                "url": url,
-                "source": r.get("source", ""),
+            item = {
+                "title":    title,
+                "summary":  summary[:220],
+                "url":      url,
+                "source":   r.get("source", ""),
                 "date_str": fmt_date(pub_date),
                 "date_raw": pub_date,
                 "category": search["cat"],
-                "flag": flag,
-                "country": country,
-            })
+                "flag":     flag,
+                "country":  country,
+            }
 
-    # Intercala categorias para que SAF, Biobunker e Blending apareçam misturados
-    # (evita que SAF domine o topo por ter mais buscas)
-    saf_items   = [i for i in all_items if i["category"] == "saf"]
-    bio_items   = [i for i in all_items if i["category"] == "bio"]
-    blend_items = [i for i in all_items if i["category"] == "blend"]
+            if search["cat"] == "saf":
+                saf_items.append(item)
+            elif search["cat"] == "bio":
+                bio_items.append(item)
+            else:
+                blend_items.append(item)
+
+    print(f"  SAF: {len(saf_items)} | Biobunker: {len(bio_items)} | Blending: {len(blend_items)}")
 
     # Ordena cada grupo por data
     for group in [saf_items, bio_items, blend_items]:
         group.sort(key=lambda x: x.get("date_raw", ""), reverse=True)
 
-    # Intercala: 1 SAF, 1 Bio, 1 Blend, 1 SAF, 1 Bio, 1 Blend...
+    # Intercala: 1 SAF, 1 Bio, 1 Blend, 1 SAF...
     interleaved = []
-    max_len = max(len(saf_items), len(bio_items), len(blend_items))
+    max_len = max(len(saf_items), len(bio_items), len(blend_items), 1)
     for i in range(max_len):
         if i < len(saf_items):   interleaved.append(saf_items[i])
         if i < len(bio_items):   interleaved.append(bio_items[i])
@@ -242,12 +251,9 @@ def render_html(items: list) -> str:
     labels = {"saf": "SAF", "bio": "Biobunker", "blend": "Blending"}
 
     cards_html = ""
-    for i, item in enumerate(items):
-        delay = min(i * 20, 400)
-        desc_html = (
-            f'<div class="news-desc">{html.escape(item["summary"][:200])}...</div>'
-            if item["summary"] else ""
-        )
+    for idx, item in enumerate(items):
+        delay = min(idx * 20, 400)
+        desc = f'<div class="news-desc">{html.escape(item["summary"][:200])}...</div>' if item["summary"] else ""
         cards_html += f"""
     <a class="news-card" href="{html.escape(item['url'])}" target="_blank" rel="noopener"
        data-cat="{item['category']}" data-title="{html.escape(item['title'].lower())}"
@@ -257,7 +263,7 @@ def render_html(items: list) -> str:
         <span class="news-time">{html.escape(item['date_str'])}</span>
       </div>
       <div class="news-title">{html.escape(item['title'])}</div>
-      {desc_html}
+      {desc}
       <div class="news-footer">
         <span class="news-source">{item['flag']} {html.escape(item['country'])} · {html.escape(item['source'])}</span>
         <span class="news-read">Ler &#8594;</span>
@@ -268,8 +274,8 @@ def render_html(items: list) -> str:
         cards_html = """
     <div class="empty">
       <div class="empty-icon">📭</div>
-      <div class="empty-title">Nenhuma noticia encontrada</div>
-      <div class="empty-desc">Verifique a chave Tavily no GitHub Secrets e tente novamente.</div>
+      <div class="empty-title">Nenhuma noticia encontrada hoje</div>
+      <div class="empty-desc">Tente rodar novamente mais tarde.</div>
     </div>"""
 
     return f"""<!DOCTYPE html>
@@ -300,8 +306,8 @@ def render_html(items: list) -> str:
   .nav-tab{{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all .15s;border:1px solid transparent}}
   .nav-tab:hover{{color:var(--text);background:var(--bg3)}}
   .nav-tab.active{{background:var(--bg3);border-color:var(--border2);color:var(--text)}}
-  .header{{padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}}
-  .header-title{{font-size:24px;font-weight:700;line-height:1.25;letter-spacing:-.3px}}
+  .header{{padding:20px 20px 16px}}
+  .header-title{{font-size:22px;font-weight:700;line-height:1.25;letter-spacing:-.3px}}
   .updated{{font-size:12px;color:var(--text3);margin-top:6px}}
   .search-wrap{{padding:0 20px 16px}}
   .search-box{{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}}
@@ -353,16 +359,14 @@ def render_html(items: list) -> str:
   </a>
   <div class="nav-tabs">
     <a class="nav-tab active" href="index.html">📰 Noticias</a>
-    <a class="nav-tab" href="mapa-mandatos.html">🗺️ Mapa de Mandatos</a>
+    <a class="nav-tab" href="mapa-mandatos.html">🗺️ Blending</a>
     <a class="nav-tab" href="mapa-saf.html">✈️ SAF</a>
   </div>
 </nav>
 
 <div class="header">
-  <div>
-    <div class="header-title">Ferramenta de monitoramento de noticias para novos mercados</div>
-    <div class="updated">Atualizado em {now}</div>
-  </div>
+  <div class="header-title">Ferramenta de monitoramento de noticias para novos mercados</div>
+  <div class="updated">Atualizado em {now}</div>
 </div>
 
 <div class="search-wrap">
@@ -427,12 +431,11 @@ function renderCards() {{
 def main():
     if not TAVILY_API_KEY:
         print("ERRO: Variavel TAVILY_API_KEY nao encontrada.")
-        print("Adicione a chave em: GitHub repo > Settings > Secrets > TAVILY_API_KEY")
         exit(1)
 
     print("Iniciando busca com Tavily...")
     items = fetch_news()
-    print(f"Total de noticias encontradas: {len(items)}")
+    print(f"Total de noticias apos filtros: {len(items)}")
 
     output = render_html(items)
     with open("index.html", "w", encoding="utf-8") as f:
