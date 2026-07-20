@@ -88,6 +88,9 @@ def is_noise(title: str, summary: str) -> bool:
 def is_football_noise(title: str, summary: str) -> bool:
     text = f"{title} {summary}".lower()
     return any(w in text for w in FOOTBALL_BLOCKLIST)
+
+
+def detect_country(title: str, summary: str):
     text = f" {title} {summary} ".lower()
     for flag, name, keywords in COUNTRY_RULES:
         if any(k in text for k in keywords):
