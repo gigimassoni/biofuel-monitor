@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>BioFuel Monitor — SAF · Biobunker · Blending</title>
+<title>BioFuel Monitor</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -18,8 +18,6 @@
     --r:14px;
   }
   body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}
-
-  /* ── NAVBAR ── */
   .navbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
   .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
   .nav-logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#2bc4a0,#065c3d);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
@@ -28,21 +26,18 @@
   .nav-tab{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all .15s;border:1px solid transparent}
   .nav-tab:hover{color:var(--text);background:var(--bg3)}
   .nav-tab.active{background:var(--bg3);border-color:var(--border2);color:var(--text)}
-
   .header{padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
   .header-title{font-size:24px;font-weight:700;line-height:1.25;letter-spacing:-.3px}
   .updated{font-size:12px;color:var(--text3);margin-top:6px}
-
   .search-wrap{padding:0 20px 16px}
   .search-box{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
   .search-box input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px}
   .search-box input::placeholder{color:var(--text3)}
-
   .stats{padding:0 20px;display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
   .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:all .15s}
   .stat-card:hover{border-color:var(--border2)}
-  .stat-card.active-saf  {border-color:var(--saf);  background:var(--saf-bg)}
-  .stat-card.active-bio  {border-color:var(--bio);  background:var(--bio-bg)}
+  .stat-card.active-saf  {border-color:var(--saf);background:var(--saf-bg)}
+  .stat-card.active-bio  {border-color:var(--bio);background:var(--bio-bg)}
   .stat-card.active-blend{border-color:var(--blend);background:var(--blend-bg)}
   .stat-card.active-all  {border-color:var(--accent);background:rgba(43,196,160,0.08)}
   .stat-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -50,21 +45,18 @@
   .stat-label{font-size:12px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text2)}
   .stat-num{font-size:34px;font-weight:700;line-height:1;margin-bottom:2px}
   .stat-sub{font-size:12px;color:var(--text3)}
-
   .filters{padding:0 20px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
   .filters::-webkit-scrollbar{display:none}
   .chip{padding:7px 18px;border-radius:20px;font-size:13px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
   .chip.a{background:var(--accent);border-color:var(--accent);color:#fff}
-
   .news-wrap{padding:0 20px;display:flex;flex-direction:column;gap:10px}
-
   @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
   .news-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-decoration:none;color:inherit;display:block;transition:border-color .15s;animation:fadeUp .2s ease both}
   .news-card:hover{border-color:var(--border2)}
   .news-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
   .news-badge{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid}
-  .news-badge.saf  {color:var(--saf);  border-color:var(--saf);  background:var(--saf-bg)}
-  .news-badge.bio  {color:var(--bio);  border-color:var(--bio);  background:var(--bio-bg)}
+  .news-badge.saf  {color:var(--saf);border-color:var(--saf);background:var(--saf-bg)}
+  .news-badge.bio  {color:var(--bio);border-color:var(--bio);background:var(--bio-bg)}
   .news-badge.blend{color:var(--blend);border-color:var(--blend);background:var(--blend-bg)}
   .news-time{font-size:11px;color:var(--text3);margin-left:auto}
   .news-title{font-size:14px;font-weight:500;line-height:1.45;margin-bottom:8px}
@@ -72,7 +64,6 @@
   .news-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .news-source{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:75%}
   .news-read{font-size:11px;color:var(--accent-l);margin-left:auto}
-
   .empty{padding:60px 20px;text-align:center;color:var(--text2)}
   .empty-icon{font-size:40px;margin-bottom:14px;opacity:.3}
   .empty-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px}
@@ -87,15 +78,16 @@
     <span class="nav-logo-name">BioFuel Monitor</span>
   </a>
   <div class="nav-tabs">
-    <a class="nav-tab active" href="index.html">📰 Notícias</a>
+    <a class="nav-tab active" href="index.html">📰 Noticias</a>
     <a class="nav-tab" href="mapa-mandatos.html">🗺️ Mapa de Mandatos</a>
+    <a class="nav-tab" href="mapa-saf.html">✈️ SAF</a>
   </div>
 </nav>
 
 <div class="header">
   <div>
-    <div class="header-title">Ferramenta de monitoramento de notícias para novos mercados</div>
-    <div class="updated">Atualizado em 19/07/2026 às 09:03 UTC</div>
+    <div class="header-title">Ferramenta de monitoramento de noticias para novos mercados</div>
+    <div class="updated">Atualizado em 20/07/2026 as 00:17 UTC</div>
   </div>
 </div>
 
@@ -109,15 +101,15 @@
 <div class="stats">
   <div class="stat-card" id="sc-saf" onclick="setFilter('saf')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--saf)"></span><span class="stat-label">SAF</span></div>
-    <div class="stat-num">36</div><div class="stat-sub">notícias</div>
+    <div class="stat-num">39</div><div class="stat-sub">noticias</div>
   </div>
   <div class="stat-card" id="sc-bio" onclick="setFilter('bio')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--bio)"></span><span class="stat-label">Biobunker</span></div>
-    <div class="stat-num">24</div><div class="stat-sub">notícias</div>
+    <div class="stat-num">24</div><div class="stat-sub">noticias</div>
   </div>
   <div class="stat-card" id="sc-blend" onclick="setFilter('blend')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--blend)"></span><span class="stat-label">Blending</span></div>
-    <div class="stat-num">24</div><div class="stat-sub">notícias</div>
+    <div class="stat-num">21</div><div class="stat-sub">noticias</div>
   </div>
   <div class="stat-card active-all" id="sc-all" onclick="setFilter('all')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--accent)"></span><span class="stat-label">Total</span></div>
@@ -133,1187 +125,1192 @@
 </div>
 
 <div class="news-wrap" id="news-area">
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiygFBVV95cUxQdTdHS3FnTFVQLS1ySTdvZFM0aUdaWllHdURVT2ZReG51dThialFPU09ka2ZRZFYxQlJWSFN5SDV6X3dQTlRKeUIzbnRUUVJoeUR0MGlaUDhSNkhpeUFLbk1RZFRBcV9NMnhGUnFkYTNRYVlaSjl1OHpNLVkxZm5IOUdZQjBpdTVWRHpwUVR6MWRBTURueVRGa3NVTmtnTXFhc0lkTEc1NkFtZGNpM1VLUXVra0s0NE9FNUdHRXpaWlU2VEZaSGNuTHZn?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="video: pongamia fuel: growing trees for sustainable aviation fuel"
+    <a class="news-card" href="https://leehamnews.com/2026/06/20/iata-saf-production-volumes-still-disappointing" target="_blank" rel="noopener"
+       data-cat="saf" data-title="iata: saf production volumes still disappointing - leeham news and analysis"
        style="animation-delay:0ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">19/07 05:40 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">VIDEO: Pongamia Fuel: Growing trees for sustainable aviation fuel</div>
-      <div class="news-desc">VIDEO: Pongamia Fuel: Growing trees for sustainable aviation fuel&amp;nbsp;&amp;nbsp;ABC News &amp; Headlines – Australian Broadcasting Corporation…</div>
+      <div class="news-title">IATA: SAF Production Volumes Still Disappointing - Leeham News and Analysis</div>
+      <div class="news-desc"># Leeham News and Analysis. **Five years after IATA’s member airlines committed to net-zero carbon emissions by 2050, the organization is seeing a slow increase in sustainable aviation fuel production...</div>
       <div class="news-footer">
-        <span class="news-source">🇦🇺 Austrália · ABC News &amp; Headlines – Australian Broadcasting Corporation</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMitwFBVV95cUxOc0wta1dEbGZhQzZvOG4yYUxTMllzSFpubWF1ZkM0SDhWdVNnSFp3eHNpS1VMS1ZhNnRteUpDWjZaRmlGN1FLOXc1N3FiQnRxaDJld1N4LWFIenI2Z0NpbTVDbUxRMkhVMm1CVlItRXZ4WGM1dUtBS0MxMUtlNDV3M3h4LUVCQUJkSkpsNlNJRGtIT0E5OEJxREdHVkRVZ3RUaWdQZEFWR3B2VWttdjNLSUZ6TDZSYU0?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="brasil está em posição de liderar produção de combustível sustentável de aviação, diz alckmin"
+    <a class="news-card" href="https://aerospaceglobalnews.com/news/sustainable-aviation-fuel-production-disappointing-iata" target="_blank" rel="noopener"
+       data-cat="saf" data-title="airlines face another disappointing year as saf production lags demand"
        style="animation-delay:20ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">19/07 01:39 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Brasil está em posição de liderar produção de combustível sustentável de aviação, diz Alckmin</div>
-      <div class="news-desc">Brasil está em posição de liderar produção de combustível sustentável de aviação, diz Alckmin&amp;nbsp;&amp;nbsp;Estadão…</div>
+      <div class="news-title">Airlines face another disappointing year as SAF production lags demand</div>
+      <div class="news-desc">With a fraction of all fuel used coming from sustainable sources, the industry body is calling for further action to increase efforts towards decarbonisation. According to a new report published by th...</div>
       <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Estadão</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi5gFBVV95cUxQT21waGFLQmNvZjZsb1FhTDlOS0RKcHdjQ28zU1diQkxjYk96eW1lTVhFMGtVcTNtcUgxNHo0ZHZJYWszZkExeWE0ZWdzaURkSzBseWViM3p6R3lYUFF0TnhNeDBIVFAxVVVxLUNmT0hkTWVUM1hwSW5lTXFrZ2FLRFlVRy1MaHdYUUtNZlMySFJ2X0R3N1FhRDhmQm5VV3lzZnNvZVJYQmg5dTBvdXA2d2JVWFkzSWU2dE5mVERkZDVjbjNnZEk3bjBkbU84Q2h2bWxaM3R1RkstQnRNM2lNd240eTdydw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="airbus and three french giants will turn farm waste into 160,000 metric tons of jet fuel, and it could reshape flying"
+    <a class="news-card" href="https://www.marketsandmarkets.com/blog/AD/sustainable-aviation-fuel-market-trends-2026" target="_blank" rel="noopener"
+       data-cat="saf" data-title="sustainable aviation fuel market trends 2026: airline mandates, feedstock innovation, and production expansion"
        style="animation-delay:40ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">18/07 23:45 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Airbus and three French giants will turn farm waste into 160,000 metric tons of jet fuel, and it could reshape flying</div>
-      <div class="news-desc">Airbus and three French giants will turn farm waste into 160,000 metric tons of jet fuel, and it could reshape flying&amp;nbsp;&amp;nbsp;OkDiario…</div>
+      <div class="news-title">Sustainable Aviation Fuel Market Trends 2026: Airline Mandates, Feedstock Innovation, and Production Expansion</div>
+      <div class="news-desc">Home*/*  Aerospace and Defense */*  sustainable-aviation-fuel-market-trends-2026. # Sustainable Aviation Fuel Market Trends 2026: Airline Mandates, Feedstock Innovation, and Production Expansion. The ...</div>
       <div class="news-footer">
-        <span class="news-source">🇫🇷 França · OkDiario</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxNbG1PMWkzUldxVGtFbTV6X2V0U0VWNUdvY3VSNXZiTUs5dU9fNU5DNGhxYk5QRENwTWgtNktwQkp0YWJSNXU1Y0hFU0x3VHViM1pzNkluejNFbUtKY21PMXhELVA2TTd5RzR1THc1LUh0eUlRUWRqZTlackozMDFGczlZamVVLVZubTVVTld1RmxTUzFKMGpWb19Md0FGWXJVRUNkM1JpWWV5eHJQbTY5WVM1dktXSmlZOGJOc211LTg0dkp6M2NXMw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="why sustainable aviation fuel certificates (safc) matter for corporate climate action"
+    <a class="news-card" href="https://www.youtube.com/watch?v=UKTM0j_C0g4" target="_blank" rel="noopener"
+       data-cat="saf" data-title="saf &amp; net zero: an update on sustainability in aviation from ..."
        style="animation-delay:60ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">18/07 07:03 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Why Sustainable Aviation Fuel certificates (SAFc) matter for corporate climate action</div>
-      <div class="news-desc">Why Sustainable Aviation Fuel certificates (SAFc) matter for corporate climate action&amp;nbsp;&amp;nbsp;SITA…</div>
+      <div class="news-title">SAF &amp; Net Zero: An Update on Sustainability in Aviation from ...</div>
+      <div class="news-desc">IATA estimates show that global Sustainable Aviation Fuel (SAF) production is expected to reach around 2.4 million tonnes in 2026,...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · SITA</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxNcFJNbVRta0M2aGo1ejhwZ3NyYkdydG9rOVNQV1lHMWNkb2Y5SWszdFo2WVQzbWtOeGhyNThwR051cUtlbG84NkxzX29ZbXBNT3RnQVJUOHdkbTZ5SzFRa0txSHpNMHJXdjRWTm9Tb2ZnWTJ5dFBsNDQtd2xVc25SWXcwZ0E0ZWhGNjVjMTFMQUFnTGpDT2xMRF95S1JsV0U5LVV5emxRN1IzQQ?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="support for year-round e15 reaches record high as senate weighs legislation, rfa says - rfd-tv"
+    <a class="news-card" href="https://www.greenairnews.com?p=1353" target="_blank" rel="noopener"
+       data-cat="saf" data-title="boeing and jetblue invest to grow sustainable aviation fuel production on us west coast – greenair news"
        style="animation-delay:80ms">
       <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">17/07 20:29 UTC</span>
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Support for Year-Round E15 Reaches Record High as Senate Weighs Legislation, RFA Says - RFD-TV</div>
-      <div class="news-desc">Support for Year-Round E15 Reaches Record High as Senate Weighs Legislation, RFA Says&amp;nbsp;&amp;nbsp;RFD-TV…</div>
+      <div class="news-title">Boeing and JetBlue invest to grow sustainable aviation fuel production on US West Coast – GreenAir News</div>
+      <div class="news-desc"># Boeing and JetBlue invest to grow sustainable aviation fuel production on US West Coast. **Sustainable aviation fuel (SAF) production on the US West Coast has been boosted with the announcement that...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · RFD-TV</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMisgFBVV95cUxNX0lEdi01X0ExcW5hZ0dzYy1NQk9VcjkyNF95UzZlNXpieU80RFlGdV9XN1dkak9qR2tyT2Z1dFBEWVBwNU5zVmwtaHlDVU5MdDFBbmJVQU1PU0tac3FZUzhGb1lGNGx5cHNKLS16QUMzZTZEQTJCdWtmeEhrbFBjd3dPVzZickxIRlNLTjZ3dUNITzFoVEdnX1RkQjI3V2xJLWRLdEFGTVhqckNUTXJRWEdB?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="eu proposes removing additional corsia credit quality criteria for phase 1"
+    <a class="news-card" href="https://reports.weforum.org/docs/WEF_Global_Aviation_Sustainability_Outlook_2026.pdf" target="_blank" rel="noopener"
+       data-cat="saf" data-title="global aviation sustainability outlook 2026"
        style="animation-delay:100ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">17/07 14:42 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">EU proposes removing additional CORSIA credit quality criteria for Phase 1</div>
-      <div class="news-desc">EU proposes removing additional CORSIA credit quality criteria for Phase 1&amp;nbsp;&amp;nbsp;Fastmarkets…</div>
+      <div class="news-title">Global Aviation Sustainability Outlook 2026</div>
+      <div class="news-desc">Global Aviation Sustainability Outlook 2026 W H I T E P A P E R M A R C H 2 0 2 6 Images: Getty Images Contents Foreword by the International Civil Aviation Organization Foreword by Airports Council I...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Fastmarkets</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi3gFBVV95cUxNV2U0QUczaFB5a0t0RmNfbVVNb0hxN3VhZFh1dzFkallZTjZydTZWX3dpZWpPcy1OWk9rVlE2S3NxY3QwQ1pMNVdCRmxXcEtpUEZ6TnJTcHpzV1Z0dnVuTF9qRm1wNmNCMHRIRU9sNHpjeEtHeDlRN1FRdlBEdHR6X3lWUV9YZ2RDaDFkR1JoLTdqajdNZFFaNkZqR1pHaGtiTmpVOVBSUUxIejZoNWNzaUNLSno1c1NfZWl2MHNUZUJOeVpNV0txdVI5d04xczNtd1hoTXA3SjYyX0lxZXc?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="axens launches france’s first industrial-scale saf unit based on advanced bioethanol using jetanol technology"
+    <a class="news-card" href="https://www.iata.org/en/programs/sustainability/sustainable-aviation-fuel-saf" target="_blank" rel="noopener"
+       data-cat="saf" data-title="sustainable aviation fuel (saf)"
        style="animation-delay:120ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">17/07 14:16 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Axens launches France’s first industrial-scale SAF unit based on advanced bioethanol using Jetanol technology</div>
-      <div class="news-desc">Axens launches France’s first industrial-scale SAF unit based on advanced bioethanol using Jetanol technology&amp;nbsp;&amp;nbsp;Ethanol Producer Magazine…</div>
+      <div class="news-title">Sustainable Aviation Fuel (SAF)</div>
+      <div class="news-desc">Fly Net Zero is the commitment of airlines to achieve net zero carbon by 2050. As a trusted voice in the aviation community, we can help raise your profile and ensure you are seen by the audience that...</div>
       <div class="news-footer">
-        <span class="news-source">🇫🇷 França · Ethanol Producer Magazine</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi_wFBVV95cUxQY3R3QnFwMUF1QUJnLV9EOEhtaVhYR0hpcU1CSkhRR2o0MVowbmh0cTFkYkZFZTJOazZEXzFBYmNlOFQtTVBaSFJfNEF3OW5scUh6M1JLTnllOU4tVVp6RzhuYWlvVC1VaEZqbUNzU1dxd2pXWC00ejgxX3lJZWxtYzlZSWoyUWJERUZ6SUdNLTBjcTZfVlpueEphdzZpS2EtSWI0bk9IWUZFMGJXZU9oeUFRSHI1NHM3S08tSzJtWGJOQjVmYUhkU0RvdzE5X0ZYZzNONy1OcFgzT1I1aERTdkxFajV2X0c0b2dsMWNzMUltb1ZWYmtaWlJsYUgwU3c?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="ao decidir ampliar mistura de etanol na gasolina para 32% governo fortalece cadeia sucroenergética brasileira afirma pedro neto"
+    <a class="news-card" href="https://www.wsj.com/pro/sustainable-business/airlines-called-sustainable-fuel-the-future-when-an-energy-crisis-broke-out-barely-any-was-around-f84a200a" target="_blank" rel="noopener"
+       data-cat="saf" data-title="airlines called sustainable fuel the future. when an energy crisis broke out, barely any was around. - wsj"
        style="animation-delay:140ms">
       <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">17/07 09:44 UTC</span>
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Ao decidir ampliar mistura de etanol na gasolina para 32% governo fortalece cadeia sucroenergética brasileira afirma Pedro Neto</div>
-      <div class="news-desc">Ao decidir ampliar mistura de etanol na gasolina para 32% governo fortalece cadeia sucroenergética brasileira afirma Pedro Neto&amp;nbsp;&amp;nbsp;Cana Online…</div>
+      <div class="news-title">Airlines Called Sustainable Fuel the Future. When an Energy Crisis Broke Out, Barely Any Was Around. - WSJ</div>
+      <div class="news-desc"># Sustainable Business. This copy is for your personal, non-commercial use only. Distribution and use of this material are governed by. For non-personal use or to order multiple copies, please contact...</div>
       <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Cana Online</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxOeTROcmFhX3d2SFFlY29tZDdSeUJzYURyLWc5cTFieUs4dnVjdkpFRC1rcURUaXRDNm1jZ2lIcUhJSF9yMkZoZEpveWlQdUhRT0hYRmxHa1N6NERFS01yNGtTZTdMbWg5TXdnRFNJRV9nUlNZejlrUG1UZk9SVTRiU1dlVWhDSnhRcGFiZVJWVFQ4NzRTZ2tNSTl3ZlRSLXQ2dnFGSUhtVnA0YTA?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="fiji airways explores local options for corsia compliance"
+    <a class="news-card" href="https://noviqtech.com/articles/global-saf-blending-mandates-emerging-policies" target="_blank" rel="noopener"
+       data-cat="saf" data-title="global saf blending mandates &amp; emerging policies | noviqtech"
        style="animation-delay:160ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">17/07 09:39 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Fiji Airways explores local options for Corsia compliance</div>
-      <div class="news-desc">Fiji Airways explores local options for Corsia compliance&amp;nbsp;&amp;nbsp;Quantum Commodity Intelligence…</div>
+      <div class="news-title">Global SAF Blending Mandates &amp; Emerging Policies | NoviqTech</div>
+      <div class="news-desc">## Global SAF Mandates and Emerging Policies: What Fuel Suppliers Need to Prove. Governments are introducing **national blending mandates** that require a growing percentage of SAF to be mixed with co...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Quantum Commodity Intelligence</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇪🇺 Uniao Europeia · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMinAFBVV95cUxQdkxGbV81NFFoQXJ1WVUwOHBtZHF2SUJOdXQ3cjVlbzJSOUI3X2NSRFJKclZjQXNieG9zbW0wb3VpdWJYclc3YnkyNktIQzZrbGZZYkhHUGZIbGczRG5NRGxxQkRhdjhNM3J2YVc2WVFBUkxFU0hYSEhZbzlXSVhHcnU5LU9lNzVGYjFpbDc4MlNMcG1pZy1YTjl0dTE?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="sustainable aviation fuel market - global forecast 2026-2032 now available — forecasts growth from $2.37b to $10.27b, profiles shell, bp, totalenergies, neste, and 49 other key players"
+    <a class="news-card" href="https://www.climatechangenews.com/2026/02/27/doubts-over-european-saf-rules-threaten-cleaner-aviation-hopes-investors-warn" target="_blank" rel="noopener"
+       data-cat="saf" data-title="doubts over european saf rules threaten cleaner aviation hopes"
        style="animation-delay:180ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">17/07 08:09 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Sustainable Aviation Fuel Market - Global Forecast 2026-2032 Now Available — Forecasts Growth from $2.37B to $10.27B, Profiles Shell, BP, TotalEnergies, Neste, and 49 Other Key Players</div>
-      <div class="news-desc">Sustainable Aviation Fuel Market - Global Forecast 2026-2032 Now Available — Forecasts Growth from $2.37B to $10.27B, Profiles Shell, BP, TotalEnergies, Neste, and 49 Other Key Players&amp;nbsp;&amp;nbsp;Yahoo Finance…</div>
+      <div class="news-title">Doubts over European SAF rules threaten cleaner aviation hopes</div>
+      <div class="news-desc">The EU and the UK introduced the world&#x27;s first SAF mandates in January 2025, requiring fuel suppliers to blend at least 2% SAF with fossil fuel...</div>
       <div class="news-footer">
-        <span class="news-source">🇳🇱 Países Baixos · Yahoo Finance</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇬🇧 Reino Unido · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMipwFBVV95cUxOeGhpRGlMemR0cWY5MHFjTi1OXzlKU3B6ajI1VzdJSjRaeWpaaGZwYzZpQU5LekVZb1ZiZ3RHSVByZ2t3LTBZSi1kTURlcHZUeUJBTGJ4b2VVS1pRNExra0RjZWtyWE9WUEJNYU1ZcXJ6OHQzY2FuenJZQ3dzTnREa2puT24wV3NqV1VzeUhmbktwb1d3T2xiNmV2WllhbXBVU3RiZ001OA?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="the e20 solution: what europe can learn from india’s ethanol success story"
+    <a class="news-card" href="https://www.carbon-direct.com/insights/beyond-the-transatlantic-core-emerging-saf-mandates-in-global-markets" target="_blank" rel="noopener"
+       data-cat="saf" data-title="beyond the transatlantic core: emerging saf mandates in global markets | carbon direct"
        style="animation-delay:200ms">
       <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">17/07 06:46 UTC</span>
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">The E20 solution: What Europe can learn from India’s ethanol success story</div>
-      <div class="news-desc">The E20 solution: What Europe can learn from India’s ethanol success story&amp;nbsp;&amp;nbsp;Biofuels International Magazine…</div>
+      <div class="news-title">Beyond the transatlantic core: Emerging SAF mandates in global markets | Carbon Direct</div>
+      <div class="news-desc"># Beyond the transatlantic core: Emerging SAF mandates in global markets. * **SAF policy frameworks are emerging outside the EU and UK.** Countries across Asia-Pacific, Latin America, and the Middle E...</div>
       <div class="news-footer">
-        <span class="news-source">🇮🇳 Índia · Biofuels International Magazine</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇬🇧 Reino Unido · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMigwJBVV95cUxNUklUb3hLb3ZWU1NwcVllc2RsenRlZWlpei01M05jOTk1UmczZ090NHJsQ0tISk1QbXFpSURWcVpMU2FTZ2g3SERydlZ5ZEQ3enJnajBER2lRRzBWRkFZbEVhS1pwUHlYNWo3Skx5a1QwcEF0T01FelY2M2V6VWhCc2JweG4xZmNuTkpDU19jdjZiNVVVbjhXTGM4aUxuMlRrOWdZN2hmNDEwc1c3MVExM2pSMUM3bE1YWFZ0WHl6empyVnJxU1JqWUVrNEt4RllWa2xCYVlabHVfQTF3TzNldWJIVUhESHFWd3Fzb1Y4UHZzeW96ejdDRGk3eFRFUUcwMkRn?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="interview: south korean airlines target price-driven intermediary corsia procurement: kis"
+    <a class="news-card" href="https://asuene.com/uk/blog/6-aviation-policy-trends-for-2026-saf-corsia-and-beyond" target="_blank" rel="noopener"
+       data-cat="saf" data-title="6 aviation policy trends for 2026: saf, corsia, and beyond | blog | asuene | the enterprise ai sustainability platform"
        style="animation-delay:220ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">17/07 03:56 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">INTERVIEW: South Korean airlines target price-driven intermediary CORSIA procurement: KIS</div>
-      <div class="news-desc">INTERVIEW: South Korean airlines target price-driven intermediary CORSIA procurement: KIS&amp;nbsp;&amp;nbsp;S&amp;amp;P Global…</div>
+      <div class="news-title">6 Aviation Policy Trends for 2026: SAF, CORSIA, and Beyond | Blog | ASUENE | The Enterprise AI Sustainability Platform</div>
+      <div class="news-desc">The aviation sector is entering a decisive phase in its climate transition. Governments, regulators and international organisations are accelerating policy frameworks that influence how airlines reduc...</div>
       <div class="news-footer">
-        <span class="news-source">🇰🇷 Coreia do Sul · S&amp;P Global</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxNaTZIOTBaRlJIUFlLTENUSkNwQ1BtMF9SNFNfV2xxNkx6VjJWSUNnMVk4dUdzaDdPLWhuY25nVG5Na255VmVKLVptVE1UVnNhS2Z3cDY5aDhlQ254Unl4aExSVVpadE52R2M5emxIOVc2Qm45c09DYWpweWZ3dkFXbGNKZXpsYm4wLWxnMG54UVdWOEs4SkZuZDl2SHlHdlFGeThjOVpKZ3YwTnc?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="beware of e15 fuel when fueling up at local gas stations"
+    <a class="news-card" href="https://skift.com/2025/12/10/airlines-warn-green-jet-fuel-goals-are-falling-apart" target="_blank" rel="noopener"
+       data-cat="saf" data-title="airlines warn green jet fuel goals are falling apart"
        style="animation-delay:240ms">
       <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">16/07 21:25 UTC</span>
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Beware Of E15 Fuel When Fueling Up At Local Gas Stations</div>
-      <div class="news-desc">Beware Of E15 Fuel When Fueling Up At Local Gas Stations&amp;nbsp;&amp;nbsp;waynecojournalbanner.com…</div>
+      <div class="news-title">Airlines Warn Green Jet Fuel Goals Are Falling Apart</div>
+      <div class="news-desc">The EU requires airlines to use 2% SAF in 2025 with the mandate rising to 70% by 2050. China has set a 5% target by 2030. Other countries with...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · waynecojournalbanner.com</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇨🇳 China · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMibEFVX3lxTFBXMXBMeGRqR2xPOWNvb1FmRmM3MkRSQnNNc255dmJTNU44LW5aWEFyREhzLWRkWE5BbTZKeGdJM3Nqd2c4dXk1NHVBVk84ck1zcktXLXVLOEM0WHZZbDllY25IU1hpWko5SEhDeA?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="sustainable aviation fuels"
+    <a class="news-card" href="https://www.greenairnews.com?p=1398" target="_blank" rel="noopener"
+       data-cat="saf" data-title="eu saf blending mandate proposals ambitious but feasible, says ..."
        style="animation-delay:260ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">16/07 17:51 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Sustainable Aviation Fuels</div>
-      <div class="news-desc">Sustainable Aviation Fuels&amp;nbsp;&amp;nbsp;Department of Energy (.gov)…</div>
+      <div class="news-title">EU SAF blending mandate proposals ambitious but feasible, says ...</div>
+      <div class="news-desc">EU SAF blending mandate proposals ambitious but feasible, says SkyNRG analysis report · Increased support for new conversion pathways to convert...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Department of Energy (.gov)</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMinwFBVV95cUxPZGNtMG52SlBieDZCOWRrbER4REdMNWNfQlZ1anJwenRDQXdXbzlHa0VKWVpaU3B2Sm5hWmtrUTBkeENKNkVGRHF6R0xPVTNRbVM5Z0pqc2NCRnZ5TDZ2d21FbzFRZjR1NEpTS080T0lRVEhDZmM5bHl1SkpqMnpPSHFhNjJsSTdYNEp2M1FTWDlVUHZES2JYejh0b2Z4Zzg?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="sustainable aviation fuel price outlook: leveling off"
+    <a class="news-card" href="https://www.argusmedia.com/en/news-and-insights/latest-market-news/2336725-eu-eyes-slightly-higher-2030-saf-mandate" target="_blank" rel="noopener"
+       data-cat="saf" data-title="eu eyes slightly higher 2030 saf mandate | latest market news"
        style="animation-delay:280ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">16/07 14:52 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Sustainable Aviation Fuel Price Outlook: Leveling Off</div>
-      <div class="news-desc">Sustainable Aviation Fuel Price Outlook: Leveling Off&amp;nbsp;&amp;nbsp;BloombergNEF…</div>
+      <div class="news-title">EU eyes slightly higher 2030 SAF mandate | Latest Market News</div>
+      <div class="news-desc">The text up for approval by ministers would increase the minimum share of SAFs from 5pc, as originally proposed by the commission, to 6pc from 1 January 2030,...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · BloombergNEF</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMitgFBVV95cUxONUw1RXNxejdkVWYzc2E1U0RsQXBfekVOdGx1NVppS19oVDNnb25PYkVfamJmaWNicXk4TDNpc2FoWEtIVkE4NUg4d041TjNnY1dPa2lNX1pHamhkM3RNYmk1bThXdWJUMUtxcnh0cWJqUEtvSmNNYUpTeHdYRTQ2NXdjdVNJWGdkNXFPUFIzSWZ6YVVGZHBSZVlQQzVxbVozVEZhTGM0dWVEMWFOcklhaktnR0l2UQ?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="indian court orders maruti to replace car in first e20 fuel damage ruling"
+    <a class="news-card" href="https://www.reuters.com/sustainability/boards-policy-regulation/european-airlines-likely-beat-2-green-jet-fuel-target-last-year-sources-say-2026-03-30" target="_blank" rel="noopener"
+       data-cat="saf" data-title="european airlines likely beat 2% green jet fuel target last year, sources say"
        style="animation-delay:300ms">
       <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">16/07 14:40 UTC</span>
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Indian court orders Maruti to replace car in first E20 fuel damage ruling</div>
-      <div class="news-desc">Indian court orders Maruti to replace car in first E20 fuel damage ruling&amp;nbsp;&amp;nbsp;Reuters…</div>
+      <div class="news-title">European airlines likely beat 2% green jet fuel target last year, sources say</div>
+      <div class="news-desc">Exclusive news, data and analytics for financial market professionals Learn more about Refinitiv. ## Browse World. *   Ukraine and Russia at War. ## Browse Business. ## Browse Sustainability. COLOGNE,...</div>
       <div class="news-footer">
-        <span class="news-source">🇮🇳 Índia · Reuters</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇬🇧 Reino Unido · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMilwFBVV95cUxQUThvQkVPczBKZ2hsWFFCQ2lfX2VxZlZWTm54bmg2SmhnSWhyTjVXOF95QW5FeDdaVklnbUo0NVJORVlCMDJCTUVFcS1RQjhWNUR5RVFpUUZKdW1ybUZtV3IzS0lta056eDlpU3NQU3E1dVNiclE1amxKY003bVpPMHhhQmZmVTVaN1BuWTE3VFJjM2lYNUkw?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="singapore bio-bunker sales plunge 25% in june 2026, lng sales also fall - news and statistics"
+    <a class="news-card" href="https://www.linkedin.com/posts/hyphen-global-ag_amrv-and-corsia-activity-7447606268464312320-oH3_" target="_blank" rel="noopener"
+       data-cat="saf" data-title="airlines face corsia carbon offset challenges by 2026"
        style="animation-delay:320ms">
       <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">16/07 11:01 UTC</span>
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Singapore Bio-Bunker Sales Plunge 25% in June 2026, LNG Sales Also Fall - News and Statistics</div>
-      <div class="news-desc">Singapore Bio-Bunker Sales Plunge 25% in June 2026, LNG Sales Also Fall - News and Statistics&amp;nbsp;&amp;nbsp;IndexBox…</div>
+      <div class="news-title">Airlines face CORSIA carbon offset challenges by 2026</div>
+      <div class="news-desc">Airlines need up to 236 million Eligible Emissions Units by 2026. by ReFuelEU Aviation. SAF usage has climbed to around 2%, a notable increase...</div>
       <div class="news-footer">
-        <span class="news-source">🇸🇬 Singapura · IndexBox</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMixAFBVV95cUxQQnFVQzQ2VmZLOWxaU25obG9QLWQwSU1maktPZ2hYblI5SkZPcG5KaF9DQ0JRUFROVGxIR2FLZjA0WnBiZlNHc2xEMUVoSlJaV1ZyaHJ2a3kxSWtBNmdlSzRzSnFKS3dEZVBGc0EzekJ3S1g5cjQ2S3BsN3VuYUdTalRVelM0SW1MQmtQWnFvdWVfY3BlWUJEbUVRMUN3R0ZJTUZhQ3NEYWZweVBkZzZ3eDVHSmktMGtibmYzX016TEp6Wjlj?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="eu drops stricter carbon credit rules for corsia phase 1, but maintains tougher standards for phase 2"
+    <a class="news-card" href="https://asuene.com/us/blog/6-aviation-policy-trends-for-2026-saf-corsia-and-beyond" target="_blank" rel="noopener"
+       data-cat="saf" data-title="6 aviation policy trends for 2026: saf, corsia, and beyond | blog | asuene | the enterprise climate cloud platform | carbon calculation decarbonization saas"
        style="animation-delay:340ms">
       <div class="news-top">
         <span class="news-badge saf">SAF</span>
-        <span class="news-time">16/07 09:17 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">EU Drops Stricter Carbon Credit Rules For CORSIA Phase 1, But Maintains Tougher Standards For Phase 2</div>
-      <div class="news-desc">EU Drops Stricter Carbon Credit Rules For CORSIA Phase 1, But Maintains Tougher Standards For Phase 2&amp;nbsp;&amp;nbsp;Carbon Herald…</div>
+      <div class="news-title">6 Aviation Policy Trends for 2026: SAF, CORSIA, and Beyond | Blog | ASUENE | The enterprise climate cloud platform | Carbon Calculation Decarbonization SaaS</div>
+      <div class="news-desc">The aviation sector is entering a decisive phase in its climate transition. The 2026 outlook highlights six major policy trends shaping aviation decarbonization strategies across fuel supply, regulato...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Carbon Herald</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMipwFBVV95cUxPV2JicUlHYWZYOVJaUHZESkxUdkpXZ00xMnlJZHJMbTd1VkRIakRyamNYSVZTam1qSnZnbUZRTkxZMFUxN1pVU2VEcnVLTEFuVkl1Z3JJY3dOMlRTTFVSbHpCa3g5RkZLUTdFNEhWZE5zcVdGQW1ZTUl5RC1qdjdQX1Y5aGpwem9KUTRXcGZxdnRYek5TeWI0VGs5N2U4R1JLTl9NSEJTZw?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="what india’s ethanol push can learn from brazil’s long ethanol journey"
+    <a class="news-card" href="https://www.ainonline.com/aviation-news/air-transport/2026-03-19/european-airlines-demand-changes-refueleu-rules" target="_blank" rel="noopener"
+       data-cat="saf" data-title="european airline groups demand changes to refueleu saf rules"
        style="animation-delay:360ms">
       <div class="news-top">
-        <span class="news-badge blend">Blending</span>
-        <span class="news-time">16/07 09:01 UTC</span>
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">What India’s ethanol push can learn from Brazil’s long ethanol journey</div>
-      <div class="news-desc">What India’s ethanol push can learn from Brazil’s long ethanol journey&amp;nbsp;&amp;nbsp;Mongabay India…</div>
+      <div class="news-title">European Airline Groups Demand Changes to ReFuelEU SAF Rules</div>
+      <div class="news-desc">ReFuelEU rules are intended to prompt airlines to use more sustainable aviation fuel as part of the European Union&#x27;s net-zero decarbonization...</div>
       <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Mongabay India</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇪🇺 Uniao Europeia · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQcGdoZnhzMnVaa1hYXy1FX3VKZnVkZ1NVbkcwRF94a2FfWkwySmZBdllQV2JBdWRaODNkcG42WkhGZDdhcVNjV1FzY3RYZE41WXlFUmozRWVUcDVhTE1Wdm1VYi1TQ1FYWHloTFVDVDdaRDZVMkdWTDNLR2xOS0loZVZtN2RDVU5BeThUWEozbk9oMkVFcVFmVDlIeFotb1RT?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="it’s time to end temporary fixes for e15"
+    <a class="news-card" href="https://www.ey.com/content/dam/ey-unified-site/ey-com/en-in/insights/consullting/documents/ey-decarbonizing-the-sky.pdf" target="_blank" rel="noopener"
+       data-cat="saf" data-title="decarbonizing the sky"
        style="animation-delay:380ms">
       <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Decarbonizing the Sky</div>
+      <div class="news-desc">Decarbonizing the sky February 2026 Table of contents Executive summary SECTION 2 The new operating context for aviation Demand growth meets hard climate constraints EU/ UK and APAC/ India: Different ...</div>
+      <div class="news-footer">
+        <span class="news-source">🇬🇧 Reino Unido · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.greenairnews.com?p=9226" target="_blank" rel="noopener"
+       data-cat="saf" data-title="commentary: corsia – a flawed scheme worth saving? – greenair news"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">COMMENTARY: CORSIA – A flawed scheme worth saving? – GreenAir News</div>
+      <div class="news-desc">SkyNRG’s latest market outlook finds a SAF industry moving from ambition to implementation. **In less than 18 months, the aviation sector’s carbon offsetting scheme CORSIA is set to enter mandatory of...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.argusmedia.com/en/news-and-insights/latest-market-news/2847676-airlines-could-buy-more-corsia-credits-then-saf-panel" target="_blank" rel="noopener"
+       data-cat="saf" data-title="airlines could buy more corsia credits, then saf: panel | latest market news"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Airlines could buy more Corsia credits, then SAF: Panel | Latest Market News</div>
+      <div class="news-desc">Airlines could buy more carbon credits to meet their near-term decarbonisation targets and increase their sustainable aviation fuel (SAF)...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://climate.ec.europa.eu/eu-action/transport-decarbonisation/reducing-emissions-aviation_en" target="_blank" rel="noopener"
+       data-cat="saf" data-title="reducing emissions from aviation - climate action - european commission"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Reducing emissions from aviation - Climate Action - European Commission</div>
+      <div class="news-desc"># Reducing emissions from aviation. The EU is taking action to reduce aviation emissions in Europe and working with the international community to develop measures with global reach. ## Aviation emiss...</div>
+      <div class="news-footer">
+        <span class="news-source">🇳🇴 Noruega · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://task39.ieabioenergy.com/wp-content/uploads/sites/37/2024/05/IEA-Bioenergy-Task-39-SAF-report.pdf" target="_blank" rel="noopener"
+       data-cat="saf" data-title="iea-bioenergy-task-39-saf-report.pdf"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">IEA-Bioenergy-Task-39-SAF-report.pdf</div>
+      <div class="news-desc"># /Sustainable Aviation Fuels (SAF):. # Aviation Fuels (SAF):. pursuing the power -to -liquids technology for efuels SAF production , this pathway is at a lower. soon limit the production of bio/renew...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://tiche.org/wp-content/uploads/2024/06/Sustainable-Aviation-Fuel_revise-template.pdf" target="_blank" rel="noopener"
+       data-cat="saf" data-title="sustainable aviation fuel: necessity and path forward as ..."
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Sustainable Aviation Fuel: Necessity and Path Forward as ...</div>
+      <div class="news-desc">Contract: PDP (ISBL+OSBL) Award: 2023 Delivery: Jun 2024 Client: LanzaJet Location: Teesside, UK • Capacity: 90 kTA • AtJ Licensor: LanzaJet/T.EN • Package providers: Complete modular ISBL Design by T...</div>
+      <div class="news-footer">
+        <span class="news-source">🇬🇧 Reino Unido · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://avinah2.com/projects/saf-alcohol-to-jet" target="_blank" rel="noopener"
+       data-cat="saf" data-title="saf | alcohol-to-jet – avina inc."
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">SAF | Alcohol-to-Jet – Avina Inc.</div>
+      <div class="news-desc">Avina Inc.Avina Inc.Avina Inc.Avina Inc. # Powering Sustainable Aviation with Innovation. ### Avina’s SAF project is transforming aviation for a greener tomorrow. Fueling the Future of Sustainable Avi...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://medium.com/prime-movers-lab/sustainable-aviation-fuel-part-3-6d07f2a914ac" target="_blank" rel="noopener"
+       data-cat="saf" data-title="sustainable aviation fuel: part 3"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Sustainable Aviation Fuel: Part 3</div>
+      <div class="news-desc">## Prime Movers Lab. 1. At a price of only ~$2.50-$3.00 per gallon, jet fuel is cheap. The post will compare the costs and other challenges of using different feedstocks for SAF, beginning with biomas...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.twinandturbine.com/the-future-of-e-fuels-for-saf" target="_blank" rel="noopener"
+       data-cat="saf" data-title="the future of e-fuels for saf"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">The Future of E-Fuels for SAF</div>
+      <div class="news-desc">We see the future growth in the supply of SAF building. HEFA-based production including gasification+synthesis and alcohol-to-jet (ATJ), also playing a role....</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.ten.com/en/markets/sustainable-aviation-fuels-saf" target="_blank" rel="noopener"
+       data-cat="saf" data-title="sustainable aviation fuels: fly to saf"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Sustainable Aviation Fuels: Fly to SAF</div>
+      <div class="news-desc">Our expertise spans the four main SAF pathways: Alcohol-To-Jet (AtJ), Hydroprocessed Esters and Fatty Acids (HEFA), Gasiﬁcation Fischer- Tropsch (GFT) eFuel,...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.resources.org/common-resources/the-promise-of-ethanol-to-jet-for-sustainable-aviation-fuel-in-the-united-states" target="_blank" rel="noopener"
+       data-cat="saf" data-title="the promise of ethanol-to-jet for sustainable aviation fuel in the united states"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">The Promise of Ethanol-to-Jet for Sustainable Aviation Fuel in the United States</div>
+      <div class="news-desc"># The Promise of Ethanol-to-Jet for Sustainable Aviation Fuel in the United States. *Ethanol-to-jet could link the large ethanol industry* *in the United States* *to aviation, one of the hardest secto...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.czadvise.com/jet-set-how-sustainable-aviation-will-propel-ethanol-production" target="_blank" rel="noopener"
+       data-cat="saf" data-title="jet set: how sustainable aviation will propel ethanol production | cz advise"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Jet Set: How Sustainable Aviation Will Propel Ethanol Production | CZ Advise</div>
+      <div class="news-desc"># Jet Set: How Sustainable Aviation Will Propel Ethanol Production. ## The Potential of SAF for Ethanol Producers. Sustainable aviation fuel (SAF) made from non-fossil sources is set to become the dom...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.honeywell.com/us/en/news/press-releases/2026/04/honeywell-to-fuel-petrobras-first-large-scale-ethanol-to-jet-project-in-latin-america" target="_blank" rel="noopener"
+       data-cat="saf" data-title="honeywell to fuel petrobras’ first, large-scale ethanol-to-jet project in latin america"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Honeywell to Fuel Petrobras’ First, Large-Scale Ethanol-To-Jet Project in Latin America</div>
+      <div class="news-desc"># Honeywell to Fuel Petrobras’ First, Large-Scale Ethanol-To-Jet Project in Latin America. Project at REPLAN refinery to produce up to 10,000 barrels per day of sustainable aviation fuel. **CHARLOTTE,...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://petrobras.com.br/en/quem-somos/saf-petrobras" target="_blank" rel="noopener"
+       data-cat="saf" data-title="petrobras saf - the sustainable aviation fuel"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Petrobras SAF - the sustainable aviation fuel</div>
+      <div class="news-desc">Petrobras SAF is a Sustainable Aviation Fuel, produced in Brazil with a renewable portion obtained from sustainable feedstocks....</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://en.unav.edu/web/global-affairs/brasil-busca-liderar-la-transicion-hacia-el-vuelo-verde" target="_blank" rel="noopener"
+       data-cat="saf" data-title="brazil seeks to lead the transition to green flight. global affairs. university of navarra"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Brazil seeks to lead the transition to green flight. Global Affairs. University of Navarra</div>
+      <div class="news-desc">## The world&#x27;s second largest ethanol producer and with an outstanding aeronautics industry, Brazil is experimenting with the generation of sustainable aviation fuels. In this context, Brazil, recogni...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.facebook.com/groups/849994733672039/posts/1105722364765940" target="_blank" rel="noopener"
+       data-cat="saf" data-title="brazil develops sustainable aviation fuel from sugarcane"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Brazil develops sustainable aviation fuel from sugarcane</div>
+      <div class="news-desc">Brazilian engineers developed sugarcane ethanol powering aircraft commercially successfully Aerospace engineers from Embraer in partnership...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://biofuels-news.com/news/petrobras-commits-e1-1-billion-to-major-renewable-diesel-and-saf-expansion" target="_blank" rel="noopener"
+       data-cat="saf" data-title="petrobras commits €1.1 billion to major renewable diesel and saf expansion"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Petrobras commits €1.1 billion to major renewable diesel and SAF expansion</div>
+      <div class="news-desc">Petrobras has approved a $1.2 billion (€1.1 billion) investment to develop a large‑scale renewable diesel and sustainable aviation fuel...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://advancedbiofuelsusa.info/the-current-scenario-of-saf-production-in-brazil-2025" target="_blank" rel="noopener"
+       data-cat="saf" data-title="the current scenario of saf production in brazil (2025)"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">The Current Scenario of SAF Production in Brazil (2025)</div>
+      <div class="news-desc"># The Current Scenario of SAF Production in Brazil (2025). Agriculture/Food Processing Residues nonfield cropAlcohol/Ethanol/IsobutanolAviation Fuel/Sustainable Aviation Fuel (SAF)BioRefineries/Renewa...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.trade.gov/market-intelligence/brazil-energy-aviation-fuel" target="_blank" rel="noopener"
+       data-cat="saf" data-title="brazil energy aviation fuel"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Brazil Energy Aviation Fuel</div>
+      <div class="news-desc">Official Website of the United States government. A **.gov** website belongs to an official government organization in the United States. A **lock** ( ) or **https://** means you’ve safely connected t...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://rsb.org/wp-content/uploads/2021/04/RSB-SAF-Feedstock-availability-in-Brazil.pdf" target="_blank" rel="noopener"
+       data-cat="saf" data-title="feedstock availability for sustainable aviation fuels ..."
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge saf">SAF</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">FEEDSTOCK AVAILABILITY FOR SUSTAINABLE AVIATION FUELS ...</div>
+      <div class="news-desc">2021 REPORT DESIGNED BY in collaboration: FEEDSTOCK AVAILABILITY FOR SUSTAINABLE AVIATION FUELS IN BRAZIL CHALLENGES AND OPPORTUNITIES INDUSTRY GOAL 2050 CURRENT REALITY GHG emissions reduced in 50% F...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.youtube.com/watch?v=sPc-eNLJauI" target="_blank" rel="noopener"
+       data-cat="bio" data-title="technical seminar on marine biofuels"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Technical Seminar on Marine Biofuels</div>
+      <div class="news-desc">Technical Seminar on Marine Biofuels
+IMOHQ
+20100 subscribers
+48 likes
+2580 views
+12 Feb 2026
+IMO&#x27;s Future Fuels and Technology (FFT) Project is organizing a Technical Seminar on Marine Biofuels to enh...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.bracewell.com/resources/2026-outlook-for-maritime-biofuels" target="_blank" rel="noopener"
+       data-cat="bio" data-title="2026 outlook for maritime biofuels | bracewell llp"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">2026 Outlook for Maritime Biofuels | Bracewell LLP</div>
+      <div class="news-desc"># 2026 Outlook for Maritime Biofuels. Maritime biofuels are “making waves” in 2026. Industry stakeholders should be aware of several international, national, and locally led initiatives that are “lowe...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.leadventgrp.com/blog/how-sustainable-marine-fuels-with-biofuels-contribute-to-the-decarbonization-of-global-shipping" target="_blank" rel="noopener"
+       data-cat="bio" data-title="sustainable marine fuels &amp; biofuels in shipping | decarbonization trends ..."
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Sustainable Marine Fuels &amp; Biofuels in Shipping | Decarbonization Trends ...</div>
+      <div class="news-desc">Global production of advanced biofuels is expected to reach 23 million tonnes of oil equivalent (Mtoe) by 2026, up from 11 Mtoe in 2023....</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.biofuelwatch.org.uk/2026/pr-biofuels-shipping" target="_blank" rel="noopener"
+       data-cat="bio" data-title="conservation groups urge governments to reject biofuels in ..."
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Conservation Groups Urge Governments to Reject Biofuels in ...</div>
+      <div class="news-desc">The NGOs warn that classifying biofuels as “green” shipping fuels risks locking the sector into a pathway that fails to deliver genuine emissions reductions....</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.spglobal.com/energy/en/news-research/latest-news/shipping/042126-growing-push-for-revisions-adds-uncertainty-to-imo-green-bunker-rules" target="_blank" rel="noopener"
+       data-cat="bio" data-title="growing push for revisions adds uncertainty to imo green bunker rules"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Growing push for revisions adds uncertainty to IMO green bunker rules</div>
+      <div class="news-desc">IMO&#x27;s progress towards achieving its goals of cutting shipping GHG emissions by 20%-30% by 2030 and 70%-80% by 2040 from 2008 levels, before...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.resourcewise.com/blog/environmental-blog/confusion-surrounding-bio-bunkering-and-imos-emissions-goals?hs_amp=true" target="_blank" rel="noopener"
+       data-cat="bio" data-title="confusion surrounding bio-bunkering and imo&#x27;s emissions goals"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Confusion Surrounding Bio-Bunkering and IMO&#x27;s Emissions Goals</div>
+      <div class="news-desc">The IMO&#x27;s decarbonization plan calls for the shipping sector to meet a 40% reduction of CO 2 emissions by 2030....</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.lr.org/en/knowledge/research/fuel-for-thought/biofuel" target="_blank" rel="noopener"
+       data-cat="bio" data-title="marine biofuels | fuel for thought | lr"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Marine Biofuels | Fuel for Thought | LR</div>
+      <div class="news-desc"># Marine Biofuels - Alternative Shipping Fuel. ## Marine Biofuel: The future of sustainable shipping. Biofuel is emerging as a promising alternative to traditional fossil fuels in the shipping industr...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://gcaptain.com/ship-bio-bunkers-imo-2030" target="_blank" rel="noopener"
+       data-cat="bio" data-title="bio-bunkers, what types of biofuels could ships burn in 2030?"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Bio-Bunkers, What Types Of BioFuels Could Ships Burn in 2030?</div>
+      <div class="news-desc">## Don’t Miss Your Daily Briefing for the Maritime Industry. Crowley LNG ISO tanks for its Caribbean group that will be used to supply, transport and distribute U.S.-sourced liquefied natural gas (LNG...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.worldcargonews.com/shipping-logistics/2026/05/going-green-gets-harder-for-shipping" target="_blank" rel="noopener"
+       data-cat="bio" data-title="going green gets harder for shipping"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Going green gets harder for shipping</div>
+      <div class="news-desc">The dual-fuel 20,000 TEU “COSCO Shipping Gemini” completed the first simultaneous operation (SIMOPS) methanol bunkering at the port of Hong...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://shipandbunker.com/news/world/689633-feature-supply-engines-and-regulation-align-as-ethanol-bunkers-turn-commercial-in-2026" target="_blank" rel="noopener"
+       data-cat="bio" data-title="feature: supply, engines and regulation align as ethanol bunkers turn commercial in 2026 - ship &amp; bunker"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">FEATURE: Supply, Engines and Regulation Align as Ethanol Bunkers Turn Commercial in 2026 - Ship &amp; Bunker</div>
+      <div class="news-desc">4. FEATURE: Supply, Engines and Regulation Align as Ethanol Bunkers Turn Commercial in 2026. *Production, regulation, and demand are aligning for ethanol as a marine fuel. * **Price case hard to ignor...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.intercargo.org/selected-headlines-on-alternative-fuels-technologies-2026" target="_blank" rel="noopener"
+       data-cat="bio" data-title="selected headlines on alternative fuels &amp; technologies 2026"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Selected Headlines on Alternative Fuels &amp; Technologies 2026</div>
+      <div class="news-desc">ammonia dual-fuel vessel orders outpacing methanol over the past six months. for hydrogen and alternative fuels to strengthen its green port...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.manifoldtimes.com/news/green-ports-and-shipping-network-launched-to-advance-green-bunker-fuels-in-india" target="_blank" rel="noopener"
+       data-cat="bio" data-title="green ports and shipping network launched to advance green bunker ..."
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Green Ports and Shipping Network launched to advance green bunker ...</div>
+      <div class="news-desc">Primary focus is on developing practical pathways for the deployment of green hydrogen, ammonia, and methanol as next-generation shipping fuels,...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.engine.online/news/the-week-in-alt-fuels-availability-isnt-enough-7e71" target="_blank" rel="noopener"
+       data-cat="bio" data-title="the week in alt fuels: availability isn’t enough"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">The Week in Alt Fuels: Availability isn’t enough</div>
+      <div class="news-desc">But bunker buyers continue to sign long-term offtake agreements as today&#x27;s availability does not guarantee tomorrow&#x27;s supply. In Brazil, global bunker supplier Bunker One delivered 500,000 litres (app...</div>
+      <div class="news-footer">
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.facebook.com/MaritimeReporter/posts/alternative-fuel-vessel-orders-slow-in-early-2026-dropping-to-137-from-155-last-/1699730802154899" target="_blank" rel="noopener"
+       data-cat="bio" data-title="alternative-fuel... - maritime reporter &amp; engineering news"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Alternative-fuel... - Maritime Reporter &amp; Engineering News</div>
+      <div class="news-desc">## Maritime Reporter &amp; Engineering News&#x27;s post. ### **Maritime Reporter &amp; Engineering News**. 2 July at 06:47  ·. Alternative-fuel vessel orders slow in early 2026, dropping to 137 from 155 last year....</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.mdpi.com/2673-4141/7/1/36" target="_blank" rel="noopener"
+       data-cat="bio" data-title="alternative maritime fuels for net-zero shipping: a comprehensive operational, techno-economic and regulatory review"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Alternative Maritime Fuels for Net-Zero Shipping: A Comprehensive Operational, Techno-Economic and Regulatory Review</div>
+      <div class="news-desc">permission is required to reuse all or part of the article published by MDPI, including figures and tables. Feature papers represent the most advanced research with significant potential for high impa...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.gminsights.com/industry-analysis/sustainable-marine-fuels-market" target="_blank" rel="noopener"
+       data-cat="bio" data-title="sustainable marine fuels market size, forecasts report 2026-2035"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Sustainable Marine Fuels Market Size, Forecasts Report 2026-2035</div>
+      <div class="news-desc">The sustainable marine fuels market was estimated at USD 4.4 billion in 2025 and is expected to grow at a CAGR of 25.8% between 2026 and 2035....</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="http://gh2.org/imo-compromise-proposal-bridge-nowhere" target="_blank" rel="noopener"
+       data-cat="bio" data-title="imo compromise proposal - a bridge to nowhere? | green hydrogen organisation"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">IMO compromise proposal - a bridge to nowhere? | Green Hydrogen Organisation</div>
+      <div class="news-desc"># IMO compromise proposal - a bridge to nowhere? **In the coming weeks, the International Maritime Organization (IMO) will take some key decisions on how to decarbonise international shipping — and th...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.dnv.com/maritime/decarbonize-shipping/regulations" target="_blank" rel="noopener"
+       data-cat="bio" data-title="maritime shipping regulation &amp; compliance guide"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Maritime shipping regulation &amp; compliance guide</div>
+      <div class="news-desc">The environment around shipping regulations is evolving rapidly, with both global and regional frameworks driving the transition to low- and zero-emission shipping. At MEPC 83, in April 2025, the IMO ...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.zerocarbonshipping.com" target="_blank" rel="noopener"
+       data-cat="bio" data-title="decarbonizing the global maritime industry | mærsk mc-kinney møller center for zero carbon shipping"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Decarbonizing the global maritime industry | Mærsk Mc-Kinney Møller Center for Zero Carbon Shipping</div>
+      <div class="news-desc"># Decarbonizing the global maritime industry. The World&#x27;s 100.000 commercial vessels consume around 300 million tons of fuel every year making shipping accountable for around 3% of global greenhouse g...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.imo.org/en/mediacentre/pressbriefings/pages/imo-approves-netzero-regulations.aspx" target="_blank" rel="noopener"
+       data-cat="bio" data-title="imo approves net-zero regulations for global shipping"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">IMO approves net-zero regulations for global shipping</div>
+      <div class="news-desc">Draft regulations will set mandatory marine fuel standard and GHG emissions pricing for shipping to address climate change. ​The IMO Net-zero Framework will combine mandatory emissions limits and GHG ...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.edf.org/media/imo-postpones-adoption-net-zero-framework-delaying-global-action-decarbonize-shipping" target="_blank" rel="noopener"
+       data-cat="bio" data-title="imo postpones adoption of net zero framework, delaying global action to decarbonize shipping"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">IMO Postpones Adoption of Net Zero Framework, Delaying Global Action to Decarbonize Shipping</div>
+      <div class="news-desc">Triple your impact to help tackle the biggest threats to our environment and communities. We deliver game-changing environmental solutions that have a real impact for people around the globe. Defendin...</div>
+      <div class="news-footer">
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.imo.org/en/mediacentre/hottopics/pages/cutting-ghg-emissions.aspx" target="_blank" rel="noopener"
+       data-cat="bio" data-title="imo&#x27;s work to cut ghg emissions from ships"
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">IMO&#x27;s work to cut GHG emissions from ships</div>
+      <div class="news-desc"># IMO’s work to cut GHG emissions from ships. In 2023, IMO adopted the 2023 IMO GHG Strategy, building on the Initial GHG Strategy (2018) and the first mandatory energy efficiency measures for ships i...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.sciencedirect.com/science/article/pii/S0308597X22004262" target="_blank" rel="noopener"
+       data-cat="bio" data-title="imo off course for decarbonisation of shipping? three ..."
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">IMO off course for decarbonisation of shipping? Three ...</div>
+      <div class="news-desc">by H Bach · 2023 · Cited by 143 — The maritime shipping industry is responsible for around 3 % of global greenhouse gas (GHG) emissions, and is now under pressure to decarbonise....</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://www.mdpi.com/2071-1050/12/8/3220" target="_blank" rel="noopener"
+       data-cat="bio" data-title="towards the imo&#x27;s ghg goals: a critical overview of ..."
+       style="animation-delay:400ms">
+      <div class="news-top">
+        <span class="news-badge bio">Biobunker</span>
+        <span class="news-time"></span>
+      </div>
+      <div class="news-title">Towards the IMO&#x27;s GHG Goals: A Critical Overview of ...</div>
+      <div class="news-desc">by P Serra · 2020 · Cited by 350 — The 50% emission reduction target set by the IMO is ambitious and will likely call for widespread uptake of lower and zero-carbon fuels, in addition to other...</div>
+      <div class="news-footer">
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
+      </div>
+    </a>
+    <a class="news-card" href="https://alliancechemical.com/blogs/news/epa-to-allow-15-ethanol-gasoline-blends-this-summer-as-biofuel-mandates-rise" target="_blank" rel="noopener"
+       data-cat="blend" data-title="epa allows 15% ethanol blends this summer"
+       style="animation-delay:400ms">
+      <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">16/07 05:06 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">It’s time to end temporary fixes for E15</div>
-      <div class="news-desc">It’s time to end temporary fixes for E15&amp;nbsp;&amp;nbsp;Times Republican…</div>
+      <div class="news-title">EPA Allows 15% Ethanol Blends This Summer</div>
+      <div class="news-desc">By Alliance Chemical Editorial Team , Industry News Desk at Alliance Chemical  Updated:  3 min read Technical. # EPA to Allow 15% Ethanol Gasoline Blends This Summer as Biofuel Mandates Rise. By Allia...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Times Republican</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiuAFBVV95cUxOUE1OTnNFNFNEVFQwemkzeXRWNW9SNWZjM1BlT2Y0bm10U1pSR2lnOENKY19DWmtCWk1xTUtMX2EzdGMzZWV2MVYwaEpRTl9JSGs3c1d1OTA3NEo3eE8zemgyYkJULS1CQVA1WHhvWGhUZWc1QnZmTDJNRllBNFQxMGxvMWZ6RngyUkZXQi1IaGxVNlMwUE1QRUpFQndGeDVrSmdoVFA4QTZUelBuQ0tYR1A3bnRFTkNK?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="para sindipetróleo, aumento da mistura de etanol na gasolina será positivo para mato grosso"
+    <a class="news-card" href="https://grains.org/wp-content/uploads/2025/04/USGC-Bioethanol-Blending-Policy-Maps-02-03-26-9x-6-FINAL_01.pdf" target="_blank" rel="noopener"
+       data-cat="blend" data-title="[pdf] global bioethanol blending policies map - u.s. grains council"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">16/07 03:12 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Para Sindipetróleo, aumento da mistura de etanol na gasolina será positivo para Mato Grosso</div>
-      <div class="news-desc">Para Sindipetróleo, aumento da mistura de etanol na gasolina será positivo para Mato Grosso&amp;nbsp;&amp;nbsp;Sapicuá…</div>
+      <div class="news-title">[PDF] Global Bioethanol Blending Policies Map - U.S. Grains Council</div>
+      <div class="news-desc">- Global: 2024 ethanol blending market share in gasoline (SGS Inspire, SGS Société Générale de Surveillance SA – 2024) Biofuel Mandates in the EU by Member State - 2024 (USDA FAS, Sabine Lieberz and A...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Sapicuá</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMingFBVV95cUxPeUhhdnM1V1dRMXNnZENIc2tOZEVQakRsdlN6Z21NTjZ1MWh6VzRKeDFKZlpGbWFpZ2tsUlFVVll5Y2xiWFlGdU9NQ25nZHAzRzM1ajBYdFJlVWpnMWdVcHJ6R2Z2Y3JWejdlWi1QVDFaT1JXbS0tTjQ1blEza1NuSmxwclhMMTFCdXo0UFNPVmtiN1BTcEtJZnVyVm80Zw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="sustainable aviation fuel: supporting your greener business goals"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">15/07 20:28 UTC</span>
-      </div>
-      <div class="news-title">Sustainable Aviation Fuel: Supporting Your Greener Business Goals</div>
-      <div class="news-desc">Sustainable Aviation Fuel: Supporting Your Greener Business Goals&amp;nbsp;&amp;nbsp;DHL…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · DHL</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxQRkRKVE1HVDd3cS13OXRpcnVtNXR6TFFQVk8ySjk2OEQ2NC1fbC1WZmpmNnlpS0pleHVhWG9GalpUSkxGZVhmd2NvWWNBcjg2T1hSdFpCMTY5ZmlwbnRmemtpSHE5akhMR1ZPb2h2SFAyWTdiTUlxdXlsakxLejhMRmtnQ05aXzdaNUMtUFBaM2FBbE9qWE9PbG9iOXhUVzdOMkhxdTQtRlZNVDE1RTJJYXo5MkV5XzZWVlN4Q1NDaEZOdVVxWlZZMw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="delta, shell expand sustainable aviation fuel partnership across major u.s. hubs"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">15/07 16:09 UTC</span>
-      </div>
-      <div class="news-title">Delta, Shell expand sustainable aviation fuel partnership across major U.S. hubs</div>
-      <div class="news-desc">Delta, Shell expand sustainable aviation fuel partnership across major U.S. hubs&amp;nbsp;&amp;nbsp;Investing.com…</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · Investing.com</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMilwFBVV95cUxQcU5SVkw4by11RU5leEtwSUY2cW1pX0JJZGlLYUpoR05rODJ4UWQzOVZfRUVQQ2ttUkY4clo3eERpTDRtMTdfaTdQNFZSendNWDZvT3Y5SE5lUC1GSzFMLVJnNzRPS3NaV3ZIYlVURnZtQnhuY19DTDllbTE0dUdLbktKUkVBOUxaVHVjZ3Z3ejdrSVg1UWxj0gGnAUFVX3lxTFBoU1YyRGp1ZndpVHRsSHhrNFIzamhudFIyWkZkaFozNEJBZUxFcm9ad1NwemhicWl0dXR3UHloN0FyVTNhcWxCRjhhSVBweHIzMFZwN2JFNS1leWt6bnZkVUhNcWNMVUsxSmR4WVo1QjNlbGRnbk9RWWJpSzBiRXJPdnZEeGFBWHNYRTdyOWxEQzBZV2VrZGdYNzVCX213UFNXWDd6WVk0?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="bio-bunker premiums rebound as oil market disruption eases"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">15/07 16:05 UTC</span>
-      </div>
-      <div class="news-title">Bio-Bunker Premiums Rebound as Oil Market Disruption Eases</div>
-      <div class="news-desc">Bio-Bunker Premiums Rebound as Oil Market Disruption Eases&amp;nbsp;&amp;nbsp;ResourceWise…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · ResourceWise</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMilgFBVV95cUxQZ2ZQRGpWZzJ0cjNrTUVXSTJOOWNhYklLanVaaHNRdnYwWDBDdEFvSFdIS3d4RFhQN1cxRlNmS1BHbUV5cnd3cl9uWFl2OEFLbE1ya0gtN1ZaZFVFdTQ5WWhkRUNXQW5BVU1jM1ZXQjhfd0FkZUh5TEpRaDJvSjFXeVR5WHp1UFVKM1czQUxWendBblBXdEE?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="one year on: how has refueleu aviation impacted europe’s saf market"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">15/07 14:45 UTC</span>
-      </div>
-      <div class="news-title">One year on: How has ReFuelEU Aviation impacted Europe’s SAF market</div>
-      <div class="news-desc">One year on: How has ReFuelEU Aviation impacted Europe’s SAF market&amp;nbsp;&amp;nbsp;Air Cargo Week…</div>
-      <div class="news-footer">
-        <span class="news-source">🇪🇺 União Europeia · Air Cargo Week</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMipgFBVV95cUxQVDNkdHF3Y2pOeUJybk1rRFk4OVRGMElNQl96V2JybFlPeXJSTEI2dTJCay1JMEN6UFNRdTFqMEZwOG5mcUlZcG4wT3JGbXh0NF9NWFhFMVBYNnhERUI2TXZNZ1kyR0lMR0xzeTZXdjVXbHRWbnVVY0dMSGNSZUVJTUNsbXBSUWdoaTRzcEYwT1ZfVi1OMGtxRzJNMnBVWHBvdjkybnFR?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="aumento da mistura de etanol na gasolina gera incertezas no setor"
+    <a class="news-card" href="https://advancedbiofuelsusa.info/biofuels-mandates-around-the-world-2026" target="_blank" rel="noopener"
+       data-cat="blend" data-title="advanced biofuels usa – biofuels mandates around the world 2026"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">15/07 14:08 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Aumento da mistura de etanol na gasolina gera incertezas no setor</div>
-      <div class="news-desc">Aumento da mistura de etanol na gasolina gera incertezas no setor&amp;nbsp;&amp;nbsp;Canal Rural…</div>
+      <div class="news-title">Advanced BioFuels USA – Biofuels Mandates Around the World 2026</div>
+      <div class="news-desc">by Jim Lane (Biofuels Digest) Daily Digest today released its annual review of biofuels mandates and targets around the world, looking at the state of biofuels mandates in 65 countries. Get the latest...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Canal Rural</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMioAFBVV95cUxOclRfVC1YTWZlelA3bVZDT2ZNc2NBSTZMWTAzUmFQYXJmelVpbDVNSm0xdnd6S1pVU3RCZUtnMDRZRFRZMDQwcU1IQ1BPTUJ6UzhNU29GcldzTGRmS3EwbjhZdE9xSVZXM3VCOW41bGJJemhvV3RnZ0lBVmktV0NIMVp1TVVBV3FpME53TjRCZXZPY0g3RmVybm5fZjZKaTIw?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="singapore’s bio-bunker sales tumble in june, lng sales also falls"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">15/07 13:16 UTC</span>
-      </div>
-      <div class="news-title">Singapore’s bio-bunker sales tumble in June, LNG sales also falls</div>
-      <div class="news-desc">Singapore’s bio-bunker sales tumble in June, LNG sales also falls&amp;nbsp;&amp;nbsp;engine.online…</div>
-      <div class="news-footer">
-        <span class="news-source">🇸🇬 Singapura · engine.online</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxPYXIzTGR2dmpqYmhmRjBZUUNzQUszMjcxSFpkeTc1cmc1c0VjRmRIOWFVTkRTVVduOGdpTHRQeF9FNHIzaTJpNVRXRlpZVUlqb3ZJaGIxOVFvNzZVM1FRQ2czXzVCYUYxRXZhUHVwSUEtRWZZcGtuV1N5eVR3OG9JMDdSTHB2RE9xeERkWG1ua2gyb1NNVDZudGtaUDhpR0xMcFVOaGVPVnhGVnJFZ3lOcVV1VnZ5TnVlT2I2eVpvM0F0OFRQWUhRUg?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="cnpe aprova temporariamente aumento da mistura de etanol na gasolina para 32% | café com esg, 15/07"
+    <a class="news-card" href="https://www.treebaytechnology.com/company/blog/ethanol-blending-mandates" target="_blank" rel="noopener"
+       data-cat="blend" data-title="ethanol blending mandates by country: full list (2026)"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">15/07 10:36 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">CNPE aprova temporariamente aumento da mistura de etanol na gasolina para 32% | Café com ESG, 15/07</div>
-      <div class="news-desc">CNPE aprova temporariamente aumento da mistura de etanol na gasolina para 32% | Café com ESG, 15/07&amp;nbsp;&amp;nbsp;XP Investimentos…</div>
+      <div class="news-title">Ethanol Blending Mandates by Country: Full List (2026)</div>
+      <div class="news-desc">See which countries use ethanol-blended petrol in 2026 — a full list of E10, E20, and E85 mandates, E15 has been permitted for year round sale...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · XP Investimentos</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxOeUdIbVZ1TjZVWTd3R0VnUXdFMnJ4V1VyWnlfU0hVaWlWS1hHM1dCd3VfR3VSekdsdVVlRnQyVDBydG54Wk9fNUZrZGlIRDhQX3YtZ1UwUFh4bUxUZXg5cFIwRy00bGVGVHlKR2VrNjE2UzlxSXgxSmhwLUR2R3VzeWxsaTJKd2t6UlRTcWJkUUx1dlJ3ZFpGUUJVUEhGR3ZOaERKakNSUmVRdTgxV1dDcVdjVkQyQ3BrcERyRjZqZ0tPRTdzb0hpMw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="achieving ultra-low carbon intensity for second-generation sustainable aviation fuel"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">15/07 10:00 UTC</span>
-      </div>
-      <div class="news-title">Achieving ultra-low carbon intensity for second-generation sustainable aviation fuel</div>
-      <div class="news-desc">Achieving ultra-low carbon intensity for second-generation sustainable aviation fuel&amp;nbsp;&amp;nbsp;Open Access Government…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Open Access Government</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMitAFBVV95cUxPNTZaMzhxVE5KMTNXcXRITThZSXQ1T2JfbThtbUVwMUZaVi1LSmpPZzIzN2FDYnVrenFQLUx0U3UyeTdPdmVPeWJIQlM3Zk5yTklKUHRkeGMzV2dpa01ndnNSQU9Dc3VXUFNHSjVyZzhtaEN3bU9aa1BjU2dwNng5aDZyWGZILU9oOWJBTk14SW9jOHprZHUzcXotdldOX240TDY2TG1Nb3c1elVTVm14bGV0dVPSAboBQVVfeXFMTlZRbmlQRW5wZUJOUG9KcV9JbXliUERLNk9LbTM1dFpRX0t6VW9HSHdmNlI2dHFsa2daWGJzNk11Q0dEdlN4RG5tWVd6QmQzbmtHbU00X1NqbXdPcHVJS1lmVjI2T3pHWUJXR2Z2MXBSS3F5R05hU2p1anZBUGhDaTNSZTZwSTVydjJ5XzVmbHR4MmhpYU8wd1BFRGZ6ZjZRNFUtQXlTcnJob19LN2NrOEZPZ2xIOEJvTFZ3?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="india’s ethanol rush prompts anger among vehicle owners, questions for gov’t"
+    <a class="news-card" href="https://growthenergy.org/wp-content/uploads/ge-docs/ethanol-policy-roadmap.pdf" target="_blank" rel="noopener"
+       data-cat="blend" data-title="[pdf] 2026 ethanol policy roadmap | growth energy"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">15/07 07:08 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">India’s ethanol rush prompts anger among vehicle owners, questions for gov’t</div>
-      <div class="news-desc">India’s ethanol rush prompts anger among vehicle owners, questions for gov’t&amp;nbsp;&amp;nbsp;Al Jazeera…</div>
+      <div class="news-title">[PDF] 2026 Ethanol Policy Roadmap | Growth Energy</div>
+      <div class="news-desc">Reduce Fuel Prices with E15 • Enact legislation to permanently allow year-round sales of E15 (S.593/H.R.1346: Nationwide Consumer and Fuel Retailer Choice Act). • Encourage the Environmental Protectio...</div>
       <div class="news-footer">
-        <span class="news-source">🇮🇳 Índia · Al Jazeera</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMivwFBVV95cUxORU9PVXpQX3hodlJ3UjhTcTQ2UWZJdlZNbkthMFJhdGRRaEp5ZFBVRmhjUWpvSHBxZjRKLXlaaGFmSmRHZzl4YmE5TW1vSEVfNXRGQnJFRWZPdFF6ZHdkTzZzSjhFb0Vjbndha084djBqaF95WFJ2RHZvVFpIOG5jdEZleVc0bmtNZnVKRW5kMjFXX095NktfQVJvb0NGN1o3VVhxZDRZY3NmTHFBNTRMOWloQVF4VU12Wi1XN0lacw?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="mistura de etanol na gasolina vai aumentar para 32%: vai cair o preço na bomba?"
+    <a class="news-card" href="https://www.wri.org/news/statement-over-30-organizations-issue-letter-us-senate-opposing-year-round-ethanol-e15" target="_blank" rel="noopener"
+       data-cat="blend" data-title="statement: over 30 organizations issue letter to us senate opposing year-round ethanol &#x27;e15&#x27; proposal | world resources institute"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 18:41 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Mistura de etanol na gasolina vai aumentar para 32%: vai cair o preço na bomba?</div>
-      <div class="news-desc">Mistura de etanol na gasolina vai aumentar para 32%: vai cair o preço na bomba?&amp;nbsp;&amp;nbsp;InvesTalk…</div>
+      <div class="news-title">STATEMENT: Over 30 Organizations Issue Letter to US Senate Opposing Year-Round Ethanol &#x27;E15&#x27; Proposal | World Resources Institute</div>
+      <div class="news-desc">* Climate filter site by Climate. * Energy filter site by Energy. * Food filter site by Food. **WASHINGTON (July 14, 2026)** — A group of over 30 environmental organizations shared the below open lett...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · InvesTalk</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇺🇸 EUA · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMilgFBVV95cUxPUlZwbF81RzkwMEN0a2ltcGNGNUpnUlNldzRWbzZVQXF6ZjdZRmRObmJFYnBnNWhXdU1pQWpoZ3RlV2otdWI0M3dBY2hnWE00UmRhbUwzbVF3Z1g2dElaejhGc0pnRHhhRnhDc2d1dkk4UHctOVd3bVY5QzBFeFJwLS1uS254NFBIbUI0UHdET1VvVU9fNHc?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="governo eleva mistura de etanol na gasolina para 32%"
+    <a class="news-card" href="https://www.instagram.com/p/DaUkNtUAcMT" target="_blank" rel="noopener"
+       data-cat="blend" data-title="which country blends the most ethanol into its petrol? hint"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 18:19 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Governo eleva mistura de etanol na gasolina para 32%</div>
-      <div class="news-desc">Governo eleva mistura de etanol na gasolina para 32%&amp;nbsp;&amp;nbsp;Revista Cultivar…</div>
+      <div class="news-title">Which country blends the most ethanol into its petrol? Hint</div>
+      <div class="news-desc">2026 ETHANOL BLEND STATUS: E10 (default), E15 (10% stations), E25 operational. E20 means 20% ethanol, E30 means 30% and so on. countries across...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Revista Cultivar</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMirwJBVV95cUxPWnJNWkYwZ1RQRVI2Z3BnVnZHSFBkNlFyMTRiX25ldmVTeURpWHpFQ2Uza2owWlhXWXlNTjZjRUpOaUpob1JleU1ZMzY1OGg2eWphSllkNTl4X1M0c3hpVjZwQWsxNHNaWVBuTHFRSEdHei0xSDA5d040QmdrUzFad3NFdUQ5clppci1neHBfZWtOc3dINUdhV0dtUGw3TVZ6aHJCbGhjN19QdkJNZ0NpcEFCcEViTGtLTElkOXZSdnpjRGRZbHV1VzJkVmlVY1NuVWJvNHJ5dkVCOExYcV9NbjlSREFjMXdKdUt6TFlWVEtWVTd4eVE2SEVWdG44eWdHcHFad1VUSGc2ZnlWZHotN0RwRF9hQ2ctanpFQXl1N1pBeGQ1VDR1Rm5VdnEzY1k?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="&quot;vai fortalecer todo o mercado&quot;: aumento da mistura de etanol na gasolina é visto como oportunidade pela indústria gaúcha"
+    <a class="news-card" href="https://m.economictimes.com/industry/energy/oil-gas/countries-using-e20-or-higher-ethanol-blends-global-biofuel-policy-explained/amp_articleshow/132304453.cms" target="_blank" rel="noopener"
+       data-cat="blend" data-title="which countries use e20 or higher ethanol blends? a global guide"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 18:17 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">&quot;Vai fortalecer todo o mercado&quot;: aumento da mistura de etanol na gasolina é visto como oportunidade pela indústria gaúcha</div>
-      <div class="news-desc">&quot;Vai fortalecer todo o mercado&quot;: aumento da mistura de etanol na gasolina é visto como oportunidade pela indústria gaúcha&amp;nbsp;&amp;nbsp;GZH…</div>
+      <div class="news-title">Which countries use E20 or higher ethanol blends? A global guide</div>
+      <div class="news-desc">countries such as Brazil, Paraguay, Thailand, Bolivia and Zimbabwe have already adopted fuel blends of E20 or higher in various forms, India...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · GZH</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMipAFBVV95cUxNQXRuREs2WWZra0p3cjRpLUp1U1pQZXFvejhUZnBqUEllbUNUMEZSOUVsVGRCcDlDNXBRR01GY0t4NGJkYjIxbzBjT3RtOTE5eV93UHh5Nk00eVM2Z0FyTVdfMUN2QlJWLWhwbEV5T19ZeXlQMV9mVXRiV2lCQ3hQR01jTzJpYmVrX3hUdm5xVGxQaENHckxieElVM2dNSjJnbklIcg?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="hugo motta elogia aumento da mistura de etanol na gasolina"
+    <a class="news-card" href="https://www.segmenty.com/GenerateNewsStaticJsps/Indonesia_to_implement_ethanol_blending_in_petrol_from_2026.html" target="_blank" rel="noopener"
+       data-cat="blend" data-title="indonesia to implement ethanol blending in petrol from 2026"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 17:51 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Hugo Motta elogia aumento da mistura de etanol na gasolina</div>
-      <div class="news-desc">Hugo Motta elogia aumento da mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;Portal da Câmara dos Deputados…</div>
+      <div class="news-title">Indonesia to implement ethanol blending in petrol from 2026</div>
+      <div class="news-desc">Oct 16, 2025 — The Government of Indonesia has announced a mandate to blend 10% ethanol into petrol from 2026. IDR 2,000 (US$ 0.12) per kg. The new policy is...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Portal da Câmara dos Deputados</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇮🇩 Indonesia · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMitwFBVV95cUxPQVZTWGUtTUVwMHVVbjlQNG12eW5ncE5LQzlFSmljSmhwdzdUakNHckxfUVB4eC1aX3BHbVg3bHJzLWVYWUFKY3dYM2JXY3M1djdCc1NlY19NRFc5TzR1bmVzTG9CalBlazRQQVdNNkVTNjNDd2VlLUpLYjlWa2wzMzd2V2ZFVjExa3VLMXFrQmZqNHIyZm9ORWRndFNWRGJtNFJxSnc0VFBQa0l2cDFEbC00b0hBT0k?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="icao urges greater corsia cooperation among member states"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">14/07 17:23 UTC</span>
-      </div>
-      <div class="news-title">ICAO Urges Greater CORSIA Cooperation among Member States</div>
-      <div class="news-desc">ICAO Urges Greater CORSIA Cooperation among Member States&amp;nbsp;&amp;nbsp;Aviation International News…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Aviation International News</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi0gFBVV95cUxPRHBpblNaMjM5NWdyZXlrd1BtQmdqUlhJV1JWbHg2T2t0eVEtUHBPckF1SnVld2IzZklrTXp5QW1obWFzdDgyZ0taR0VaQ0t4VjBUTW16bmozejVBTDV5b0dtSks5QlZFdXRCLXVqMld6b0pGRDJsX29oZndKa1Byd1VBaUtTV0FsbnVLbTRuOXBRcWk2dFJmdjN2NmxRSjN5SHVIem0yLWdMbWMtRFpWMm02SVlvbDY1MzVBV3FXY2RTbVdjVHZGaUxnUmRRa0tST0HSAeABQVVfeXFMUGp1dEZFUFh5TURaWUdTcTZNR3NiVXlxOTZ3RktILURDczd6ZjFXcUgzTHVwNXFod3RmVjc2dXdPRjNJb3U5dTVwZ0VOVjFmN2t0MGxSclh5SjV6aXlCaWVRcThFNUJnYldJWlFqX3BUa3ZDZzc5TFVtNjlsWEp6VExkb2xBd2hINUtBVFN3TDR5XzY4ckFERDZfSy11UWtwOUFxVXJ4TmVKWWdaOTRsR2U1SkNEOHZZS1JfbGt6RFJlQzRlMWZva2pLeTFNX0ZQdnJLODJYSXpFdHp0ZTBNLXg?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="entidades já haviam manifestado preocupação com percentual de etanol na gasolina"
+    <a class="news-card" href="https://www.thehindubusinessline.com/news/asias-ethanol-targets-and-recent-developments/article70679050.ece" target="_blank" rel="noopener"
+       data-cat="blend" data-title="asia&#x27;s ethanol targets and recent developments"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 17:04 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Entidades já haviam manifestado preocupação com percentual de etanol na gasolina</div>
-      <div class="news-desc">Entidades já haviam manifestado preocupação com percentual de etanol na gasolina&amp;nbsp;&amp;nbsp;Valor Econômico…</div>
+      <div class="news-title">Asia&#x27;s ethanol targets and recent developments</div>
+      <div class="news-desc">Feb 26, 2026 — Vietnam ⁠will switch completely to ethanol-blended gasoline from 2026 ... The Philippines ​has a mandate to blend 10% ethanol in gasoline ...Read more...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Valor Econômico</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇻🇳 Vietna · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMijAFBVV95cUxOcGpXWkVaREF4a3dmeW1GNVdRRV96b1NudlNYUDlvRnNyNGxTMFpXU2NlNG81R3M1WkFMMUl0RzF6U082aE0xdlhzZThKamhkOVRQeVIxZDBVUVhYTldfdFM5YU5Ya1JHWTdkMVFkakJFNXpWN1BUR0hGTkM5aWl2ZUMzcDJBVG0xQkZ6UA?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="grassley provides update on e15 in the senate"
+    <a class="news-card" href="https://en.tempo.co/read/2104879/indonesia-to-mandate-5-ethanol-blended-gasoline-from-july-2026" target="_blank" rel="noopener"
+       data-cat="blend" data-title="indonesia to mandate 5% ethanol-blended gasoline from ..."
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 15:46 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Grassley provides update on E15 in the Senate</div>
-      <div class="news-desc">Grassley provides update on E15 in the Senate&amp;nbsp;&amp;nbsp;Brownfield Ag News…</div>
+      <div class="news-title">Indonesia to Mandate 5% Ethanol-Blended Gasoline From ...</div>
+      <div class="news-desc">May 22, 2026 — ESDM announced that the country will begin mandating gasoline blended with 5 percent ethanol, known as E5, starting in July 2026 in several...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Brownfield Ag News</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇮🇩 Indonesia · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMieEFVX3lxTFB6RWNWTVVnRDFudUJUc3pBakMtRWczUl85dlVXc3hZendsSnVkNXMxV1NQakl5Q3hwUGg2N1d6MHNJQi1Nc0wtZEdTQlRieUFDTWk4aWFqOWFtQ2I0dmVObEkwV2RuMkFWVVduaG1kVWFDQ1ZqRzQ1Tw?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="renovação energética: governo aumenta mistura de etanol na gasolina para 32%"
+    <a class="news-card" href="https://www.chinimandi.com/ethanol-blending-status-across-asia" target="_blank" rel="noopener"
+       data-cat="blend" data-title="ethanol blending status across asia"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 15:07 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Renovação energética: governo aumenta mistura de etanol na gasolina para 32%</div>
-      <div class="news-desc">Renovação energética: governo aumenta mistura de etanol na gasolina para 32%&amp;nbsp;&amp;nbsp;TVT News…</div>
+      <div class="news-title">Ethanol blending status across Asia</div>
+      <div class="news-desc">Feb 26, 2026 — Vietnam has announced that it will fully switch to ethanol-blended gasoline from 2026. From June 1, 2026, all gasoline sold nationwide must ...Read more...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · TVT News</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇻🇳 Vietna · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiwgFBVV95cUxOZjZKNHdJekxvOU93dFlRUnV5dVloUV9yWm8xdWZFVWVzdm5rNGl4SEFUd00xN0hwLXZtdmUwVjZFcE5mVWlsRUtNdGxoQ29McUpYOUI4MG1jRjZXci1jU3RMNlI0akhSVUxQR1h2THN6OTZXLTdXY09iemVuSHczUDBGdXVyUE85S3lQS2RkS1YtN1JiQUxRem0yVFA1MXVWRFNNYnpmU0hvLTgxN3VoYzJCbHJHejVMTm1OZWtCZWYxQQ?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="governo eleva mistura de etanol na gasolina para 32% por 180 dias"
+    <a class="news-card" href="https://biofuelsdigest.com/biofuels-mandates-around-the-world-2026" target="_blank" rel="noopener"
+       data-cat="blend" data-title="biofuels mandates around the world 2026 : the daily digest"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 14:59 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Governo eleva mistura de etanol na gasolina para 32% por 180 dias</div>
-      <div class="news-desc">Governo eleva mistura de etanol na gasolina para 32% por 180 dias&amp;nbsp;&amp;nbsp;Movimento Econômico…</div>
+      <div class="news-title">Biofuels Mandates Around the World 2026 : The Daily Digest</div>
+      <div class="news-desc">Dec 29, 2025 — India advanced its ethanol blending target two years ahead of schedule, declaring nationwide E20 availability by March 2026 under the Ethanol ...Read more...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Movimento Econômico</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇮🇳 India · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMingFBVV95cUxOZUxTWHNKbVFwb0x1ZHFhdlZHVzQyRU5ab3BESWQzcW5pQWRDMS11d0VEdndEbWl2bzNXMWNQa1kyVnM3ekZkc09FazNfblpRUGtldmpObjBLaTRFMEtUa3dEWmhRa3k5bVVBd3VOLUtoR0xJZGFJYVlkeWoxcGRNaURiZzVQNnlfU2NfNlhCc0g5YjFhd2hfcldRQ2RCd9IBowFBVV95cUxNZGdBbWs1WGJGOXNSYnFTYTJIRjl1MnNTN0hGYlpMVmdxTVExUTR6a1pkVE50RkhlMGV3S2dZaWVJcDhYcUZDR0JWS1V3LTV6Z3Y1TDk2MFhnNXBnR09sWFc3RFRWeXFiX0hUWjNlYWJCZXZuRGw1ZXlDNjVwMGZxNEpBRm9yM2lNTkNINTdSdUxsN3M4TnpkcjdHeTMwdnJkY3Bj?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="brasil eleva temporariamente mistura de etanol na gasolina"
+    <a class="news-card" href="https://bioenergytimes.com/ethanol-blending-gains-momentum-across-asia" target="_blank" rel="noopener"
+       data-cat="blend" data-title="ethanol blending gains momentum across asia"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 14:35 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Brasil eleva temporariamente mistura de etanol na gasolina</div>
-      <div class="news-desc">Brasil eleva temporariamente mistura de etanol na gasolina&amp;nbsp;&amp;nbsp;InfoMoney…</div>
+      <div class="news-title">Ethanol blending gains momentum across Asia</div>
+      <div class="news-desc">Feb 26, 2026 — In Thailand, the government has extended subsidies on biofuels for two more years until September 24, 2026, to encourage greater use of E20 and ...Read more...</div>
       <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · InfoMoney</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇹🇭 Tailandia · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiekFVX3lxTE9OTjFqQjFvUEVFNG03bFpISTcyY1FjaE5Nb2szbVJmZVF2ZHFXS3NiS3FlVTU0UWo5c2Z3cVdBWFRjYVdOOHZySmRYQmRleWZ3ZTBjUU5kT0FvMEhhVXItOXdGMks0bldUcmMwTDR3aFVvLVIwMmYtMEtB?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="poll reveals record voter support for e15"
+    <a class="news-card" href="https://www.bnamericas.com/en/features/latin-america-eyes-ethanol-mandates-to-drive-biofuels-growth" target="_blank" rel="noopener"
+       data-cat="blend" data-title="latin america eyes ethanol mandates to drive biofuels ..."
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">14/07 13:52 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Poll reveals record voter support for E15</div>
-      <div class="news-desc">Poll reveals record voter support for E15&amp;nbsp;&amp;nbsp;The Mighty 790 KFGO…</div>
+      <div class="news-title">Latin America eyes ethanol mandates to drive biofuels ...</div>
+      <div class="news-desc">Guatemala plans to implement a 10% blending mandate in 2026, according to Aida Lorenzo, director general of the country&#x27;s renewable fuels...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · The Mighty 790 KFGO</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🌐 Global · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi8AFBVV95cUxNQ2VHNi1QRUNyN3c2UHItaEwxREdia0RxLW5fUGlQR0JTa3piME9YSWRPSkVxMUhyY2pGQ3lQZU05bkNsdnNidUxjaVhUb3FnajhSZF9DRHotNlZ1NDRCRnZpNkF2RXpqcXZNUnk2Slo3UGVWVjBFYlIzU3dweFZUMHdBWTBTakVYb3VJbXNKVmtUTjJFVFlnakctWUY1YjZYQ1loay14Q2owM0RBdU43bklBYlUtaThicUNFb014ZGp5MTRZY1JKblVBZnZSdERYUGhYMVo4b1RERC1SSUN5dXU1LW9jZVlVbkhEeTkyNDg?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="state reps. williams, klopfenstein introduce legislation expanding access to e15 fuel on ohio turnpikes"
+    <a class="news-card" href="https://theicct.org/wp-content/uploads/2026/02/ID-531-%E2%80%93-Brazil-fuels-policy_policy-update_final-1.pdf" target="_blank" rel="noopener"
+       data-cat="blend" data-title="mapping brazil&#x27;s latest fuels policies"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">13/07 20:25 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">State Reps. Williams, Klopfenstein Introduce Legislation Expanding Access to E15 Fuel on Ohio Turnpikes</div>
-      <div class="news-desc">State Reps. Williams, Klopfenstein Introduce Legislation Expanding Access to E15 Fuel on Ohio Turnpikes&amp;nbsp;&amp;nbsp;Ohio House of Representatives (.gov)…</div>
+      <div class="news-title">Mapping Brazil&#x27;s latest fuels policies</div>
+      <div class="news-desc">The annual emissions reduction target is determined based on the volume of fossil fuels distributed for the road sector in the previous year.4 The CI values used to calculate CBIOs are based on standa...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Ohio House of Representatives (.gov)</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMivwFBVV95cUxONGJVcFo5OHJrWFQzSmxOQjFfbVpzdTZ5S2R0N3dvNTVqOERfTnBJSzVGWFRRQzhYRFV4U3BSYklubnhjR29xSGJWbGZRRkpUTzJqOTN0S1pkUXZOMktKMU5RMFRabmVhZm5ZUnpVS0tpbnVBS3pvei0ydTE3SmloQzJ4djhEenBWa3gzU2Z0T2FoLUdKRWlMWDQtZWFhT0xQamUxTlA2RFJUWExCR1k3VG9URHc1MmhwYkVxMjZhbw?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="new poll reveals record voter support for e15"
+    <a class="news-card" href="https://advancedbiofuelsusa.info/argentina-allows-up-to-15-ethanol-blend-into-gasoline-after-oil-shock" target="_blank" rel="noopener"
+       data-cat="blend" data-title="argentina allows up to 15% ethanol blend into gasoline ..."
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">13/07 13:57 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">New Poll Reveals Record Voter Support for E15</div>
-      <div class="news-desc">New Poll Reveals Record Voter Support for E15&amp;nbsp;&amp;nbsp;Renewable Fuels Association…</div>
+      <div class="news-title">Argentina Allows up to 15% Ethanol Blend into Gasoline ...</div>
+      <div class="news-desc">Argentina&#x27;s government said on Friday (March 27, 2026) it will allow local firms to voluntarily blend up to 15% ethanol into gasoline,...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · Renewable Fuels Association</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇦🇷 Argentina · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxOTURjeENGQVh5M21OSmJhWTNHazZfbGg3N1d1MTh5RWhuVVNBNFh4SlU5SmEycDBmN0NkWmFVajRrbk8yUUhqc3pBMU94akQ2TWZPM1NBc18yRVZ6Vzc4UHoxNjBnSzQ1TTFOdnpxZ0dlcFh5ZDJBV1RGcGctNkU0ZkxJMWdxa2NXZkN5T2NrLWFmYmRacnJPeS14RXhNOTVMRTEta2QtUVJERGR2Zm9qeUJrRGc3QjNzOFpOVHBucEk?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="&#x27;brasil tem vantagem competitiva única na produção de saf&#x27;, afirma executivo da inpasa"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">12/07 22:04 UTC</span>
-      </div>
-      <div class="news-title">&#x27;Brasil tem vantagem competitiva única na produção de SAF&#x27;, afirma executivo da Inpasa</div>
-      <div class="news-desc">&#x27;Brasil tem vantagem competitiva única na produção de SAF&#x27;, afirma executivo da Inpasa&amp;nbsp;&amp;nbsp;Canal Rural…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Canal Rural</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMitAFBVV95cUxQZEd3amtZVHk1MmZ4cVRUR0tXVFNVOE5lWkF0MVg0VzRnbnJRRlA1UWQwMlJxTmlpMzU4ZnJMX19RTGx3R0RMTTJUUmdtc1pSVTl3bG0yUVpaalBlUWtyOGZBUWdXQmNmdlhsYXhhTlRqTkN3YW9XX2g3N1NvYTY4UkQxc1V2QW5XWkdNQ0s5ejY5Wjhrc0NGckU2RGItdkpEbC1VUEFnVGs1WmVBZjZpWE9ENF8?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="na cna, especialistas destacam potencial do brasil na produção de saf e biobunker"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">09/07 11:21 UTC</span>
-      </div>
-      <div class="news-title">Na CNA, especialistas destacam potencial do Brasil na produção de SAF e biobunker</div>
-      <div class="news-desc">Na CNA, especialistas destacam potencial do Brasil na produção de SAF e biobunker&amp;nbsp;&amp;nbsp;Portal CNA Brasil…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Portal CNA Brasil</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiX0FVX3lxTE50ZG4tdEV3TWcxVjFMc0tiVzc0bVdtSnRUaWo2c2V3clBWSHVaelIwZXIydmx1ckNfS0pHbVRyWmQyU3Y1MjJNRHdTbldNMVUyWkd0amh6Qi1VZHQxX0kw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="feedstocks and processes for global-scale sustainable aviation fuel production"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">08/07 18:09 UTC</span>
-      </div>
-      <div class="news-title">Feedstocks and processes for global-scale sustainable aviation fuel production</div>
-      <div class="news-desc">Feedstocks and processes for global-scale sustainable aviation fuel production&amp;nbsp;&amp;nbsp;Nature…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Nature</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMirwFBVV95cUxQanN6aWM2QS15QzhLbF9WVU8yeWM1WWZHOVgyODJMMzgtWDVTZEk0NXBYUUNyTTFiaVR3czZYbFQteUFDT3d6NDk5cHZhTUZQR05OYjBEc1h5d0gxUE9xWW84dmJMRGtvMzFNcDFUTUN6N2l6S1Q0cDdxamNwN25ZYWtfYkRMWUIteHZPX1lOSzJJYy0yNThfcndPSnl6WTd5c2Q1R0VPc2ZpbDFsVERr?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="chimbusco supplies b24 marine biofuel in shenzhen to cosco"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">08/07 08:07 UTC</span>
-      </div>
-      <div class="news-title">Chimbusco supplies B24 marine biofuel in Shenzhen to COSCO</div>
-      <div class="news-desc">Chimbusco supplies B24 marine biofuel in Shenzhen to COSCO&amp;nbsp;&amp;nbsp;Quantum Commodity Intelligence…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Quantum Commodity Intelligence</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMipgFBVV95cUxPck04eUlhbHJmWnVhdVpMTkl0cUtBS2w0M2tuLW8tNTh6MWkzSVNKQmZYakVCdlpPM016SjRlNS1Gd0hRN21JNW5NRGJNUkV6elkzNk9ITTR4dV91MDV2eWJXRzVTYUJrYV9vZ0lnOXlOODZrZWVseUhKV3doR2dsa25tY0k2eUJsUE9QaGFocDJ0bF90bFNYVFBjcDZEX0FxdXY1Z1hn?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="4º agroenergia – transição energética sustentável - edição saf e biobunker"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">08/07 07:00 UTC</span>
-      </div>
-      <div class="news-title">4º Agroenergia – Transição Energética Sustentável - edição SAF e Biobunker</div>
-      <div class="news-desc">4º Agroenergia – Transição Energética Sustentável - edição SAF e Biobunker&amp;nbsp;&amp;nbsp;Portal CNA Brasil…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Portal CNA Brasil</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiWkFVX3lxTFBUM2VKVUhkdktHanNIQlo1Z2pERUp6VmUyMHI0REp3UklkbGhvdFRPS21uU0VLOFpwek1vejFTRFFxZDhGU29wcFFZQUNyUWRJZjBhb19NY2ZNZw?oc=5" target="_blank" rel="noopener"
-       data-cat="blend" data-title="india is adding biofuels to petrol – but many drivers are unhappy"
+    <a class="news-card" href="https://ethanolproducer.com/articles/brazil-to-boost-biofuel-mandates-to-e30-b15" target="_blank" rel="noopener"
+       data-cat="blend" data-title="brazil to boost biofuel mandates to e30, b15"
        style="animation-delay:400ms">
       <div class="news-top">
         <span class="news-badge blend">Blending</span>
-        <span class="news-time">08/07 07:00 UTC</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">India is adding biofuels to petrol – but many drivers are unhappy</div>
-      <div class="news-desc">India is adding biofuels to petrol – but many drivers are unhappy&amp;nbsp;&amp;nbsp;BBC…</div>
+      <div class="news-title">Brazil to boost biofuel mandates to E30, B15</div>
+      <div class="news-desc">The government of Brazil on June 25 announced it will increase the mandatory blend of ethanol in gasoline from 27% to 30%...</div>
       <div class="news-footer">
-        <span class="news-source">🇮🇳 Índia · BBC</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE5kUjI1LVdJSEdCVnBId1Nra1VDbXMzaVRGdnhmaHc1Zm5wMXlxV2YyeXVWaW1lT1lPQW5IclpxNDMzQmxwYjV4N3VaYTA1MEhvbksw?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="biobunker: a oportunidade de expansão do setor sucroenergético"
+    <a class="news-card" href="https://theicct.org/publication/mapping-brazils-latest-fuels-policies-feb26" target="_blank" rel="noopener"
+       data-cat="blend" data-title="mapping brazil’s latest fuels policies - international council on clean transportation"
        style="animation-delay:400ms">
       <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">07/07 09:05 UTC</span>
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Biobunker: a oportunidade de expansão do setor sucroenergético</div>
-      <div class="news-desc">Biobunker: a oportunidade de expansão do setor sucroenergético&amp;nbsp;&amp;nbsp;JornalCana…</div>
+      <div class="news-title">Mapping Brazil’s latest fuels policies - International Council on Clean Transportation</div>
+      <div class="news-desc">Passed in 2024, Brazil’s Fuel of the Future package established a set of programs aimed at reducing the carbon intensity (CI) of civil aviation and promoting the use of biomethane, while also advancin...</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · JornalCana</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMipgFBVV95cUxPdGE5OVJmVVZMSWhlOEhyTVJvRmUxbGdGc0FzUWk0MFQxbFVJYnZvWkd6U3ZjN3g3NnpSTVRBcDNkN3VmU0JpWVpNdVNUMDhqR01vUWhJRzluY3FVOWg5bFZXXzU1akxpYXZTeUdtaThmb2ttZVpfRWtPWmNjZDhOY012WDFQQkZpNzk1SWx2aWx6ajd3NDRFYldXZ1FHbENSYUF0SV9B?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="combustível sustentável de aviação será destaque da fenasucro &amp; agrocana 2026"
+    <a class="news-card" href="https://www.spglobal.com/energy/en/news-research/latest-news/refined-products/091924-brazils-fuel-of-the-future-biofuel-ramp-up-mandate-may-soothe-fuel-deficit-industry-sources" target="_blank" rel="noopener"
+       data-cat="blend" data-title="brazil&#x27;s fuel of the future biofuel ramp-up mandate may ..."
        style="animation-delay:400ms">
       <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">06/07 10:57 UTC</span>
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Combustível sustentável de aviação será destaque da Fenasucro &amp; Agrocana 2026</div>
-      <div class="news-desc">Combustível sustentável de aviação será destaque da Fenasucro &amp; Agrocana 2026&amp;nbsp;&amp;nbsp;cbnribeirao.com.br…</div>
+      <div class="news-title">Brazil&#x27;s Fuel of the Future biofuel ramp-up mandate may ...</div>
+      <div class="news-desc">Brazil currently blends 27.5% anhydrous ethanol with gasoline sold at the pump, but is expected to raise the mandate to 30%....</div>
       <div class="news-footer">
-        <span class="news-source">🌐 Global · cbnribeirao.com.br</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMisAFBVV95cUxPbG9ObjZzZi1vMkhMOUI1QTUwdUIwUXdMYWdrMHRkSjRHTkpXZGExMVlpeThieEY1UTM5bFRuWVJwUHJ3bjk1aXNoTVktbUxHTVBGQXo2V0tnRy04QWtvNWVaV3RwZkNFLWRmU3VVdWx4bzFZMG01WHpsY2phdDlxLTkxaGhOLXQ4Yk5vN1daRldyVUVlMGlwOVFSRkdGMHhXcmlyaXNlU3VZM1B3NGx0RQ?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="deutsche bank invests in sustainable aviation fuel with lufthansa group"
+    <a class="news-card" href="https://www.industrialinfo.com/iirenergy/industry-news/article/brazil-could-soon-require-more-ethanol-in-gasoline--358937" target="_blank" rel="noopener"
+       data-cat="blend" data-title="brazil could soon require more ethanol in gasoline"
        style="animation-delay:400ms">
       <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">02/07 07:00 UTC</span>
+        <span class="news-badge blend">Blending</span>
+        <span class="news-time"></span>
       </div>
-      <div class="news-title">Deutsche Bank invests in Sustainable Aviation Fuel with Lufthansa Group</div>
-      <div class="news-desc">Deutsche Bank invests in Sustainable Aviation Fuel with Lufthansa Group&amp;nbsp;&amp;nbsp;Lufthansa Group…</div>
+      <div class="news-title">Brazil Could Soon Require More Ethanol in Gasoline</div>
+      <div class="news-desc">Brazil could soon increase its mandatory ethanol blend in gasoline from 30% to 32%. The increase would require 1 billion liters of anhydrous...</div>
       <div class="news-footer">
-        <span class="news-source">🇩🇪 Alemanha · Lufthansa Group</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMikAFBVV95cUxOWEFfREs3UGNheVJmWTZJdFlCSjcwaFlpS2FQbmt6QnJwWHoyMjQ2MkdlSG44MnlWY2Z5aXRUNkFlWkI0Y1NUamNUY0Vfa1BjU0pqb2ZFWVlEblU4ZlY3YWxqWndsMUg0bDRFc0Y4VVJvRXpONHA3UWF3Y19CSk9YTHZ6ckNLSkNKX1RQb2lEaDQ?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="corsia represents us$ 8.5 billion opportunity for asean member states"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">01/07 03:51 UTC</span>
-      </div>
-      <div class="news-title">CORSIA Represents US$ 8.5 Billion Opportunity for ASEAN Member States</div>
-      <div class="news-desc">CORSIA Represents US$ 8.5 Billion Opportunity for ASEAN Member States&amp;nbsp;&amp;nbsp;ASEAN Main Portal…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · ASEAN Main Portal</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiTEFVX3lxTFBBWFBGcG9QNTFnT1MyUlRza1U4X2NsT2xYY3U0dmdqOV9tS2FZSWxJZHRURWcyN2JtNjVMMkdRN1JqZW82d2FpUDZyNjc?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="commentary: corsia – a flawed scheme worth saving?"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">24/06 10:57 UTC</span>
-      </div>
-      <div class="news-title">COMMENTARY: CORSIA – A flawed scheme worth saving?</div>
-      <div class="news-desc">COMMENTARY: CORSIA – A flawed scheme worth saving?&amp;nbsp;&amp;nbsp;GreenAir News…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · GreenAir News</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMixgFBVV95cUxPUHhNVy1ad0M1dDdGYy1tV0RZWkdVZGktbm5JaTRuN2pLU2RjeW52dE16Tjg4MlpFSFUwUE9MQmJwV2xXbzhFeTRxZHpUeHVOd1gtZENNWDktaUdvYjA1ejN6eHVnR1NOU2pSNnVIaWVHNmhpR0pNWDl1dWkwXzhUSzlkTW1JRlR5dlNGLTNnNFktY1VDWmYtNDBqU0JxYklMYndReDBvNlIxaUVTNzlhZWJwV3daM3QtQ3hqYkdDOTM2cE55QnfSAcsBQVVfeXFMTTNJTHBJaE1RdDBGYlhxMnNsemVva2l5QVdBTi1lRndEZlFLVWR4Z3NCbFlqVUtUd2JrSU5Qaks1a3RlVllsVlRORlRacEJQVGlEZ2lHcW1MR2g0Y0ZiQjlnYy1kcGoxVDJaX1VqNUNZM3djMUktaUlTbXhkellCV1JKYTlCSFN2Zmg4T19rd1NPNFAzZDVXUTBqekVHSTVCR1JadkhwUFVxZFY0VHRyUUtMS3lXMmI3cFMtc1JpcXVqazFSS1pKaXBxZ2M?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="ufsm integra projeto de pesquisa com a petrobras para estudar combustível sustentável de aviação"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">22/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">UFSM integra projeto de pesquisa com a Petrobras para estudar combustível sustentável de aviação</div>
-      <div class="news-desc">UFSM integra projeto de pesquisa com a Petrobras para estudar combustível sustentável de aviação&amp;nbsp;&amp;nbsp;UFSM…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · UFSM</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMizwFBVV95cUxPd3I0UnNnMTJWWG9jVFBTcHBRQUxwRGk5ZjVxZUxBd1QyTkNad0ltY0hKcGQyM1NyXzRIRzYzQkJfY0s1dldkVGRuTEdCaGwwZUpPQ2plNHhRa1FIRnpaaFk1WFVCOE5hU2pyVFMzUjRCc29CRWdPcGlxRncxVUZpS0kzMXB1MVBiUnNrTHlMM1VSUjNQanZaaUFEUEF6QTVsNS1rN25rU0w2SXp6NUZtMEJCZnRwTWFvY1FCa0Q1UWxlOGt0X21kTldJY0pfd0E?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="petrobras aprova us$ 1,2 bilhão para produzir combustível sustentável de aviação em cubatão"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">22/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">Petrobras aprova US$ 1,2 bilhão para produzir combustível sustentável de aviação em Cubatão</div>
-      <div class="news-desc">Petrobras aprova US$ 1,2 bilhão para produzir combustível sustentável de aviação em Cubatão&amp;nbsp;&amp;nbsp;Transporte Moderno…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Transporte Moderno</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMipgFBVV95cUxOQTBoOFVrYk5rSVNxclBhQnRXYVlyVjdvS1ljSXo3cFZXWkJCRDB3bzJJWTF2ZWFhNWxNbEgwczJ3RXJyOGRVMWRPX2JJNkhEVHVTcTFwS3VKdm5ZeWJESVh0cW5QV29KYm13Tk50a3pQUnpqN1RHOTZrMDdIQkFrdXZnbU5wejdscVRNLWRBQlNSQ2hOcTVvRkdmN0hmSVpJbTJuZWxn?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="kvasir technologies raises eur 10m to scale marine biofuel tech"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">19/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">Kvasir Technologies raises EUR 10m to scale marine biofuel tech</div>
-      <div class="news-desc">Kvasir Technologies raises EUR 10m to scale marine biofuel tech&amp;nbsp;&amp;nbsp;Renewables Now…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Renewables Now</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMizAFBVV95cUxPek16R2lkRHVWekhSZFhRY3NYbEIzNl9aS1dGVVpqbll1elJROU9DNHA3TnBvZDJ6RFdsQnRqZkEtUy11blQyQ0pmdmhjN1htZVd3OEQ5LXl0VkI0TFNJNmg3b3V4MEFPcUZpM2VxRGI3VndFLWhLWHB4Mm9WREpLd1FRaEVMLXoyYXVhWFFPVkZySVBkdFdfcXR6N2ZxbkVFZzBSM3p2V0ZVNFY0c3lGeXRLZUYzUVJXZnJZUnI5T2ZhM1BfdGNKZTFJUEs?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="kvasir technologies raises €10m to commercialise climate-neutral marine biofuel"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">18/06 16:00 UTC</span>
-      </div>
-      <div class="news-title">Kvasir Technologies raises €10m to commercialise climate-neutral marine biofuel</div>
-      <div class="news-desc">Kvasir Technologies raises €10m to commercialise climate-neutral marine biofuel&amp;nbsp;&amp;nbsp;Net Zero Investor…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Net Zero Investor</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxOUzU1OUhjcG1QelVCbEZ1SDZ5WTVrMV9xdnpzLVBZTGNVVVp2Nnp0Nm1kdHlUUjZfRnFUN0FCTTlaR0N2VW9MWVh1OTRJWlp0dEZGZGJnUWNCMWE4OV8wMkJNZ1lzNlY5UEpjMXJ5eEZKdS1qVTNfSmNYVEEybkdMT2dtYWU5MlhrOXEtbVl1UWNhSWdacTJwV1ZaMDVPOVo3Q24zNzd6YTBYeWtsbGZ2dTVFcTFVTVp1MEVWSWp5QThEZmpjUVozTA?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="decreto para combustível sustentável de aviação deve sair em breve, diz diretora do mme"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">17/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">Decreto para combustível sustentável de aviação deve sair em breve, diz diretora do MME</div>
-      <div class="news-desc">Decreto para combustível sustentável de aviação deve sair em breve, diz diretora do MME&amp;nbsp;&amp;nbsp;Agência eixos…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Agência eixos</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMirwFBVV95cUxPdEg1UUV2VlNzU21KREFDWXBLNTZISVVsRkRqYmtXVTRvTGN5aWtseFJvNmxrbUtvSUtnSG85VjByaERsX3hrSW1HZHNlSWttcG1nLTlyZE1Qa1lVN3JhWnEzTEFPQTN0c3RzaF9ERTZLem9UdFlRdHpiQlV3dVRGSFdjQUlmR08wWUsyemVFdGk0ZzFhdFNEeC1SbGgtbWF1QVFsZ3FOZGo3RDl6a09R0gG0AUFVX3lxTE15S1M3bDNmOWdXd2xJRVgtcmxGQmdoQVFaWnA0cjdvRXJ0dHdFQ3Rmd0JpN1dvWGFHSTFPLXhfak0wVDdMLWxYRzgtbmcwSXJPcThPYzZnbE5yTnZ4N0E3ZFVMNWNlLXMxcUxCWjhjYXhKSzVTLWJDbi1wbTZsaGVHa2kyWHJZdHR5R2xza2RETi14LThtOXVXNWN0M3ZoOUlpcGJQbTZIWVljSGNGY3ZEYWJGWg?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="expansão da produção de combustível sustentável de aviação no brasil avança"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">17/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">Expansão da produção de combustível sustentável de aviação no Brasil avança</div>
-      <div class="news-desc">Expansão da produção de combustível sustentável de aviação no Brasil avança&amp;nbsp;&amp;nbsp;AERO Magazine…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · AERO Magazine</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi1gFBVV95cUxQeTlqeVJ6eFN2bGFiT1NLLTFWY3lIRVV5UnFxa2ptMXhMSWxheW9OVHNWc2ZkdVI3ME84Rm5BRWxOQXRoYlI0eFJXOFV2dmZmVXV6NHpROUJaQXZ0MUZmWlVvWGN4ZF8wM2ZpaFhRT0JGYVYzeFBfTEZFRmpIeC01N3ZPZEVkVFRmNndGRHJEYnhrZXdvSFpQZGs2MDBoaXIwSlIxejZsb1BSXzl6RUlaZHd3VzF6MVhZdW1UdDhxRjBDZ2FuUmQ1eWx5aXEycGlpTHowbk1B?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="ibp promove fórum sobre saf para debater a implementação do combustível sustentável de aviação no país"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">15/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">IBP promove fórum sobre SAF para debater a implementação do combustível sustentável de aviação no país</div>
-      <div class="news-desc">IBP promove fórum sobre SAF para debater a implementação do combustível sustentável de aviação no país&amp;nbsp;&amp;nbsp;TN Petróleo…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · TN Petróleo</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi1gFBVV95cUxOS0NRN0ktOHZQU2dYaG9jOGt4VTNWOGUzNVpjZ3BEekpEd0Y3akJKeTBPV055a2lNZ0haUG5PN09QZ3lobTdHcVdvNjZIWDREa3RYTVBmcDVib3d4emp0WDMwOUc2UldhaWVabUdyMFQwWE1NTG92SDFMbFM1WjhHc2g3Nm1aRkthVm9LaTRQVnRQVFZCcFJmR0FjNG9rNWxLRDd2bGZLdXpNMU16R2c1UUcxaVZZUzg3RkpBTUwwcVpDQU9kWmRiUmRPR0ZTblJuSXltN29n?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="hidrogênio verde e descarbonização marítima serão temas de palestra no energy summit 2026"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">09/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">Hidrogênio verde e descarbonização marítima serão temas de palestra no Energy Summit 2026</div>
-      <div class="news-desc">Hidrogênio verde e descarbonização marítima serão temas de palestra no Energy Summit 2026&amp;nbsp;&amp;nbsp;Sala da Notícia…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Sala da Notícia</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxNaGM0OTd3bnJucE5fYnNyZnhZOUo3ZHJ0d1FQMGxZbVpOdmlwX3huTWFLeTVCdmQ1RFVQSWpra0R1RjlIdmtuVEcyTmdZczFfYkRpVzFHTDI1RUVHZ3NxemsxUmRyUlJ3MTVTQzJpTHdqNW1yYU5JQnl3N1dqN0xUOUVyUTJBSXlUcms2b1U0ckFfOGNaUHRtZk94OHJnaGh2NzZ6eU02aE5UWkFtWkRiRWpXTndTYkRrN3BxaTRma2toQ2h2bDNOUTdWX2ZVSkk2ZWg4dTEzLWZyV3R3UFY0NtIB7wFBVV95cUxOc19CZklPVnpMRVgzSUx0c0prZ3ZOTFJkRlhLLVRsTnlEaHA5d3NuSnVHVDRfTkMyVGdnOXdEbzFVeTlVU18xaHFlaUNHS1JxTkY4MUM0MkhLaEJTLVZpb0pjMUhqM2ItbnRVdTV6U2J4Q2lSNHpucEs5N05jb1NTT0pUbWdhM2s4NkEwMUtNNFBqc3dMVk44eGZHUWpqZ1lnam5YNEtLenM5aTdjTEUyMDJTTU9GVE1KUmJCTVlsbWJMU1prYzZnUWVKbWIxaTBhOVhKWnBtTk9TY0szc2d4YzcxaFJJQXdyVmVXMzVVZw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="brasil pode ser potência global de saf, o biocombustível de aviação, diz entidade"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">08/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">Brasil pode ser potência global de SAF, o biocombustível de aviação, diz entidade</div>
-      <div class="news-desc">Brasil pode ser potência global de SAF, o biocombustível de aviação, diz entidade&amp;nbsp;&amp;nbsp;O GLOBO…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · O GLOBO</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMihgFBVV95cUxNWm5UakhJQjc0SnBYamFLT1p5NThONTlmMWVPYkIzQUhnbm1BLTFDN2RwVGQ2cmNDOFQzNVpFVS1veTNpcVhQa1Y1TGl6cjlaeGF4dVI3YlZhREtpUmhtbWREV3g1OTNBdjNOX2pNa0hhd2dac1ZFd01qbEx3Vl9TbHVJNTlqdw?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="abs calls for more flexible imo decarbonization framework"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">08/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">ABS Calls for More Flexible IMO Decarbonization Framework</div>
-      <div class="news-desc">ABS Calls for More Flexible IMO Decarbonization Framework&amp;nbsp;&amp;nbsp;gCaptain…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · gCaptain</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxNZFdfckVFRzVRSWdtSURDVmw4TEljSG1nOGotQnhBQnlYNV9TdmxMNmRVa3F6TnhxMHFFNlZ2MWJxejdCTjJ4cVZfWVJFUS1OMVJPMEZYdmNHcWVWZ3EzZFJKR29sV0EwdjJqWUFONXdIcjV5SkQ0ZF9mOGdqTEdtb0JOOFg5bjRUc25hN2xmUTVzSVNncFZ4M2lZaWlmMFJZTDh3YlRaNXBIUQ?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="iata launches supporting alliance for corsia eeu supply"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">06/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">IATA Launches Supporting Alliance for CORSIA EEU Supply</div>
-      <div class="news-desc">IATA Launches Supporting Alliance for CORSIA EEU Supply&amp;nbsp;&amp;nbsp;IATA…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · IATA</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxQeEtISGdZU1Z2TEhZREZFZ1FYNWUwR1VUN25lQlNmR1l0cE1qOVY0NjludmpkR25GQUI1eFNQSWFXdmM5YndZLWJxT29fT1BpR1MtTTRQOGxjUEdrbXVoNmdST2owM1NmOUp6aVN5d3lCal81WVlLOHFab29obDNWb0tobTA0MzlXOWU4ZEJwbXRfZDR1eWtwR1JWU29CQlFqQVM3dE15ZlZidlJ5anBDY0JGckpEQmxjN2p3eDB6aTRuSUxLbUU5ZdIB3AFBVV95cUxPOXVydHVKMUUyZkw1Ny00eUpVTE1lV19odGR6SGloZG4wV28ydjJqSW13MzhNemgyVkF4NUNUX0o3TllibFdUcGJKa3lMQ3FQYmxaWmRTRjFQTHZRdkxtdjJWR1ZKMlBGLWdESTg4ZnNLMUcya2luVGRSZU1GeUVaZ0FJcTdxM0lJRUpzWFJHbDc2ODFueG91UG9IR2cxamhzc29WUkJMNlFKUTNnQ0xhaW13UkRycHp1OXZFQllUZ1pWdkNuNXYxTVdHY1BVdm5nRzY5TS0zeHM2aWRC?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="jetbio planeja maior fábrica de combustível sustentável de aviação do mundo no brasil"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">02/06 07:00 UTC</span>
-      </div>
-      <div class="news-title">JetBio planeja maior fábrica de combustível sustentável de aviação do mundo no Brasil</div>
-      <div class="news-desc">JetBio planeja maior fábrica de combustível sustentável de aviação do mundo no Brasil&amp;nbsp;&amp;nbsp;Bloomberg Línea Brasil…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Bloomberg Línea Brasil</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMipgFBVV95cUxQcElEdTVPZjA5d0xHeDR4aFFlYzRnNXRLSGtFdUE1WGkzZTJha04xakNGU0lQSUFrajliOW5hVVBKaDE5XzlOS216STB2M3ctN1ZoMG4wN2U1NXRDSktRd195Q2dhUDNqTWhvOFhsNHdaRW9iS29UNXUwZHlKUVhLVEhtLXhJZ2dxZEluYlBlS2tXQ3NaR1pfYmNLcGlDNmoyRmg0NHRR?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="u.s. marine biofuel hopes build despite uncertain global market - agri-pulse"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">27/05 07:00 UTC</span>
-      </div>
-      <div class="news-title">U.S. marine biofuel hopes build despite uncertain global market - Agri-Pulse</div>
-      <div class="news-desc">U.S. marine biofuel hopes build despite uncertain global market&amp;nbsp;&amp;nbsp;Agri-Pulse…</div>
-      <div class="news-footer">
-        <span class="news-source">🇺🇸 EUA · Agri-Pulse</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMitAFBVV95cUxPbU54a0FKQmZDM3JNUngyM3lkVEpiVnNtYUpPMUJVUGFqTHNfNXVZb2dreUFmcV8wUS1xMEVueUppMUV4cGJtQWhDVjBsTm9WWlpCR3ZvVVQ4c0tWRmdUNjVIWlJvZ0ZWdEMyckZGeVJzYWlrZTI3T082RzZ5VEN3S1pibWhMTUhpZ2dSSVFiMU53RWY3UXp4dWhNeVFXUjlGdlNfYmxIeS1qa2JKWFBsUXU0bGI?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="navigating article 6.2 and corsia: an overview of verra&#x27;s updated label guidance documents"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">20/05 07:00 UTC</span>
-      </div>
-      <div class="news-title">Navigating Article 6.2 and CORSIA: An Overview of Verra&#x27;s Updated Label Guidance Documents</div>
-      <div class="news-desc">Navigating Article 6.2 and CORSIA: An Overview of Verra&#x27;s Updated Label Guidance Documents&amp;nbsp;&amp;nbsp;Verra…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Verra</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMioAFBVV95cUxNbzFPXzAycmZ4Q0tsX04xWFhDa0hNRTNuT0FKa1N1eTNHalJWV3pGV0p1YXcwb1hjaVpIa1ZyZjNfd2ktNmNLbk9UQ3FsMl9pck9kMm5kdnpvNTBrU25LdWJFVzFrbXpuQTRCS3ljZWRQaExqeWppMG9YVDh1ck5RTGQwekFNTjA3bHB6TXplektKa29POW1CMDRvTC1jSlRL?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="na vanguarda da descarbonização marítima"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">19/05 07:00 UTC</span>
-      </div>
-      <div class="news-title">Na vanguarda da descarbonização marítima</div>
-      <div class="news-desc">Na vanguarda da descarbonização marítima&amp;nbsp;&amp;nbsp;A Tribuna…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · A Tribuna</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMizgFBVV95cUxNd3J2U2UwT1djREh4TjFDbzljel9LZXp2eTFJeElQZ1R4d1RpQ1JkT0NlMnNMamlid093RlgyaFpxenhKaDA3eEIyeWcyT2h1U0c3WGdQbnVtZGtyWTF5TTBZNFRub2kxM3NVcnV0dGFRWmJTR0NaTDMtYmEzWnlKM002clctMTJSZHh6YWFNLVl0ellIYTdsUGtKX1ExLUtPd1RlSjlIQlFjaDVZRlo5SGhfTlIwdUFqb1o3Uk1kemgwSFA4d3FESi1Rdno1dw?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="norueguesa odfjell inaugura corredor verde com biobunker da petrobras"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">18/05 07:00 UTC</span>
-      </div>
-      <div class="news-title">Norueguesa Odfjell inaugura corredor verde com biobunker da Petrobras</div>
-      <div class="news-desc">Norueguesa Odfjell inaugura corredor verde com biobunker da Petrobras&amp;nbsp;&amp;nbsp;Agência eixos…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Agência eixos</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMixAFBVV95cUxQMFl3Tnl3d2FzU3BKZEVqOUtZVjUzYkVVWU5nbGpfbElqZmtLcmZFUE8xS1pPSkdxUGNDZ3lmckxIVVBCWkRDQzYtRFdMMl9pYUlDV2pGYUJ4ZG5IS25MQ1NzU1QzNURVODJwVzhCTVA3YjdNQ2thclVHUW0zMWI4OUhjVEVCYTk0RmNybFhWVWhuUVRqRy1Ca3VBRHQ1UGVJYlNmQ2NkTjgxVHZ6aVd1U2VWTE9TaU5sbHZJWGFoWHZ6N0dl?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="pbio amplia sinergia com petrobras e mira mercado de biobunker"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">14/05 07:00 UTC</span>
-      </div>
-      <div class="news-title">PBIO amplia sinergia com Petrobras e mira mercado de biobunker</div>
-      <div class="news-desc">PBIO amplia sinergia com Petrobras e mira mercado de biobunker&amp;nbsp;&amp;nbsp;Agência eixos…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Agência eixos</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiggFBVV95cUxQN2N4ZFg1ZF9YZ2hTNDBScGJCUTB2ejBWQld2RF9uakFEc2htdXpQd01CVVE2R3FHM3JWRE9fWTU4TVJUNnlWYnZpNDhsZGU4Y0JLU1p1Unh6dmJKUDdZUE01aHBlQk1Hck02clBSVnhhbmlUdHdOTjJjXzNYQ0xLeXpn?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="corsia update: icao approves two new programmes as eu mulls specific requirements for its airlines"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">30/04 07:00 UTC</span>
-      </div>
-      <div class="news-title">CORSIA update: ICAO approves two new programmes as EU mulls specific requirements for its airlines</div>
-      <div class="news-desc">CORSIA update: ICAO approves two new programmes as EU mulls specific requirements for its airlines&amp;nbsp;&amp;nbsp;Abatable…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Abatable</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMivAFBVV95cUxNTWp5THN1YjZnQ3VCVlRCRy1pTUdEY1BRcG00c3hGLTI0NzVKTXVzLXhFZnkzcjcwMTJrMEtGa3gtaHp2UGtNSWxfbGpWeEMwdzNWWjJlTVNETGlfWFBtR0dvS2RGb3o3T1g5MVBfX09uQlZ3S1oyOHNnZ3lfQnhDSm5OcWprejQ2NVJLaFFORmVmWWhQaFk3bjhqQ3M4SjRqVnZXbGhTeFBEZFpJOGw3TFNxRWRJMU9IQl9DVw?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="petrobras aposta no etanol para abastecer aviões"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">16/04 07:00 UTC</span>
-      </div>
-      <div class="news-title">Petrobras aposta no etanol para abastecer aviões</div>
-      <div class="news-desc">Petrobras aposta no etanol para abastecer aviões&amp;nbsp;&amp;nbsp;CNN Brasil…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · CNN Brasil</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxQUGl1dFNwaFZ0d3BQTW5tcWpqZHJYa3BPcXp5Ul81V0ZsUUhWWFF1UGI0Sm5uMEs4U0JQaG5yWnpCTVplQWJZTHlKZ3BRSW14djlPRXllQ1U4Z0dYRkMxM3pVZzVQbWlVXy1iWGd4WEJNR1hBSWtOTzZ0OUdYaWUza2hhbUdjUGwxcDFDOFl1UkRlY1MydmoxekRLdW5VZXhXdUJqbTVNZjlKQUE?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="us proposes ethanol-bunker friendly change to imo biofuel rules"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">16/04 07:00 UTC</span>
-      </div>
-      <div class="news-title">US Proposes Ethanol-Bunker Friendly Change to IMO Biofuel Rules</div>
-      <div class="news-desc">US Proposes Ethanol-Bunker Friendly Change to IMO Biofuel Rules&amp;nbsp;&amp;nbsp;Ship &amp; Bunker…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Ship &amp; Bunker</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMimwFBVV95cUxOZDNsMjlmOC1UTnl6Y2JKSWhQa2hsRkZyMWwzYXBuTjN1WVRHVUExMUVITFRDc1NoUGRFSklHTHVVeEVBZWpabDBvUnpyWWlPZzRqNnJvQm51SDI4NGFkaFFXQVdoVzkyREJjU3JVaTZIUWVOTEY0alFQNmtSMnByNDJWRFdnZFJUUmp0TTdhQi0zeVJ4SDBLTVlWQQ?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="mme analisa incluir combustível marítimo sustentável no renovabio"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">16/04 07:00 UTC</span>
-      </div>
-      <div class="news-title">MME analisa incluir combustível marítimo sustentável no RenovaBio</div>
-      <div class="news-desc">MME analisa incluir combustível marítimo sustentável no RenovaBio&amp;nbsp;&amp;nbsp;JOTA Info…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · JOTA Info</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE1nakE4dzlXZ09qTnBxRU1qdjVjYTlnV2JKSDJ1b2VyekgtM3RmcXl6R2pzd2ZXOUlscnJPVWVweGtpVzZVZ3pRaG5CVUJoU3BNbTkyR3phMHQwRm9kdGU0Nw?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="marine biofuel market | global market analysis report - 2036"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">30/03 07:00 UTC</span>
-      </div>
-      <div class="news-title">Marine Biofuel Market | Global Market Analysis Report - 2036</div>
-      <div class="news-desc">Marine Biofuel Market | Global Market Analysis Report - 2036&amp;nbsp;&amp;nbsp;Fact.MR…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Fact.MR</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiigJBVV95cUxOclF4djdNZTFQVnhsekpRSXAxT3d3NFoya1docEUzVmlJeUhGVm1QMjEtUXhZRkkxUGt5TXA2Q0huMExsd2ItZmg5Vk9iQUZMT3RMY1ZOQVVSNHNRRlQwMlRzeVI5bXpnR3JIUHdRM2l5ZzY3MWJiTTlHcmtKUmhGVUFFZmJ3Zk9CdFFGOGp1M1o5WEZ1NzlTNFFrbmFra0hBSmZKek83RHY0a3JCWHJVREFZaV9jSHNiMk90TVBFbDdFbzRnOWwzUWlYZ3ZHOVJlcmM3Mmt4MFBhc3V5LVZUNExvMWpvWjlvWkxad2FHRmZJUHRqaWFXdzZ5dEJxQ240bXg4T2dVS2JLUQ?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="platts launches b30 biobunker advanced fame delivered rotterdam assessments march 16"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">16/03 07:00 UTC</span>
-      </div>
-      <div class="news-title">Platts launches B30 Biobunker Advanced FAME delivered Rotterdam assessments March 16</div>
-      <div class="news-desc">Platts launches B30 Biobunker Advanced FAME delivered Rotterdam assessments March 16&amp;nbsp;&amp;nbsp;S&amp;amp;P Global…</div>
-      <div class="news-footer">
-        <span class="news-source">🇳🇱 Países Baixos · S&amp;P Global</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiwgFBVV95cUxQYi1PazB1NklhRkdVT1VuckUwSGxEWmZpaGF1TGtCNGE4X3UtWXNuY0tEY3ItVktvb25aLW9wU2JpNmNKQkU0c2wybHFSZG5FQWo3NmhXVGJ2bGNIcEcybDJnTDZfNURVckg1NnBvOXBlS3hkVWl2R0FYcDI1MFhyWVViSE04UWVlcWROS1pEQi0xRkVNeVdGVjJRckpCeFlEa29SOUhGSWhLLWFPSTQyNmtjbmprcjlUUTJfeTl2M0hUdw?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="o etanol brasileiro na rota da descarbonização marítima global"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">10/03 07:00 UTC</span>
-      </div>
-      <div class="news-title">O etanol brasileiro na rota da descarbonização marítima global</div>
-      <div class="news-desc">O etanol brasileiro na rota da descarbonização marítima global&amp;nbsp;&amp;nbsp;Movimento Econômico…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Movimento Econômico</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMirAFBVV95cUxQVmprLTlsNHNPM3FKeFBYckZBeXdUYzRfWW9JNHRiTERjNG1Zd0pTQUpMUTVacHRlQUJqUEswb3FVSERnRGJ6b19oWnd6dEFDamJUQzRXNG1BdVBuMWYwZVFUMl9rZFRsR2hLb29nejRmTGFXMVE2cU9YQUdta0NLdlNDWDFiSGlaYWFMQlpISWE5cVAwcWVsaWRfeDQzWnlRTk9wS25ycnJKSlBo?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="insights to corsia: market trends and strategies for airlines"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">01/03 08:00 UTC</span>
-      </div>
-      <div class="news-title">Insights to CORSIA: Market trends and strategies for airlines</div>
-      <div class="news-desc">Insights to CORSIA: Market trends and strategies for airlines&amp;nbsp;&amp;nbsp;Shell Global…</div>
-      <div class="news-footer">
-        <span class="news-source">🇳🇱 Países Baixos · Shell Global</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMijgFBVV95cUxPWFlMVGo0dUhGMFVaNzRJTTlDaEYteW9SWHRrejVRaDNpMGhueE5lam5fWHkxdFdRVlZiMFF4ZTAxU3RFN2dqNW5sYVZvTUlmaUZSVHR2M3gycy0xeEdHdk1lRV9jWmJZRGNaZUczS19pYy1hNERkZjJ3VlBObmRNNXIzODZtdDltZGZfUVlB?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="petrobras signs historic marine biofuel supply deal with odfjell"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">20/01 08:00 UTC</span>
-      </div>
-      <div class="news-title">Petrobras Signs Historic Marine Biofuel Supply Deal With Odfjell</div>
-      <div class="news-desc">Petrobras Signs Historic Marine Biofuel Supply Deal With Odfjell&amp;nbsp;&amp;nbsp;Yahoo Finance…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Yahoo Finance</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi5gFBVV95cUxPai1yeE9hN184cTREbTlrMGIxQmtwQW9uTm5tN0ZnbzBya2xMcmRyTktzZ0gyRW9udm0xcU93Z19ndmNxajNyT1hOVDN4UGdzMWtNLWpGSTBTZlF6MUFIZlBGdHNvd1FHVW1KWHNoZmNiam1wZ2dTLTluSFl0dWZFdVl4blQ0eDhuMkoyRVlEbUl4M0l6RXNCMEFsTU8xVmRWQjFRQ2poSnBfdW9LQjMzSzZJSWlPUzlNOC1rQ1BDZkZsck5Wb3FubFV2SnIzeVBBWlJRSjhRUENMa2hKM3JYYmJqYy1MQdIB6wFBVV95cUxPWUJscnMtNldFQjE2SlFJRC05N2J5RnAzRlB0Tm1FVHh6ZGphUUtVUXJITFJNYmJ1d0lKb1A0Uml6TDRPQnlTMzlvT1Ywdk1JcGJZd3hJVDNJeTJOT0I2M2xydHEzNzNxNXJoM2VwNm00NFRQR0lWMl9yOGNMRUFSTXRHMGstOTBVTVFnT2tUeTY4cHhEcVhuNURMckpJVlRyRDJBZjYzT2Z5cW9PeG5YTmdzWXBuZXF0b2Y0eWptYl9lVU9UV0xHcTdDa3pYU19seVlvb0VjNVZUVUszVFNFN3JBdjJsXzljZXRN?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="brasil avança para atender demanda de combustível sustentável de aviação até 2029"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">29/12 08:00 UTC</span>
-      </div>
-      <div class="news-title">Brasil avança para atender demanda de combustível sustentável de aviação até 2029</div>
-      <div class="news-desc">Brasil avança para atender demanda de combustível sustentável de aviação até 2029&amp;nbsp;&amp;nbsp;Notícias Agrícolas…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Notícias Agrícolas</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMi2AFBVV95cUxNY1NfZHFDUWlaUEloR0tVMTRId2NPZUZJR012elJSSWd4dF9aQ0pxSkFDcTJSWUdBcUVJbUF0bHRKVjlQZG0tYjFiUThVQXFKWk5BSktocnJkbG5YUmdXYk91Y2t4bGNUQW5jYkViUGt6Tm1lUTRfRFR4cVZuLThBTmx2MnhORGJSMlNlSnVxN3pYRGVXTGFCZmxZMWNfVlhZVEpTVGJTYUhCYUJrdVpyc05rWEpZOVJPb3hrR3BzdGR3cDJDVkViUkJHYTZPSWRLTlRQOUpKYkU?oc=5" target="_blank" rel="noopener"
-       data-cat="saf" data-title="petrobras lança combustível sustentável de aviação produzido totalmente no brasil"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge saf">SAF</span>
-        <span class="news-time">05/12 08:00 UTC</span>
-      </div>
-      <div class="news-title">Petrobras lança combustível sustentável de aviação produzido totalmente no Brasil</div>
-      <div class="news-desc">Petrobras lança combustível sustentável de aviação produzido totalmente no Brasil&amp;nbsp;&amp;nbsp;Agência Petrobras de Notícias…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · Agência Petrobras de Notícias</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMimgFBVV95cUxNQkpGaldzRFVnYkZ0VWk2a19VSjBZaEFYYnFiX2trZWlIQnRteDZMdE15aXdzRF92NXlUY1lpY2R0MXZSMENIeVhsREtyQWNjZHNHbWpVMTBsNzFKYTcyZHk1b09hYURIQ2N0c09VS2pROGdCSW5QLWE5ZU1iT2RSeEJCalczNWFkbnlVbFNIZG4zRlA2TWlVQmpn?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="brasil poderá liderar a descarbonização marítima global"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">26/09 07:00 UTC</span>
-      </div>
-      <div class="news-title">Brasil poderá liderar a descarbonização marítima global</div>
-      <div class="news-desc">Brasil poderá liderar a descarbonização marítima global&amp;nbsp;&amp;nbsp;CNN Brasil…</div>
-      <div class="news-footer">
-        <span class="news-source">🇧🇷 Brasil · CNN Brasil</span>
-        <span class="news-read">Ler →</span>
-      </div>
-    </a>
-    <a class="news-card" href="https://news.google.com/rss/articles/CBMiwgFBVV95cUxOTDlXNnZUaVotUHMzdXB1cUkyQnIxVzhzNHVFUVBKMzlHT18xNXRaNzBoZHIwd2s4R29rT1Z3T0REcGRtc2dpLVYyc3ZXOVNaMzhsVUUyX1JBZnBPUHFRUzdaMkpvVEVXUlV6QU9YVW4wMlNQNVlQNTBDVUJLWWczWjh3RFduWmduNEdCMUNsc3JmOG5TeFcwX1JJOGZwaWtYZjNqMkUxWUp1VlhJOU9Idm9RT3V1SVl1VDBhUDhqWmozUQ?oc=5" target="_blank" rel="noopener"
-       data-cat="bio" data-title="etanol pode crescer 9,2 vezes com saf, biobunker e bioplásticos, aponta especialista"
-       style="animation-delay:400ms">
-      <div class="news-top">
-        <span class="news-badge bio">Biobunker</span>
-        <span class="news-time">12/09 07:00 UTC</span>
-      </div>
-      <div class="news-title">Etanol pode crescer 9,2 vezes com SAF, biobunker e bioplásticos, aponta especialista</div>
-      <div class="news-desc">Etanol pode crescer 9,2 vezes com SAF, biobunker e bioplásticos, aponta especialista&amp;nbsp;&amp;nbsp;Cana Online…</div>
-      <div class="news-footer">
-        <span class="news-source">🌐 Global · Cana Online</span>
-        <span class="news-read">Ler →</span>
+        <span class="news-source">🇧🇷 Brasil · </span>
+        <span class="news-read">Ler &#8594;</span>
       </div>
     </a>
 </div>
 
 <script>
 let activeFilter = 'all';
-
 function setFilter(f) {
   activeFilter = f;
   ['all','saf','bio','blend'].forEach(k=>{
@@ -1322,14 +1319,12 @@ function setFilter(f) {
   });
   renderCards();
 }
-
 function renderCards() {
   const q = document.getElementById('search-input').value.toLowerCase();
-  const cards = document.querySelectorAll('.news-card');
-  cards.forEach(c => {
-    const matchesFilter = activeFilter === 'all' || c.dataset.cat === activeFilter;
-    const matchesSearch = !q || c.dataset.title.includes(q);
-    c.style.display = (matchesFilter && matchesSearch) ? 'block' : 'none';
+  document.querySelectorAll('.news-card').forEach(c => {
+    const mf = activeFilter === 'all' || c.dataset.cat === activeFilter;
+    const ms = !q || c.dataset.title.includes(q);
+    c.style.display = (mf && ms) ? 'block' : 'none';
   });
 }
 </script>
