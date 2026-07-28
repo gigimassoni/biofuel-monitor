@@ -290,12 +290,17 @@ def fetch_news() -> list:
     # Ordena por data
     filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
 
-    # Gera resumos com Gemini para cada noticia (roda no build, fica seguro)
+    # Gera resumos com Gemini apenas para as 10 noticias mais recentes
     if GEMINI_API_KEY:
-        print(f"  Gerando resumos para {len(filtered)} noticias...")
-        for i, item in enumerate(filtered):
-            print(f"    [{i+1}/{len(filtered)}] {item['title'][:60]}")
+        top = min(10, len(filtered))
+        print(f"  Gerando resumos para as {top} noticias mais recentes...")
+        for i in range(top):
+            item = filtered[i]
+            print(f"    [{i+1}/{top}] {item['title'][:60]}")
             item["summary"] = gemini_summarize(item["title"], item["url"])
+        # Demais noticias ficam sem resumo
+        for item in filtered[top:]:
+            item["summary"] = ""
     else:
         for item in filtered:
             item["summary"] = ""
@@ -320,7 +325,7 @@ def render_html(items: list) -> str:
         delay = min(idx * 15, 500)
         url_escaped = html.escape(item['url'])
         title_escaped = html.escape(item['title'])
-        summary_escaped = html.escape(item.get("summary", "Resumo nao disponivel."))
+        summary_escaped = html.escape(item.get("summary", "") or "Resumo nao disponivel para esta noticia.")
         cards_html += f"""
     <div class="news-card" data-cat="{item['category']}" data-title="{html.escape(item['title'].lower())}"
          style="animation-delay:{delay}ms">
