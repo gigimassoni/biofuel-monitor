@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
 BioFuel Monitor - Raizen Novos Negocios
-Busca noticias sobre SAF, Biobunker e Blending usando Google News RSS
-para encontrar noticias relevantes e Tavily para extrair o conteudo.
+Google News RSS para buscar noticias + Gemini para filtrar e resumir.
 """
 
 import html
@@ -14,102 +13,66 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from urllib.parse import quote
 
-TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 
-# ── GOOGLE NEWS RSS QUERIES ──
-# Queries com aspas para maxima precisao no nicho
+# ── QUERIES GOOGLE NEWS RSS ──
 RSS_SEARCHES = [
-
-    # SAF - Geral
-    {"cat": "saf", "query": '"sustainable aviation fuel"'},
-    {"cat": "saf", "query": '"SAF" "aviation fuel" mandate OR production OR airline'},
-    {"cat": "saf", "query": '"SAF" "ethanol" OR "alcohol to jet" OR "ATJ"'},
-    {"cat": "saf", "query": '"CORSIA" OR "ReFuelEU" "aviation fuel"'},
-    {"cat": "saf", "query": '"SAF" "HEFA" OR "Fischer-Tropsch" OR "power to liquid" OR "e-fuel"'},
-    {"cat": "saf", "query": '"sustainable aviation fuel" Brazil OR Raizen OR sugarcane OR ethanol'},
-
-    # Biobunker - Maritimo
-    {"cat": "bio", "query": '"marine biofuel" OR "bio-bunker" OR "biobunker"'},
-    {"cat": "bio", "query": '"ethanol" "shipping" OR "vessel" OR "bunker fuel"'},
-    {"cat": "bio", "query": '"CMA CGM" OR "Maersk" OR "MSC" OR "Hapag" biofuel OR ethanol bunker'},
-    {"cat": "bio", "query": '"IMO" "biofuel" OR "green fuel" shipping decarbonization'},
-    {"cat": "bio", "query": '"FuelEU Maritime" OR "IMO 2050" shipping biofuel'},
-
-    # Blending - Mandatos etanol+gasolina
+    # SAF
+    {"cat": "saf",   "query": '"sustainable aviation fuel"'},
+    {"cat": "saf",   "query": '"SAF" "aviation" mandate OR production OR airline OR investment'},
+    {"cat": "saf",   "query": '"SAF" "ethanol" OR "alcohol to jet" OR "ATJ" OR "sugarcane"'},
+    {"cat": "saf",   "query": '"CORSIA" OR "ReFuelEU" aviation fuel'},
+    {"cat": "saf",   "query": '"SAF" "HEFA" OR "Fischer-Tropsch" OR "power to liquid" OR "e-fuel"'},
+    {"cat": "saf",   "query": '"sustainable aviation fuel" Brazil OR Raizen OR sugarcane OR ethanol'},
+    # Biobunker
+    {"cat": "bio",   "query": '"marine biofuel" OR "bio-bunker" OR "biobunker"'},
+    {"cat": "bio",   "query": '"ethanol" "shipping" OR "vessel" OR "bunker fuel" OR "maritime"'},
+    {"cat": "bio",   "query": '"CMA CGM" OR "Maersk" OR "MSC" OR "Hapag" biofuel OR ethanol bunker'},
+    {"cat": "bio",   "query": '"IMO" "biofuel" OR "green fuel" shipping decarbonization'},
+    {"cat": "bio",   "query": '"FuelEU Maritime" OR "IMO 2050" shipping biofuel'},
+    {"cat": "bio",   "query": '"ethanol bunker" OR "ethanol bunkering" shipping worldwide'},
+    # Blending
     {"cat": "blend", "query": '"ethanol blending mandate" OR "blending mandate" ethanol gasoline'},
-    {"cat": "blend", "query": '"E10" OR "E15" OR "E20" OR "E25" OR "E30" ethanol mandate'},
+    {"cat": "blend", "query": '"E10" OR "E15" OR "E20" OR "E25" OR "E30" ethanol mandate policy'},
     {"cat": "blend", "query": '"RenovaBio" OR "ANP" etanol mistura'},
     {"cat": "blend", "query": '"ethanol" "blending" India OR Indonesia OR Vietnam OR Thailand OR Philippines'},
     {"cat": "blend", "query": '"ethanol blend" Brazil OR Argentina OR Colombia mandate 2026'},
 ]
 
-MAX_PER_QUERY = 8
-
-# Palavras que indicam ruido absoluto — nao tem nada a ver com o tema
-NOISE_TITLE = [
-    "golf", "golfe", "bunker shot", "british open", "ryder cup", "golf championship",
-    "arbitration report", "kluwer", "law review", "legal journal",
-    "week in technology", "aviation week space technology",
-    "engine leasing", "capa airline leader summit",
-    "football club", "futebol", "soccer club", "premier league",
-    "champions league", "serie a", "bundesliga", "la liga",
-    "flamengo", "corinthians", "palmeiras", "vasco", "botafogo",
-    "fluminense", "gremio", "cruzeiro", "athletico",
-    "midfielder", "striker", "transfer window", "manager sacked",
-    "sociedade anonima do futebol",
-]
-
-NOISE_SUMMARY = [
-    "sign up to read", "free email subscription", "subscribe to access",
-    "start a free trial", "create an account to",
-]
-
 COUNTRY_RULES = [
-    ("🇧🇷", "Brasil",          ["brasil", "brazil", "brazilian", "petrobras", "anp", "renovabio", "embraer", "raizen", "sao paulo", "rio de janeiro"]),
-    ("🇺🇸", "EUA",             ["united states", " u.s.", "usa", "american", "faa", "epa", "washington", "california", "texas", "boeing", "delta", "united airlines", "american airlines"]),
-    ("🇪🇺", "Uniao Europeia",  ["european union", "eu commission", "brussels", "refueleu", "eu parliament", "europe"]),
+    ("🇧🇷", "Brasil",          ["brasil", "brazil", "brazilian", "petrobras", "anp", "renovabio", "embraer", "raizen"]),
+    ("🇺🇸", "EUA",             ["united states", " u.s.", "usa", "american", "faa", "epa", "washington", "california", "boeing"]),
+    ("🇪🇺", "Uniao Europeia",  ["european union", "eu commission", "brussels", "refueleu"]),
     ("🇬🇧", "Reino Unido",     ["uk", "united kingdom", "britain", "british", "london", "heathrow"]),
-    ("🇩🇪", "Alemanha",        ["germany", "german", "berlin", "lufthansa", "frankfurt"]),
-    ("🇫🇷", "Franca",          ["france", "french", "paris", "total energies", "airbus", "air france"]),
+    ("🇩🇪", "Alemanha",        ["germany", "german", "berlin", "lufthansa"]),
+    ("🇫🇷", "Franca",          ["france", "french", "paris", "total energies", "airbus"]),
     ("🇳🇱", "Paises Baixos",   ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
     ("🇸🇬", "Singapura",       ["singapore", "singaporean", "changi"]),
-    ("🇨🇳", "China",           ["china", "chinese", "beijing", "sinopec", "shanghai"]),
-    ("🇯🇵", "Japao",           ["japan", "japanese", "tokyo", "ana holdings", "jal", "osaka"]),
-    ("🇮🇳", "India",           ["india", "indian", "delhi", "mumbai", "indianoil", "air india"]),
-    ("🇦🇺", "Australia",       ["australia", "australian", "qantas", "sydney", "melbourne"]),
-    ("🇨🇦", "Canada",          ["canada", "canadian", "toronto", "air canada", "vancouver"]),
-    ("🇦🇪", "Emirados Arabes", ["uae", "emirates", "dubai", "abu dhabi", "etihad"]),
-    ("🇮🇩", "Indonesia",       ["indonesia", "indonesian", "jakarta", "pertamina"]),
-    ("🇻🇳", "Vietna",          ["vietnam", "vietnamese", "hanoi", "ho chi minh"]),
+    ("🇨🇳", "China",           ["china", "chinese", "beijing", "sinopec"]),
+    ("🇯🇵", "Japao",           ["japan", "japanese", "tokyo"]),
+    ("🇮🇳", "India",           ["india", "indian", "delhi", "mumbai"]),
+    ("🇦🇺", "Australia",       ["australia", "australian", "qantas"]),
+    ("🇨🇦", "Canada",          ["canada", "canadian"]),
+    ("🇦🇪", "Emirados Arabes", ["uae", "emirates", "dubai", "abu dhabi"]),
+    ("🇮🇩", "Indonesia",       ["indonesia", "indonesian", "jakarta"]),
+    ("🇻🇳", "Vietna",          ["vietnam", "vietnamese", "hanoi"]),
     ("🇹🇭", "Tailandia",       ["thailand", "thai", "bangkok"]),
-    ("🇵🇭", "Filipinas",       ["philippines", "filipino", "manila"]),
-    ("🇰🇷", "Coreia do Sul",   ["south korea", "korean", "seoul", "korean air"]),
+    ("🇵🇭", "Filipinas",       ["philippines", "manila"]),
     ("🇳🇴", "Noruega",         ["norway", "norwegian"]),
     ("🇿🇦", "Africa do Sul",   ["south africa", "johannesburg"]),
     ("🇦🇷", "Argentina",       ["argentina", "buenos aires"]),
     ("🇨🇴", "Colombia",        ["colombia", "bogota"]),
     ("🇲🇾", "Malasia",         ["malaysia", "kuala lumpur", "petronas"]),
-    ("🇳🇬", "Nigeria",         ["nigeria", "lagos", "abuja"]),
-    ("🇮🇱", "Israel",          ["israel", "tel aviv"]),
+    ("🇰🇷", "Coreia do Sul",   ["south korea", "korean", "seoul"]),
+    ("🇳🇬", "Nigeria",         ["nigeria", "lagos"]),
     ("🇨🇱", "Chile",           ["chile", "chilean", "santiago"]),
-    ("🇪🇸", "Espanha",         ["spain", "spanish", "madrid", "iberia", "repsol"]),
-    ("🇮🇹", "Italia",          ["italy", "italian", "rome", "eni", "milan"]),
+    ("🇪🇸", "Espanha",         ["spain", "spanish", "madrid", "repsol", "iberia"]),
+    ("🇮🇹", "Italia",          ["italy", "italian", "rome", "eni"]),
 ]
 
 
-def is_noise(title: str, summary: str) -> bool:
-    title_l = title.lower()
-    summary_l = summary.lower()
-    if any(w in title_l for w in NOISE_TITLE):
-        return True
-    if any(w in summary_l for w in NOISE_SUMMARY):
-        return True
-    if title.strip().startswith("[PDF]"):
-        return True
-    return False
-
-
-def detect_country(title: str, summary: str):
+def detect_country(title: str, summary: str = ""):
     text = f" {title} {summary} ".lower()
     for flag, name, keywords in COUNTRY_RULES:
         if any(k in text for k in keywords):
@@ -126,192 +89,173 @@ def fmt_date(date_str: str) -> str:
     if not date_str:
         return "hoje"
     try:
-        # RSS date format: "Mon, 19 Jul 2026 10:30:00 GMT"
         from email.utils import parsedate_to_datetime
         d = parsedate_to_datetime(date_str)
         diff = int((datetime.now(timezone.utc) - d).total_seconds() / 60)
-        if diff < 60:
-            return f"ha {diff}min"
-        if diff < 1440:
-            return f"ha {diff // 60}h"
-        if diff < 10080:
-            return f"ha {diff // 1440}d"
+        if diff < 60:   return f"ha {diff}min"
+        if diff < 1440: return f"ha {diff // 60}h"
+        if diff < 10080: return f"ha {diff // 1440}d"
         return d.strftime("%d/%m/%Y")
     except Exception:
         return "hoje"
 
 
+def parse_date_obj(date_str: str):
+    try:
+        from email.utils import parsedate_to_datetime
+        return parsedate_to_datetime(date_str)
+    except Exception:
+        return datetime.min.replace(tzinfo=timezone.utc)
+
+
 def build_rss_url(query: str) -> str:
-    q = quote(query)
-    return f"https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en"
+    return f"https://news.google.com/rss/search?q={quote(query)}&hl=en-US&gl=US&ceid=US:en"
 
 
-def fetch_rss(query: str, max_results: int = 8) -> list:
+def fetch_rss(query: str) -> list:
     url = build_rss_url(query)
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                      "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    }
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     try:
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=15) as resp:
             raw = resp.read()
         root = ET.fromstring(raw)
         items = []
-        for item in root.findall(".//item")[:max_results]:
+        for item in root.findall(".//item"):
             title = item.findtext("title") or ""
+            title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
             link  = item.findtext("link") or ""
             desc  = item.findtext("description") or ""
             date  = item.findtext("pubDate") or ""
-            # Clean title: remove " - Source" suffix
-            title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
-            # Extract source from description
             source = ""
             m = re.search(r"<font[^>]*>([^<]+)</font>", desc)
             if m:
                 source = m.group(1).strip()
-            items.append({
-                "title": title,
-                "url": link,
-                "date": date,
-                "source": source,
-            })
+            if title and link:
+                items.append({"title": title, "url": link, "date": date, "source": source})
         return items
     except Exception as e:
         print(f"    AVISO RSS: {e}")
         return []
 
 
-def resolve_url(url: str) -> str:
-    """Resolve URL de redirecionamento do Google News para a URL real do artigo."""
-    if "news.google.com" not in url:
-        return url
-    try:
-        req = urllib.request.Request(url, headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                          "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-        })
-        # Segue o redirecionamento automaticamente
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return resp.url
-    except Exception:
-        return url
+def gemini_filter(items_by_cat: dict) -> list:
+    """Usa Gemini para filtrar apenas noticias realmente relevantes para o setor."""
+    if not GEMINI_API_KEY:
+        # Sem Gemini, retorna tudo
+        all_items = []
+        for cat, items in items_by_cat.items():
+            for item in items:
+                item["category"] = cat
+                all_items.append(item)
+        return all_items
 
+    print("  Filtrando noticias com Gemini...")
 
-def tavily_extract(url: str) -> str:
-    """Extrai o conteudo de uma URL usando Tavily."""
-    if not TAVILY_API_KEY:
-        return ""
-    # Resolve URL real antes de extrair
-    real_url = resolve_url(url)
-    payload = json.dumps({"urls": [real_url]}).encode("utf-8")
-    req = urllib.request.Request(
-        "https://api.tavily.com/extract",
-        data=payload,
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {TAVILY_API_KEY}",
-        },
-        method="POST",
-    )
+    # Monta lista numerada para o Gemini avaliar
+    all_items = []
+    for cat, items in items_by_cat.items():
+        for item in items:
+            item["category"] = cat
+            all_items.append(item)
+
+    if not all_items:
+        return []
+
+    numbered = "\n".join([f"{i+1}. [{item['category'].upper()}] {item['title']}" for i, item in enumerate(all_items)])
+
+    prompt = f"""Voce e um analista especializado em biocombustiveis para uma empresa de etanol (Raizen).
+Abaixo ha uma lista numerada de titulos de noticias coletadas sobre SAF (combustivel sustentavel de aviacao), Biobunker (combustivel maritimo sustentavel) e Blending (mandatos de mistura etanol+gasolina).
+
+Avalie cada noticia e retorne APENAS os numeros das noticias que sao RELEVANTES para o setor de novos negocios de etanol.
+
+Descarte:
+- Noticias de esporte (futebol, golfe, etc)
+- Relatorios juridicos ou academicos sem relevancia pratica
+- Noticias de preco de gasolina sem contexto de biocombustivel
+- Agregadores de noticias ou indices
+- Noticias duplicadas (mantenha apenas a primeira)
+- Qualquer coisa claramente fora do contexto de biocombustiveis
+
+Retorne APENAS um JSON no formato: {{"relevantes": [1, 3, 5, 7, ...]}}
+Sem texto extra, sem explicacao.
+
+NOTICIAS:
+{numbered}"""
+
+    payload = json.dumps({
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.1, "maxOutputTokens": 500}
+    }).encode("utf-8")
+
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        req = urllib.request.Request(
+            GEMINI_URL,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-        results = data.get("results", [])
-        if results:
-            raw = results[0].get("raw_content", "") or ""
-            clean = re.sub(r"\s+", " ", re.sub(r"[#*\[\]|]+", "", raw)).strip()
-            return clean[:280]
-        return ""
-    except Exception:
-        return ""
+
+        text = data["candidates"][0]["content"]["parts"][0]["text"]
+        text = re.sub(r"```json|```", "", text).strip()
+        result = json.loads(text)
+        indices = [i - 1 for i in result.get("relevantes", []) if 1 <= i <= len(all_items)]
+        filtered = [all_items[i] for i in indices]
+        print(f"    Gemini: {len(all_items)} -> {len(filtered)} noticias relevantes")
+        return filtered
+
+    except Exception as e:
+        print(f"    AVISO Gemini filter: {e}")
+        return all_items
 
 
 def fetch_news() -> list:
-    saf_items, bio_items, blend_items = [], [], []
     seen_urls   = set()
     seen_titles = set()
+    items_by_cat = {"saf": [], "bio": [], "blend": []}
 
     for search in RSS_SEARCHES:
         cat   = search["cat"]
         query = search["query"]
         print(f"  [{cat.upper()}] {query[:60]}...")
 
-        rss_items = fetch_rss(query, MAX_PER_QUERY)
+        rss_items = fetch_rss(query)
         print(f"    Retornou {len(rss_items)} itens")
 
         for r in rss_items:
             url   = r["url"]
             title = r["title"]
-
             if not url or not title:
                 continue
             if url in seen_urls:
                 continue
-
             norm = normalize_title(title)
             if norm in seen_titles:
                 continue
-
-            if is_noise(title, ""):
-                print(f"    [RUIDO] {title[:70]}")
-                continue
-
             seen_urls.add(url)
             seen_titles.add(norm)
 
-            # Extrai resumo via Tavily
-            print(f"    [EXTRACT] {title[:60]}")
-            summary = tavily_extract(url)
-
-            if is_noise(title, summary):
-                print(f"    [RUIDO pos-extract] {title[:60]}")
-                seen_urls.discard(url)
-                seen_titles.discard(norm)
-                continue
-
-            flag, country = detect_country(title, summary)
-
-            item = {
+            flag, country = detect_country(title)
+            items_by_cat[cat].append({
                 "title":    title,
-                "summary":  summary,
                 "url":      url,
                 "source":   r["source"],
                 "date_str": fmt_date(r["date"]),
                 "date_raw": r["date"],
-                "category": cat,
                 "flag":     flag,
                 "country":  country,
-            }
+            })
 
-            if cat == "saf":
-                saf_items.append(item)
-            elif cat == "bio":
-                bio_items.append(item)
-            else:
-                blend_items.append(item)
+    print(f"  Total coletado: SAF={len(items_by_cat['saf'])} | Bio={len(items_by_cat['bio'])} | Blend={len(items_by_cat['blend'])}")
 
-    print(f"  SAF: {len(saf_items)} | Biobunker: {len(bio_items)} | Blending: {len(blend_items)}")
+    # Filtra com Gemini
+    filtered = gemini_filter(items_by_cat)
 
-    def parse_date(date_str: str):
-        try:
-            from email.utils import parsedate_to_datetime
-            return parsedate_to_datetime(date_str)
-        except Exception:
-            return datetime.min.replace(tzinfo=timezone.utc)
-
-    # Intercala: 1 SAF, 1 Bio, 1 Blend para garantir variedade
-    interleaved = []
-    max_len = max(len(saf_items), len(bio_items), len(blend_items), 1)
-    for i in range(max_len):
-        if i < len(saf_items):   interleaved.append(saf_items[i])
-        if i < len(bio_items):   interleaved.append(bio_items[i])
-        if i < len(blend_items): interleaved.append(blend_items[i])
-
-    # Ordena globalmente por data — mais recente primeiro
-    interleaved.sort(key=lambda x: parse_date(x.get("date_raw", "")), reverse=True)
-
-    return interleaved
+    # Ordena por data
+    filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
+    return filtered
 
 
 def render_html(items: list) -> str:
@@ -326,25 +270,35 @@ def render_html(items: list) -> str:
 
     labels = {"saf": "SAF", "bio": "Biobunker", "blend": "Blending"}
 
+    # Gemini API key para uso no browser (resumo sob demanda)
+    gemini_key = GEMINI_API_KEY
+
     cards_html = ""
     for idx, item in enumerate(items):
-        delay = min(idx * 20, 400)
-        desc = f'<div class="news-desc">{html.escape(item["summary"][:250])}...</div>' if item["summary"] else ""
+        delay = min(idx * 15, 500)
+        url_escaped = html.escape(item['url'])
+        title_escaped = html.escape(item['title'])
         cards_html += f"""
-    <a class="news-card" href="{html.escape(item['url'])}" target="_blank" rel="noopener"
-       data-cat="{item['category']}" data-title="{html.escape(item['title'].lower())}"
-       style="animation-delay:{delay}ms">
+    <div class="news-card" data-cat="{item['category']}" data-title="{html.escape(item['title'].lower())}"
+         style="animation-delay:{delay}ms">
       <div class="news-top">
         <span class="news-badge {item['category']}">{labels[item['category']]}</span>
         <span class="news-time">{html.escape(item['date_str'])}</span>
       </div>
-      <div class="news-title">{html.escape(item['title'])}</div>
-      {desc}
+      <div class="news-title">
+        <a href="{url_escaped}" target="_blank" rel="noopener">{title_escaped}</a>
+      </div>
+      <div class="news-summary" id="summary-{idx}" style="display:none"></div>
       <div class="news-footer">
         <span class="news-source">{item['flag']} {html.escape(item['country'])} · {html.escape(item['source'])}</span>
-        <span class="news-read">Ler &#8594;</span>
+        <div class="news-actions">
+          <button class="btn-resumo" onclick="toggleResumo({idx}, '{url_escaped}', `{title_escaped}`)" id="btn-{idx}">
+            📄 Resumo
+          </button>
+          <a class="news-read" href="{url_escaped}" target="_blank" rel="noopener">Ler →</a>
+        </div>
       </div>
-    </a>"""
+    </div>"""
 
     if not items:
         cards_html = """
@@ -407,7 +361,7 @@ def render_html(items: list) -> str:
   .chip.a{{background:var(--accent);border-color:var(--accent);color:#fff}}
   .news-wrap{{padding:0 20px;display:flex;flex-direction:column;gap:10px}}
   @keyframes fadeUp{{from{{opacity:0;transform:translateY(6px)}}to{{opacity:1;transform:translateY(0)}}}}
-  .news-card{{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-decoration:none;color:inherit;display:block;transition:border-color .15s;animation:fadeUp .2s ease both}}
+  .news-card{{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:border-color .15s;animation:fadeUp .2s ease both}}
   .news-card:hover{{border-color:var(--border2)}}
   .news-top{{display:flex;align-items:center;gap:8px;margin-bottom:10px}}
   .news-badge{{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid}}
@@ -415,15 +369,27 @@ def render_html(items: list) -> str:
   .news-badge.bio  {{color:var(--bio);border-color:var(--bio);background:var(--bio-bg)}}
   .news-badge.blend{{color:var(--blend);border-color:var(--blend);background:var(--blend-bg)}}
   .news-time{{font-size:11px;color:var(--text3);margin-left:auto}}
-  .news-title{{font-size:14px;font-weight:500;line-height:1.45;margin-bottom:8px}}
-  .news-desc{{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:10px}}
-  .news-footer{{display:flex;align-items:center;gap:8px;flex-wrap:wrap}}
-  .news-source{{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:75%}}
-  .news-read{{font-size:11px;color:var(--accent-l);margin-left:auto}}
+  .news-title{{font-size:14px;font-weight:500;line-height:1.45;margin-bottom:10px}}
+  .news-title a{{color:var(--text);text-decoration:none}}
+  .news-title a:hover{{color:var(--accent-l);text-decoration:underline}}
+  .news-summary{{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:10px;padding:12px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent)}}
+  .news-footer{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}}
+  .news-source{{font-size:11px;color:var(--text3)}}
+  .news-actions{{display:flex;align-items:center;gap:8px}}
+  .btn-resumo{{font-size:11px;font-weight:500;padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s}}
+  .btn-resumo:hover{{border-color:var(--accent);color:var(--accent-l)}}
+  .btn-resumo.loading{{opacity:.6;cursor:not-allowed}}
+  .btn-resumo.open{{border-color:var(--accent);color:var(--accent-l);background:rgba(43,196,160,0.08)}}
+  .news-read{{font-size:11px;color:var(--accent-l);text-decoration:none}}
+  .news-read:hover{{text-decoration:underline}}
   .empty{{padding:60px 20px;text-align:center;color:var(--text2)}}
   .empty-icon{{font-size:40px;margin-bottom:14px;opacity:.3}}
   .empty-title{{font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px}}
   .empty-desc{{font-size:13px;line-height:1.6;max-width:300px;margin:0 auto}}
+  @media(max-width:640px){{
+    .navbar{{padding:0 14px}}
+    .header,.search-wrap,.stats,.filters,.news-wrap{{padding-left:14px;padding-right:14px}}
+  }}
 </style>
 </head>
 <body>
@@ -482,7 +448,75 @@ def render_html(items: list) -> str:
 </div>
 
 <script>
+const GEMINI_KEY = "{gemini_key}";
 let activeFilter = 'all';
+const summaryCache = {{}};
+
+async function toggleResumo(idx, url, title) {{
+  const box = document.getElementById('summary-' + idx);
+  const btn = document.getElementById('btn-' + idx);
+
+  // Se ja esta aberto, fecha
+  if (box.style.display !== 'none') {{
+    box.style.display = 'none';
+    btn.textContent = '📄 Resumo';
+    btn.classList.remove('open');
+    return;
+  }}
+
+  // Se ja tem cache, mostra direto
+  if (summaryCache[idx]) {{
+    box.innerHTML = summaryCache[idx];
+    box.style.display = 'block';
+    btn.textContent = '📄 Fechar';
+    btn.classList.add('open');
+    return;
+  }}
+
+  // Chama Gemini para gerar resumo
+  btn.textContent = '⏳ Gerando...';
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {{
+    const prompt = `Voce e um analista de biocombustiveis. Faca um resumo objetivo em portugues (3-4 frases) da seguinte noticia sobre biocombustiveis/etanol/SAF/blending. Seja direto e informativo, destacando o que e mais relevante para o mercado de novos negocios de etanol.
+
+Titulo: ${{title}}
+URL: ${{url}}
+
+Retorne APENAS o resumo em texto corrido, sem titulos nem marcadores.`;
+
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${{GEMINI_KEY}}`,
+      {{
+        method: 'POST',
+        headers: {{'Content-Type': 'application/json'}},
+        body: JSON.stringify({{
+          contents: [{{parts: [{{text: prompt}}]}}],
+          generationConfig: {{temperature: 0.3, maxOutputTokens: 300}}
+        }})
+      }}
+    );
+
+    const data = await resp.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Nao foi possivel gerar o resumo.';
+    summaryCache[idx] = text;
+    box.innerHTML = text;
+    box.style.display = 'block';
+    btn.textContent = '📄 Fechar';
+    btn.classList.remove('loading');
+    btn.classList.add('open');
+    btn.disabled = false;
+
+  }} catch(e) {{
+    box.innerHTML = 'Erro ao gerar resumo. Tente novamente.';
+    box.style.display = 'block';
+    btn.textContent = '📄 Resumo';
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }}
+}}
+
 function setFilter(f) {{
   activeFilter = f;
   ['all','saf','bio','blend'].forEach(k=>{{
@@ -491,6 +525,7 @@ function setFilter(f) {{
   }});
   renderCards();
 }}
+
 function renderCards() {{
   const q = document.getElementById('search-input').value.toLowerCase();
   document.querySelectorAll('.news-card').forEach(c => {{
@@ -506,9 +541,8 @@ function renderCards() {{
 
 def main():
     print("BioFuel Monitor - iniciando...")
-
-    if not TAVILY_API_KEY:
-        print("AVISO: TAVILY_API_KEY nao encontrada. Resumos nao serao extraidos.")
+    if not GEMINI_API_KEY:
+        print("AVISO: GEMINI_API_KEY nao encontrada. Filtragem por IA desativada.")
 
     items = fetch_news()
     print(f"Total final: {len(items)} noticias")
