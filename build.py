@@ -14,7 +14,9 @@ from datetime import datetime, timezone
 from urllib.parse import quote
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+
+def get_gemini_url():
+    return f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 
 # ── QUERIES GOOGLE NEWS RSS ──
 RSS_SEARCHES = [
@@ -195,7 +197,7 @@ NOTICIAS:
 
     try:
         req = urllib.request.Request(
-            GEMINI_URL,
+            get_gemini_url(),
             data=payload,
             headers={"Content-Type": "application/json"},
             method="POST"
@@ -234,7 +236,7 @@ def gemini_summarize(title: str, url: str) -> str:
     }).encode("utf-8")
     try:
         req = urllib.request.Request(
-            GEMINI_URL, data=payload,
+            get_gemini_url(), data=payload,
             headers={"Content-Type": "application/json"}, method="POST"
         )
         with urllib.request.urlopen(req, timeout=20) as resp:
