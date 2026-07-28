@@ -22,7 +22,7 @@ jobs:
 
       - name: Buscar notícias e gerar index.html
         env:
-          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python build.py
 
       - name: Publicar alterações
