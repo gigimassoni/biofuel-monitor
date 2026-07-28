@@ -320,6 +320,7 @@ def render_html(items: list) -> str:
         delay = min(idx * 15, 500)
         url_escaped = html.escape(item['url'])
         title_escaped = html.escape(item['title'])
+        summary_escaped = html.escape(item.get("summary", "Resumo nao disponivel."))
         cards_html += f"""
     <div class="news-card" data-cat="{item['category']}" data-title="{html.escape(item['title'].lower())}"
          style="animation-delay:{delay}ms">
@@ -330,7 +331,7 @@ def render_html(items: list) -> str:
       <div class="news-title">
         <a href="{url_escaped}" target="_blank" rel="noopener">{title_escaped}</a>
       </div>
-      <div class="news-summary" id="summary-{idx}" style="display:none">{html.escape(item.get("summary", "Resumo nao disponivel."))}</div>
+      <div class="news-summary" id="summary-{idx}" style="display:none">{summary_escaped}</div>
       <div class="news-footer">
         <span class="news-source">{item['flag']} {html.escape(item['country'])} · {html.escape(item['source'])}</span>
         <div class="news-actions">
