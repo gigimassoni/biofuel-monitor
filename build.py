@@ -211,6 +211,35 @@ NOTICIAS:
         return all_items
 
 
+
+def gemini_summarize(title: str, url: str) -> str:
+    """Gera resumo de uma noticia usando Gemini. Roda no build, nao no browser."""
+    if not GEMINI_API_KEY:
+        return ""
+    prompt = (
+        "Voce e um analista de biocombustiveis. "
+        "Faca um resumo objetivo em portugues (3-4 frases) sobre a seguinte noticia. "
+        "Seja direto e informativo, destacando o que e mais relevante para o mercado de etanol, SAF e biocombustiveis maritimos. "
+        "Retorne APENAS o resumo em texto corrido, sem titulos nem marcadores.\n\n"
+        f"Titulo: {title}\nURL: {url}"
+    )
+    payload = json.dumps({
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.3, "maxOutputTokens": 250}
+    }).encode("utf-8")
+    try:
+        req = urllib.request.Request(
+            GEMINI_URL, data=payload,
+            headers={"Content-Type": "application/json"}, method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+    except Exception as e:
+        print(f"    AVISO resumo: {e}")
+        return ""
+
+
 def fetch_news() -> list:
     seen_urls   = set()
     seen_titles = set()
@@ -255,6 +284,17 @@ def fetch_news() -> list:
 
     # Ordena por data
     filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
+
+    # Gera resumos com Gemini para cada noticia (roda no build, fica seguro)
+    if GEMINI_API_KEY:
+        print(f"  Gerando resumos para {len(filtered)} noticias...")
+        for i, item in enumerate(filtered):
+            print(f"    [{i+1}/{len(filtered)}] {item['title'][:60]}")
+            item["summary"] = gemini_summarize(item["title"], item["url"])
+    else:
+        for item in filtered:
+            item["summary"] = ""
+
     return filtered
 
 
@@ -269,9 +309,6 @@ def render_html(items: list) -> str:
     }
 
     labels = {"saf": "SAF", "bio": "Biobunker", "blend": "Blending"}
-
-    # Gemini API key para uso no browser (resumo sob demanda)
-    gemini_key = GEMINI_API_KEY
 
     cards_html = ""
     for idx, item in enumerate(items):
@@ -288,11 +325,11 @@ def render_html(items: list) -> str:
       <div class="news-title">
         <a href="{url_escaped}" target="_blank" rel="noopener">{title_escaped}</a>
       </div>
-      <div class="news-summary" id="summary-{idx}" style="display:none"></div>
+      <div class="news-summary" id="summary-{{idx}}" style="display:none">{html.escape(item.get("summary", "Resumo nao disponivel."))}</div>
       <div class="news-footer">
         <span class="news-source">{item['flag']} {html.escape(item['country'])} · {html.escape(item['source'])}</span>
         <div class="news-actions">
-          <button class="btn-resumo" onclick="toggleResumo({idx}, '{url_escaped}', `{title_escaped}`)" id="btn-{idx}">
+          <button class="btn-resumo" onclick="toggleResumo({idx})" id="btn-{idx}">
             📄 Resumo
           </button>
           <a class="news-read" href="{url_escaped}" target="_blank" rel="noopener">Ler →</a>
@@ -448,72 +485,21 @@ def render_html(items: list) -> str:
 </div>
 
 <script>
-const GEMINI_KEY = "{gemini_key}";
+// Resumo via proxy endpoint
 let activeFilter = 'all';
 const summaryCache = {{}};
 
-async function toggleResumo(idx, url, title) {{
+function toggleResumo(idx) {{
   const box = document.getElementById('summary-' + idx);
   const btn = document.getElementById('btn-' + idx);
-
-  // Se ja esta aberto, fecha
   if (box.style.display !== 'none') {{
     box.style.display = 'none';
     btn.textContent = '📄 Resumo';
     btn.classList.remove('open');
-    return;
-  }}
-
-  // Se ja tem cache, mostra direto
-  if (summaryCache[idx]) {{
-    box.innerHTML = summaryCache[idx];
+  }} else {{
     box.style.display = 'block';
     btn.textContent = '📄 Fechar';
     btn.classList.add('open');
-    return;
-  }}
-
-  // Chama Gemini para gerar resumo
-  btn.textContent = '⏳ Gerando...';
-  btn.classList.add('loading');
-  btn.disabled = true;
-
-  try {{
-    const prompt = `Voce e um analista de biocombustiveis. Faca um resumo objetivo em portugues (3-4 frases) da seguinte noticia sobre biocombustiveis/etanol/SAF/blending. Seja direto e informativo, destacando o que e mais relevante para o mercado de novos negocios de etanol.
-
-Titulo: ${{title}}
-URL: ${{url}}
-
-Retorne APENAS o resumo em texto corrido, sem titulos nem marcadores.`;
-
-    const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${{GEMINI_KEY}}`,
-      {{
-        method: 'POST',
-        headers: {{'Content-Type': 'application/json'}},
-        body: JSON.stringify({{
-          contents: [{{parts: [{{text: prompt}}]}}],
-          generationConfig: {{temperature: 0.3, maxOutputTokens: 300}}
-        }})
-      }}
-    );
-
-    const data = await resp.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Nao foi possivel gerar o resumo.';
-    summaryCache[idx] = text;
-    box.innerHTML = text;
-    box.style.display = 'block';
-    btn.textContent = '📄 Fechar';
-    btn.classList.remove('loading');
-    btn.classList.add('open');
-    btn.disabled = false;
-
-  }} catch(e) {{
-    box.innerHTML = 'Erro ao gerar resumo. Tente novamente.';
-    box.style.display = 'block';
-    btn.textContent = '📄 Resumo';
-    btn.classList.remove('loading');
-    btn.disabled = false;
   }}
 }}
 
