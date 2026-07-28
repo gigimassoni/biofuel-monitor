@@ -33,11 +33,13 @@ RSS_SEARCHES = [
     {"cat": "bio",   "query": '"FuelEU Maritime" OR "IMO 2050" shipping biofuel'},
     {"cat": "bio",   "query": '"ethanol bunker" OR "ethanol bunkering" shipping worldwide'},
     # Blending
-    {"cat": "blend", "query": '"ethanol blending mandate" OR "blending mandate" ethanol gasoline'},
-    {"cat": "blend", "query": '"E10" OR "E15" OR "E20" OR "E25" OR "E30" ethanol mandate policy'},
-    {"cat": "blend", "query": '"RenovaBio" OR "ANP" etanol mistura'},
-    {"cat": "blend", "query": '"ethanol" "blending" India OR Indonesia OR Vietnam OR Thailand OR Philippines'},
-    {"cat": "blend", "query": '"ethanol blend" Brazil OR Argentina OR Colombia mandate 2026'},
+    {"cat": "blend", "query": '"ethanol blending mandate" ethanol gasoline worldwide'},
+    {"cat": "blend", "query": '"E10" OR "E15" OR "E20" OR "E25" OR "E30" ethanol mandate 2026'},
+    {"cat": "blend", "query": '"RenovaBio" OR "ANP" OR "etanol" mistura gasolina Brasil'},
+    {"cat": "blend", "query": '"ethanol blend" Europe OR Africa OR "Middle East" mandate policy'},
+    {"cat": "blend", "query": '"ethanol blend" Brazil OR Argentina OR Colombia OR Paraguay mandate'},
+    {"cat": "blend", "query": '"ethanol blending" Indonesia OR Vietnam OR Thailand OR Philippines policy'},
+    {"cat": "blend", "query": '"ethanol blending" USA OR Canada OR "United States" policy 2026'},
 ]
 
 COUNTRY_RULES = [
@@ -174,8 +176,11 @@ Descarte:
 - Relatorios juridicos ou academicos sem relevancia pratica
 - Noticias de preco de gasolina sem contexto de biocombustivel
 - Agregadores de noticias ou indices
-- Noticias duplicadas (mantenha apenas a primeira)
+- Noticias duplicadas (mantenha apenas a primeira ocorrencia)
 - Qualquer coisa claramente fora do contexto de biocombustiveis
+
+IMPORTANTE - Diversidade geografica: para noticias de BLENDING, garanta variedade geografica.
+Nao selecione mais de 3 noticias do mesmo pais. Se houver muitas noticias da India, selecione apenas as 3 mais relevantes e inclua noticias de outros paises.
 
 Retorne APENAS um JSON no formato: {{"relevantes": [1, 3, 5, 7, ...]}}
 Sem texto extra, sem explicacao.
@@ -325,7 +330,7 @@ def render_html(items: list) -> str:
       <div class="news-title">
         <a href="{url_escaped}" target="_blank" rel="noopener">{title_escaped}</a>
       </div>
-      <div class="news-summary" id="summary-{{idx}}" style="display:none">{html.escape(item.get("summary", "Resumo nao disponivel."))}</div>
+      <div class="news-summary" id="summary-{idx}" style="display:none">{html.escape(item.get("summary", "Resumo nao disponivel."))}</div>
       <div class="news-footer">
         <span class="news-source">{item['flag']} {html.escape(item['country'])} · {html.escape(item['source'])}</span>
         <div class="news-actions">
