@@ -219,6 +219,8 @@ NOTICIAS:
 
 
 
+import time
+
 def gemini_summarize(title: str, url: str) -> str:
     """Gera resumo de uma noticia usando Gemini. Roda no build, nao no browser."""
     if not GEMINI_API_KEY:
@@ -296,11 +298,15 @@ def fetch_news() -> list:
     if GEMINI_API_KEY:
         top = min(10, len(filtered))
         print(f"  Gerando resumos para as {top} noticias mais recentes...")
+        # Aguarda 10s para o rate limit do Gemini resetar apos a chamada de filtro
+        time.sleep(10)
         for i in range(top):
             item = filtered[i]
             print(f"    [{i+1}/{top}] {item['title'][:60]}")
             item["summary"] = gemini_summarize(item["title"], item["url"])
-        # Demais noticias ficam sem resumo
+            # Pausa de 5s entre chamadas para respeitar limite de 15 req/min
+            if i < top - 1:
+                time.sleep(5)
         for item in filtered[top:]:
             item["summary"] = ""
     else:
