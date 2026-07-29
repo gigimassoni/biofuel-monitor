@@ -8,6 +8,7 @@ import html
 import json
 import os
 import re
+import time
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -18,7 +19,6 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 def get_gemini_url():
     return f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 
-# ── QUERIES GOOGLE NEWS RSS ──
 RSS_SEARCHES = [
     # SAF
     {"cat": "saf",   "query": '"sustainable aviation fuel"'},
@@ -76,7 +76,7 @@ COUNTRY_RULES = [
 ]
 
 
-def detect_country(title: str, summary: str = ""):
+def detect_country(title, summary=""):
     text = f" {title} {summary} ".lower()
     for flag, name, keywords in COUNTRY_RULES:
         if any(k in text for k in keywords):
@@ -84,27 +84,27 @@ def detect_country(title: str, summary: str = ""):
     return "🌐", "Global"
 
 
-def normalize_title(title: str) -> str:
+def normalize_title(title):
     t = re.sub(r"[^\w\s]", "", title.lower().strip())
     return re.sub(r"\s+", " ", t)
 
 
-def fmt_date(date_str: str) -> str:
+def fmt_date(date_str):
     if not date_str:
         return "hoje"
     try:
         from email.utils import parsedate_to_datetime
         d = parsedate_to_datetime(date_str)
         diff = int((datetime.now(timezone.utc) - d).total_seconds() / 60)
-        if diff < 60:   return f"ha {diff}min"
-        if diff < 1440: return f"ha {diff // 60}h"
+        if diff < 60:    return f"ha {diff}min"
+        if diff < 1440:  return f"ha {diff // 60}h"
         if diff < 10080: return f"ha {diff // 1440}d"
         return d.strftime("%d/%m/%Y")
     except Exception:
         return "hoje"
 
 
-def parse_date_obj(date_str: str):
+def parse_date_obj(date_str):
     try:
         from email.utils import parsedate_to_datetime
         return parsedate_to_datetime(date_str)
@@ -112,11 +112,11 @@ def parse_date_obj(date_str: str):
         return datetime.min.replace(tzinfo=timezone.utc)
 
 
-def build_rss_url(query: str) -> str:
+def build_rss_url(query):
     return f"https://news.google.com/rss/search?q={quote(query)}&hl=en-US&gl=US&ceid=US:en"
 
 
-def fetch_rss(query: str) -> list:
+def fetch_rss(query):
     url = build_rss_url(query)
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     try:
@@ -125,12 +125,12 @@ def fetch_rss(query: str) -> list:
             raw = resp.read()
         root = ET.fromstring(raw)
         items = []
-        for item in root.findall(".//item"):
-            title = item.findtext("title") or ""
-            title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
-            link  = item.findtext("link") or ""
-            desc  = item.findtext("description") or ""
-            date  = item.findtext("pubDate") or ""
+        for item in root.findall(".//item")[:5]:
+            title  = item.findtext("title") or ""
+            title  = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
+            link   = item.findtext("link") or ""
+            desc   = item.findtext("description") or ""
+            date   = item.findtext("pubDate") or ""
             source = ""
             m = re.search(r"<font[^>]*>([^<]+)</font>", desc)
             if m:
@@ -143,52 +143,33 @@ def fetch_rss(query: str) -> list:
         return []
 
 
-def gemini_filter(items_by_cat: dict) -> list:
-    """Usa Gemini para filtrar apenas noticias realmente relevantes para o setor."""
-    if not GEMINI_API_KEY:
-        # Sem Gemini, retorna tudo
-        all_items = []
-        for cat, items in items_by_cat.items():
-            for item in items:
-                item["category"] = cat
-                all_items.append(item)
-        return all_items
-
-    print("  Filtrando noticias com Gemini...")
-
-    # Monta lista numerada para o Gemini avaliar
+def gemini_filter(items_by_cat):
+    """Usa Gemini para selecionar apenas noticias relevantes."""
     all_items = []
     for cat, items in items_by_cat.items():
         for item in items:
             item["category"] = cat
             all_items.append(item)
 
-    if not all_items:
-        return []
+    if not all_items or not GEMINI_API_KEY:
+        return all_items
 
-    numbered = "\n".join([f"{i+1}. [{item['category'].upper()}] {item['title']}" for i, item in enumerate(all_items)])
+    # Limita a 50 para nao sobrecarregar
+    all_items = all_items[:50]
+    numbered = "\n".join([
+        f"{i+1}. [{item['category'].upper()}] {item['title']}"
+        for i, item in enumerate(all_items)
+    ])
 
-    prompt = f"""Voce e um analista especializado em biocombustiveis para uma empresa de etanol (Raizen).
-Abaixo ha uma lista numerada de titulos de noticias coletadas sobre SAF (combustivel sustentavel de aviacao), Biobunker (combustivel maritimo sustentavel) e Blending (mandatos de mistura etanol+gasolina).
-
-Avalie cada noticia e retorne APENAS os numeros das noticias que sao RELEVANTES para o setor de novos negocios de etanol.
-
-Descarte:
-- Noticias de esporte (futebol, golfe, etc)
-- Relatorios juridicos ou academicos sem relevancia pratica
-- Noticias de preco de gasolina sem contexto de biocombustivel
-- Agregadores de noticias ou indices
-- Noticias duplicadas (mantenha apenas a primeira ocorrencia)
-- Qualquer coisa claramente fora do contexto de biocombustiveis
-
-IMPORTANTE - Diversidade geografica: para noticias de BLENDING, garanta variedade geografica.
-Nao selecione mais de 3 noticias do mesmo pais. Se houver muitas noticias da India, selecione apenas as 3 mais relevantes e inclua noticias de outros paises.
-
-Retorne APENAS um JSON no formato: {{"relevantes": [1, 3, 5, 7, ...]}}
-Sem texto extra, sem explicacao.
-
-NOTICIAS:
-{numbered}"""
+    prompt = (
+        "Voce e um analista especializado em biocombustiveis para uma empresa de etanol (Raizen).\n"
+        "Avalie cada noticia abaixo e retorne APENAS os numeros das RELEVANTES para o setor.\n\n"
+        "Descarte: esportes, relatorios juridicos, precos de gasolina sem contexto de biocombustivel, "
+        "agregadores, duplicatas, e qualquer coisa fora do contexto de biocombustiveis.\n\n"
+        "IMPORTANTE - Diversidade geografica: para BLENDING, nao selecione mais de 3 noticias do mesmo pais.\n\n"
+        "Retorne APENAS JSON: {\"relevantes\": [1, 3, 5, ...]}\n\n"
+        f"NOTICIAS:\n{numbered}"
+    )
 
     payload = json.dumps({
         "contents": [{"parts": [{"text": prompt}]}],
@@ -197,14 +178,11 @@ NOTICIAS:
 
     try:
         req = urllib.request.Request(
-            get_gemini_url(),
-            data=payload,
-            headers={"Content-Type": "application/json"},
-            method="POST"
+            get_gemini_url(), data=payload,
+            headers={"Content-Type": "application/json"}, method="POST"
         )
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-
         text = data["candidates"][0]["content"]["parts"][0]["text"]
         text = re.sub(r"```json|```", "", text).strip()
         result = json.loads(text)
@@ -212,44 +190,56 @@ NOTICIAS:
         filtered = [all_items[i] for i in indices]
         print(f"    Gemini: {len(all_items)} -> {len(filtered)} noticias relevantes")
         return filtered
-
     except Exception as e:
         print(f"    AVISO Gemini filter: {e}")
         return all_items
 
 
+def gemini_summarize_batch(items_batch):
+    """Gera resumos para um lote de noticias em uma unica requisicao."""
+    if not GEMINI_API_KEY or not items_batch:
+        return {}
 
-import time
+    prompt_items = []
+    for idx, item in enumerate(items_batch):
+        prompt_items.append(f"ID {idx+1}:\nTitulo: {item['title']}\nURL: {item['url']}")
 
-def gemini_summarize(title: str, url: str) -> str:
-    """Gera resumo de uma noticia usando Gemini. Roda no build, nao no browser."""
-    if not GEMINI_API_KEY:
-        return ""
+    news_block = "\n\n".join(prompt_items)
+
     prompt = (
-        "Voce e um analista de biocombustiveis. "
-        "Faca um resumo objetivo em portugues (3-4 frases) sobre a seguinte noticia. "
-        "Seja direto e informativo, destacando o que e mais relevante para o mercado de etanol, SAF e biocombustiveis maritimos. "
-        "Retorne APENAS o resumo em texto corrido, sem titulos nem marcadores.\n\n"
-        f"Titulo: {title}\nURL: {url}"
+        "Voce e um analista especialista em biocombustiveis (SAF, Biobunker, Blending de etanol).\n"
+        "Para CADA noticia abaixo, faca um resumo objetivo em portugues de 2 a 3 frases "
+        "focado no mercado e nos impactos comerciais/regulatorios.\n\n"
+        "Retorne APENAS um objeto JSON onde as chaves sejam os IDs (como string) "
+        "e o valor seja o texto do resumo.\n"
+        "Exemplo: {\"1\": \"Resumo...\", \"2\": \"Resumo...\"}\n\n"
+        f"NOTICIAS:\n{news_block}"
     )
+
     payload = json.dumps({
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.3, "maxOutputTokens": 250}
+        "generationConfig": {
+            "temperature": 0.2,
+            "maxOutputTokens": 2000,
+            "responseMimeType": "application/json"
+        }
     }).encode("utf-8")
+
     try:
         req = urllib.request.Request(
             get_gemini_url(), data=payload,
             headers={"Content-Type": "application/json"}, method="POST"
         )
-        with urllib.request.urlopen(req, timeout=20) as resp:
+        with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+            text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+            return json.loads(text)
     except Exception as e:
-        print(f"    AVISO resumo: {e}")
-        return ""
+        print(f"    AVISO Erro no resumo em lote: {e}")
+        return {}
 
 
-def fetch_news() -> list:
+def fetch_news():
     seen_urls   = set()
     seen_titles = set()
     items_by_cat = {"saf": [], "bio": [], "blend": []}
@@ -258,7 +248,6 @@ def fetch_news() -> list:
         cat   = search["cat"]
         query = search["query"]
         print(f"  [{cat.upper()}] {query[:60]}...")
-
         rss_items = fetch_rss(query)
         print(f"    Retornou {len(rss_items)} itens")
 
@@ -284,41 +273,42 @@ def fetch_news() -> list:
                 "date_raw": r["date"],
                 "flag":     flag,
                 "country":  country,
+                "summary":  ""
             })
 
     print(f"  Total coletado: SAF={len(items_by_cat['saf'])} | Bio={len(items_by_cat['bio'])} | Blend={len(items_by_cat['blend'])}")
 
-    # Filtra com Gemini
+    # 1. Filtra com Gemini
     filtered = gemini_filter(items_by_cat)
 
-    # Ordena por data
+    # 2. Ordena por data
     filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
 
-    # Gera resumos com Gemini apenas para as 10 noticias mais recentes
-    if GEMINI_API_KEY:
-        top = min(10, len(filtered))
-        print(f"  Gerando resumos para as {top} noticias mais recentes...")
-        # Aguarda 10s para o rate limit do Gemini resetar apos a chamada de filtro
-        time.sleep(10)
-        for i in range(top):
-            item = filtered[i]
-            print(f"    [{i+1}/{top}] {item['title'][:60]}")
-            item["summary"] = gemini_summarize(item["title"], item["url"])
-            # Pausa de 5s entre chamadas para respeitar limite de 15 req/min
-            if i < top - 1:
-                time.sleep(5)
-        for item in filtered[top:]:
-            item["summary"] = ""
-    else:
-        for item in filtered:
-            item["summary"] = ""
+    # 3. Gera resumos em lotes
+    if GEMINI_API_KEY and filtered:
+        batch_size = 10
+        print(f"  Gerando resumos para {len(filtered)} noticias em lotes de {batch_size}...")
+        time.sleep(5)  # Pausa apos filtro para resetar rate limit
+
+        for i in range(0, len(filtered), batch_size):
+            batch = filtered[i:i + batch_size]
+            lote  = i // batch_size + 1
+            total = (len(filtered) - 1) // batch_size + 1
+            print(f"    Lote {lote}/{total}...")
+
+            resumos = gemini_summarize_batch(batch)
+            for idx, item in enumerate(batch):
+                item["summary"] = resumos.get(str(idx + 1), "")
+
+            if i + batch_size < len(filtered):
+                time.sleep(4)  # Pausa entre lotes
 
     return filtered
 
 
-def render_html(items: list) -> str:
-    now = datetime.now(timezone.utc).strftime("%d/%m/%Y as %H:%M UTC")
-
+def render_html(items):
+    now    = datetime.now(timezone.utc).strftime("%d/%m/%Y as %H:%M UTC")
+    labels = {"saf": "SAF", "bio": "Biobunker", "blend": "Blending"}
     counts = {
         "all":   len(items),
         "saf":   sum(1 for i in items if i["category"] == "saf"),
@@ -326,32 +316,35 @@ def render_html(items: list) -> str:
         "blend": sum(1 for i in items if i["category"] == "blend"),
     }
 
-    labels = {"saf": "SAF", "bio": "Biobunker", "blend": "Blending"}
-
     cards_html = ""
     for idx, item in enumerate(items):
-        delay = min(idx * 15, 500)
-        url_escaped = html.escape(item['url'])
-        title_escaped = html.escape(item['title'])
-        summary_escaped = html.escape(item.get("summary", "") or "Resumo nao disponivel para esta noticia.")
+        delay          = min(idx * 15, 500)
+        url_esc        = html.escape(item["url"])
+        title_esc      = html.escape(item["title"])
+        summary_esc    = html.escape(item.get("summary", "") or "Resumo nao disponivel para esta noticia.")
+        date_esc       = html.escape(item["date_str"])
+        country_esc    = html.escape(item["country"])
+        source_esc     = html.escape(item["source"])
+        title_low      = html.escape(item["title"].lower())
+        cat            = item["category"]
+        label          = labels[cat]
+        flag           = item["flag"]
+
         cards_html += f"""
-    <div class="news-card" data-cat="{item['category']}" data-title="{html.escape(item['title'].lower())}"
-         style="animation-delay:{delay}ms">
+    <div class="news-card" data-cat="{cat}" data-title="{title_low}" style="animation-delay:{delay}ms">
       <div class="news-top">
-        <span class="news-badge {item['category']}">{labels[item['category']]}</span>
-        <span class="news-time">{html.escape(item['date_str'])}</span>
+        <span class="news-badge {cat}">{label}</span>
+        <span class="news-time">{date_esc}</span>
       </div>
       <div class="news-title">
-        <a href="{url_escaped}" target="_blank" rel="noopener">{title_escaped}</a>
+        <a href="{url_esc}" target="_blank" rel="noopener">{title_esc}</a>
       </div>
-      <div class="news-summary" id="summary-{idx}" style="display:none">{summary_escaped}</div>
+      <div class="news-summary" id="summary-{idx}" style="display:none">{summary_esc}</div>
       <div class="news-footer">
-        <span class="news-source">{item['flag']} {html.escape(item['country'])} · {html.escape(item['source'])}</span>
+        <span class="news-source">{flag} {country_esc} · {source_esc}</span>
         <div class="news-actions">
-          <button class="btn-resumo" onclick="toggleResumo({idx})" id="btn-{idx}">
-            📄 Resumo
-          </button>
-          <a class="news-read" href="{url_escaped}" target="_blank" rel="noopener">Ler →</a>
+          <button class="btn-resumo" onclick="toggleResumo({idx})" id="btn-{idx}">📄 Resumo</button>
+          <a class="news-read" href="{url_esc}" target="_blank" rel="noopener">Ler →</a>
         </div>
       </div>
     </div>"""
@@ -380,8 +373,7 @@ def render_html(items: list) -> str:
     --saf:#4db8f0;--saf-bg:rgba(77,184,240,0.10);
     --bio:#3dd6a0;--bio-bg:rgba(61,214,160,0.10);
     --blend:#f0b84d;--blend-bg:rgba(240,184,77,0.10);
-    --accent:#2bc4a0;--accent-l:#3dd6a0;
-    --r:14px;
+    --accent:#2bc4a0;--accent-l:#3dd6a0;--r:14px;
   }}
   body{{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}}
   .navbar{{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}}
@@ -434,7 +426,6 @@ def render_html(items: list) -> str:
   .news-actions{{display:flex;align-items:center;gap:8px}}
   .btn-resumo{{font-size:11px;font-weight:500;padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s}}
   .btn-resumo:hover{{border-color:var(--accent);color:var(--accent-l)}}
-  .btn-resumo.loading{{opacity:.6;cursor:not-allowed}}
   .btn-resumo.open{{border-color:var(--accent);color:var(--accent-l);background:rgba(43,196,160,0.08)}}
   .news-read{{font-size:11px;color:var(--accent-l);text-decoration:none}}
   .news-read:hover{{text-decoration:underline}}
@@ -449,7 +440,6 @@ def render_html(items: list) -> str:
 </style>
 </head>
 <body>
-
 <nav class="navbar">
   <a class="nav-logo" href="index.html">
     <div class="nav-logo-mark">🛢️</div>
@@ -461,19 +451,16 @@ def render_html(items: list) -> str:
     <a class="nav-tab" href="mapa-saf.html">✈️ SAF</a>
   </div>
 </nav>
-
 <div class="header">
   <div class="header-title">Ferramenta de monitoramento de noticias para novos mercados</div>
   <div class="updated">Atualizado em {now}</div>
 </div>
-
 <div class="search-wrap">
   <div class="search-box">
     <span>🔍</span>
     <input type="text" id="search-input" placeholder="Buscar..." oninput="renderCards()"/>
   </div>
 </div>
-
 <div class="stats">
   <div class="stat-card" id="sc-saf" onclick="setFilter('saf')">
     <div class="stat-head"><span class="stat-dot" style="background:var(--saf)"></span><span class="stat-label">SAF</span></div>
@@ -492,22 +479,16 @@ def render_html(items: list) -> str:
     <div class="stat-num">{counts['all']}</div><div class="stat-sub">—</div>
   </div>
 </div>
-
 <div class="filters">
   <button class="chip a" id="chip-all"   onclick="setFilter('all')">Todos</button>
   <button class="chip"   id="chip-saf"   onclick="setFilter('saf')">SAF</button>
   <button class="chip"   id="chip-bio"   onclick="setFilter('bio')">Biobunker</button>
   <button class="chip"   id="chip-blend" onclick="setFilter('blend')">Blending</button>
 </div>
-
 <div class="news-wrap" id="news-area">{cards_html}
 </div>
-
 <script>
-// Resumo via proxy endpoint
 let activeFilter = 'all';
-const summaryCache = {{}};
-
 function toggleResumo(idx) {{
   const box = document.getElementById('summary-' + idx);
   const btn = document.getElementById('btn-' + idx);
@@ -521,7 +502,6 @@ function toggleResumo(idx) {{
     btn.classList.add('open');
   }}
 }}
-
 function setFilter(f) {{
   activeFilter = f;
   ['all','saf','bio','blend'].forEach(k=>{{
@@ -530,7 +510,6 @@ function setFilter(f) {{
   }});
   renderCards();
 }}
-
 function renderCards() {{
   const q = document.getElementById('search-input').value.toLowerCase();
   document.querySelectorAll('.news-card').forEach(c => {{
@@ -547,7 +526,7 @@ function renderCards() {{
 def main():
     print("BioFuel Monitor - iniciando...")
     if not GEMINI_API_KEY:
-        print("AVISO: GEMINI_API_KEY nao encontrada. Filtragem por IA desativada.")
+        print("AVISO: GEMINI_API_KEY nao encontrada.")
 
     items = fetch_news()
     print(f"Total final: {len(items)} noticias")
