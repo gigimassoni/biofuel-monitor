@@ -143,19 +143,20 @@ def fetch_rss(query):
         return []
 
 
-def gemini_filter(items_by_cat):
-    """Usa Gemini para selecionar apenas noticias relevantes."""
+def gemini_filter(items_by_cat: dict) -> list:
+    """Usa Gemini para filtrar apenas noticias realmente relevantes para o setor."""
     all_items = []
-    for cat, items in items_by_cat.items():
-        for item in items:
+    # Coleta proporcional para garantir que Blending nao seja cortado
+    for cat in ["saf", "bio", "blend"]:
+        for item in items_by_cat.get(cat, []):
             item["category"] = cat
             all_items.append(item)
 
     if not all_items or not GEMINI_API_KEY:
         return all_items
 
-    # Limita a 50 para nao sobrecarregar
-    all_items = all_items[:50]
+    print(f"  Filtrando {len(all_items)} noticias coletadas com Gemini...")
+
     numbered = "\n".join([
         f"{i+1}. [{item['category'].upper()}] {item['title']}"
         for i, item in enumerate(all_items)
@@ -163,17 +164,18 @@ def gemini_filter(items_by_cat):
 
     prompt = (
         "Voce e um analista especializado em biocombustiveis para uma empresa de etanol (Raizen).\n"
-        "Avalie cada noticia abaixo e retorne APENAS os numeros das RELEVANTES para o setor.\n\n"
+        "Avalie cada noticia abaixo e retorne APENAS os numeros das RELEVANTES para o setor de novos negocios.\n\n"
         "Descarte: esportes, relatorios juridicos, precos de gasolina sem contexto de biocombustivel, "
         "agregadores, duplicatas, e qualquer coisa fora do contexto de biocombustiveis.\n\n"
-        "IMPORTANTE - Diversidade geografica: para BLENDING, nao selecione mais de 3 noticias do mesmo pais.\n\n"
-        "Retorne APENAS JSON: {\"relevantes\": [1, 3, 5, ...]}\n\n"
+        "IMPORTANTE - Diversidade geografica: para BLENDING, garanta presenca de noticias de varios paises "
+        "e nao selecione mais de 3 do mesmo pais.\n\n"
+        "Retorne APENAS JSON no formato exato: {\"relevantes\": [1, 3, 5, ...]}\n\n"
         f"NOTICIAS:\n{numbered}"
     )
 
     payload = json.dumps({
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.1, "maxOutputTokens": 500}
+        "generationConfig": {"temperature": 0.1, "maxOutputTokens": 1000}
     }).encode("utf-8")
 
     try:
@@ -232,10 +234,29 @@ def gemini_summarize_batch(items_batch):
         )
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-            text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-            return json.loads(text)
+
+        text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+        # Parse robusto — limpa markdown e tenta varios formatos
+        text = re.sub(r"```json|```", "", text).strip()
+
+        # Tenta parse direto
+        try:
+            result = json.loads(text)
+            return {str(k): str(v) for k, v in result.items()}
+        except Exception:
+            pass
+
+        # Tenta extrair JSON do texto
+        m = re.search(r'\{.*\}', text, re.DOTALL)
+        if m:
+            result = json.loads(m.group(0))
+            return {str(k): str(v) for k, v in result.items()}
+
+        return {}
+
     except Exception as e:
-        print(f"    AVISO Erro no resumo em lote: {e}")
+        print(f"    AVISO resumo em lote: {e}")
         return {}
 
 
@@ -288,7 +309,7 @@ def fetch_news():
     if GEMINI_API_KEY and filtered:
         batch_size = 10
         print(f"  Gerando resumos para {len(filtered)} noticias em lotes de {batch_size}...")
-        time.sleep(5)  # Pausa apos filtro para resetar rate limit
+        time.sleep(15)  # Pausa para resetar rate limit apos filtro
 
         for i in range(0, len(filtered), batch_size):
             batch = filtered[i:i + batch_size]
