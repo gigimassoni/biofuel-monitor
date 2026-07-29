@@ -305,24 +305,29 @@ def fetch_news():
     # 2. Ordena por data
     filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
 
-    # 3. Gera resumos em lotes
+    # 3. Gera resumos em lotes (apenas top 20 para respeitar rate limit)
     if GEMINI_API_KEY and filtered:
-        batch_size = 10
-        print(f"  Gerando resumos para {len(filtered)} noticias em lotes de {batch_size}...")
-        time.sleep(15)  # Pausa para resetar rate limit apos filtro
+        top      = min(20, len(filtered))
+        to_summarize = filtered[:top]
+        batch_size   = 10
+        print(f"  Gerando resumos para {top} noticias em lotes de {batch_size}...")
+        time.sleep(60)  # Pausa de 1 minuto para resetar rate limit apos filtro
 
-        for i in range(0, len(filtered), batch_size):
-            batch = filtered[i:i + batch_size]
+        for i in range(0, top, batch_size):
+            batch = to_summarize[i:i + batch_size]
             lote  = i // batch_size + 1
-            total = (len(filtered) - 1) // batch_size + 1
+            total = (top - 1) // batch_size + 1
             print(f"    Lote {lote}/{total}...")
 
             resumos = gemini_summarize_batch(batch)
             for idx, item in enumerate(batch):
                 item["summary"] = resumos.get(str(idx + 1), "")
 
-            if i + batch_size < len(filtered):
-                time.sleep(4)  # Pausa entre lotes
+            if i + batch_size < top:
+                time.sleep(60)  # 1 minuto entre lotes
+
+        for item in filtered[top:]:
+            item["summary"] = ""
 
     return filtered
 
