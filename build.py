@@ -11,6 +11,7 @@ import re
 import time
 import urllib.request
 import xml.etree.ElementTree as ET
+import print("API encontrada:", bool(os.getenv("GEMINI_API_KEY")))
 from datetime import datetime, timezone
 from urllib.parse import quote
 
