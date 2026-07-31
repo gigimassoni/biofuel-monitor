@@ -11,7 +11,6 @@ import re
 import time
 import urllib.request
 import xml.etree.ElementTree as ET
-print("API encontrada:", bool(os.getenv("GEMINI_API_KEY")))
 from datetime import datetime, timezone
 from urllib.parse import quote
 
@@ -554,6 +553,8 @@ def main():
     print("BioFuel Monitor - iniciando...")
     if not GEMINI_API_KEY:
         print("AVISO: GEMINI_API_KEY nao encontrada.")
+    else:
+        print(f"GEMINI_API_KEY encontrada: {GEMINI_API_KEY[:8]}... (primeiros 8 chars)")
 
     items = fetch_news()
     print(f"Total final: {len(items)} noticias")
