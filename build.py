@@ -230,8 +230,7 @@ def gemini_summarize_batch(items_batch):
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "temperature": 0.2,
-            "maxOutputTokens": 2000,
-            "responseMimeType": "application/json"
+            "maxOutputTokens": 2000
         }
     }).encode("utf-8")
 
