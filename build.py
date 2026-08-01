@@ -172,7 +172,7 @@ def gemini_summarize_batch(items_batch: list) -> dict:
         )
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
+            model="gemini-2.5-flash-lite-preview-06-17",
             contents=prompt
         )
 
@@ -222,7 +222,7 @@ def gemini_filter(items_by_cat: dict) -> list:
         from google import genai
         client = genai.Client(api_key=GEMINI_API_KEY)
         response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
+            model="gemini-2.5-flash-lite-preview-06-17",
             contents=prompt
         )
         text = re.sub(r"```json|```", "", response.text).strip()
