@@ -17,7 +17,18 @@ from urllib.parse import quote
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
 def get_gemini_url():
-    return f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
+    return "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent"
+
+def make_gemini_request(payload: bytes) -> urllib.request.Request:
+    return urllib.request.Request(
+        get_gemini_url(),
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "x-goog-api-key": GEMINI_API_KEY,
+        },
+        method="POST"
+    )
 
 RSS_SEARCHES = [
     # SAF
@@ -179,10 +190,7 @@ def gemini_filter(items_by_cat: dict) -> list:
     }).encode("utf-8")
 
     try:
-        req = urllib.request.Request(
-            get_gemini_url(), data=payload,
-            headers={"Content-Type": "application/json"}, method="POST"
-        )
+        req = make_gemini_request(payload)
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         text = data["candidates"][0]["content"]["parts"][0]["text"]
@@ -228,10 +236,7 @@ def gemini_summarize_batch(items_batch):
     }).encode("utf-8")
 
     try:
-        req = urllib.request.Request(
-            get_gemini_url(), data=payload,
-            headers={"Content-Type": "application/json"}, method="POST"
-        )
+        req = make_gemini_request(payload)
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read().decode("utf-8"))
 
