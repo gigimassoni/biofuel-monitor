@@ -1,34 +1,19 @@
 #!/usr/bin/env python3
 """
 BioFuel Monitor - Raizen Novos Negocios
-Google News RSS para buscar noticias + Gemini para filtrar e resumir.
+Google News RSS para buscar noticias com filtro por palavras-chave.
 """
 
 import html
 import json
 import os
 import re
-import time
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from urllib.parse import quote
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
-def get_gemini_url():
-    return "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent"
-
-def make_gemini_request(payload: bytes) -> urllib.request.Request:
-    return urllib.request.Request(
-        get_gemini_url(),
-        data=payload,
-        headers={
-            "Content-Type": "application/json",
-            "x-goog-api-key": GEMINI_API_KEY,
-        },
-        method="POST"
-    )
 
 RSS_SEARCHES = [
     # SAF
@@ -147,17 +132,68 @@ def fetch_rss(query):
             if m:
                 source = m.group(1).strip()
             if title and link:
-                items.append({"title": title, "url": link, "date": date, "source": source})
+                # Limpa a descricao do RSS (remove HTML)
+                desc_clean = re.sub(r"<[^>]+>", "", desc).strip()
+                desc_clean = re.sub(r"\s+", " ", desc_clean)[:300]
+                items.append({"title": title, "url": link, "date": date, "source": source, "desc": desc_clean})
         return items
     except Exception as e:
         print(f"    AVISO RSS: {e}")
         return []
 
 
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+
+
+def gemini_summarize_batch(items_batch: list) -> dict:
+    """Gera resumos em lote usando a biblioteca oficial google-genai."""
+    if not GEMINI_API_KEY or not items_batch:
+        return {}
+
+    try:
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
+
+        prompt_items = []
+        for idx, item in enumerate(items_batch):
+            desc = item.get("desc", "")
+            entry = f"ID {idx+1}:\nTitulo: {item['title']}"
+            if desc:
+                entry += f"\nDescricao: {desc}"
+            prompt_items.append(entry)
+
+        news_block = "\n\n".join(prompt_items)
+        prompt = (
+            "Voce e um analista especialista em biocombustiveis (SAF, Biobunker, Blending).\n"
+            "Para CADA noticia abaixo, faca um resumo objetivo em portugues de 2 a 3 frases "
+            "focado no mercado e nos impactos comerciais e regulatorios.\n\n"
+            "Retorne APENAS um JSON: {\"1\": \"Resumo...\", \"2\": \"Resumo...\"}\n\n"
+            f"NOTICIAS:\n{news_block}"
+        )
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt
+        )
+
+        text = response.text.strip()
+        text = re.sub(r"```json|```", "", text).strip()
+        try:
+            return json.loads(text)
+        except Exception:
+            m = re.search(r'\{.*\}', text, re.DOTALL)
+            if m:
+                return json.loads(m.group(0))
+        return {}
+
+    except Exception as e:
+        print(f"    AVISO Gemini: {e}")
+        return {}
+
+
 def gemini_filter(items_by_cat: dict) -> list:
-    """Usa Gemini para filtrar apenas noticias realmente relevantes para o setor."""
+    """Usa Gemini para selecionar apenas noticias relevantes."""
     all_items = []
-    # Coleta proporcional para garantir que Blending nao seja cortado
     for cat in ["saf", "bio", "blend"]:
         for item in items_by_cat.get(cat, []):
             item["category"] = cat
@@ -166,7 +202,7 @@ def gemini_filter(items_by_cat: dict) -> list:
     if not all_items or not GEMINI_API_KEY:
         return all_items
 
-    print(f"  Filtrando {len(all_items)} noticias coletadas com Gemini...")
+    print(f"  Filtrando {len(all_items)} noticias com Gemini...")
 
     numbered = "\n".join([
         f"{i+1}. [{item['category'].upper()}] {item['title']}"
@@ -175,93 +211,52 @@ def gemini_filter(items_by_cat: dict) -> list:
 
     prompt = (
         "Voce e um analista especializado em biocombustiveis para uma empresa de etanol (Raizen).\n"
-        "Avalie cada noticia abaixo e retorne APENAS os numeros das RELEVANTES para o setor de novos negocios.\n\n"
-        "Descarte: esportes, relatorios juridicos, precos de gasolina sem contexto de biocombustivel, "
-        "agregadores, duplicatas, e qualquer coisa fora do contexto de biocombustiveis.\n\n"
-        "IMPORTANTE - Diversidade geografica: para BLENDING, garanta presenca de noticias de varios paises "
-        "e nao selecione mais de 3 do mesmo pais.\n\n"
-        "Retorne APENAS JSON no formato exato: {\"relevantes\": [1, 3, 5, ...]}\n\n"
+        "Avalie cada noticia e retorne APENAS os numeros das RELEVANTES.\n\n"
+        "Descarte: esportes, juridico, preco de gasolina sem etanol, agregadores, duplicatas.\n"
+        "Para BLENDING: nao selecione mais de 3 do mesmo pais.\n\n"
+        "Retorne APENAS JSON: {\"relevantes\": [1, 3, 5, ...]}\n\n"
         f"NOTICIAS:\n{numbered}"
     )
 
-    payload = json.dumps({
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.1, "maxOutputTokens": 1000}
-    }).encode("utf-8")
-
     try:
-        req = make_gemini_request(payload)
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        text = data["candidates"][0]["content"]["parts"][0]["text"]
-        text = re.sub(r"```json|```", "", text).strip()
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt
+        )
+        text = re.sub(r"```json|```", "", response.text).strip()
         result = json.loads(text)
         indices = [i - 1 for i in result.get("relevantes", []) if 1 <= i <= len(all_items)]
         filtered = [all_items[i] for i in indices]
-        print(f"    Gemini: {len(all_items)} -> {len(filtered)} noticias relevantes")
+        print(f"    Gemini: {len(all_items)} -> {len(filtered)} relevantes")
         return filtered
     except Exception as e:
-        print(f"    AVISO Gemini filter: {e}")
+        print(f"    AVISO filtro Gemini: {e}")
         return all_items
 
 
-def gemini_summarize_batch(items_batch):
-    """Gera resumos para um lote de noticias em uma unica requisicao."""
-    if not GEMINI_API_KEY or not items_batch:
-        return {}
+def simple_filter(items_by_cat: dict) -> list:
+    """Filtra noticias por palavras-chave relevantes."""
+    NOISE = [
+        "golf", "golfe", "bunker shot", "british open", "ryder cup",
+        "football club", "futebol", "soccer", "premier league",
+        "champions league", "flamengo", "corinthians", "palmeiras",
+        "arbitration report", "law review", "legal journal",
+        "week in technology", "sign up to read", "start a free trial",
+        "access newswire", "tradingview",
+    ]
 
-    prompt_items = []
-    for idx, item in enumerate(items_batch):
-        prompt_items.append(f"ID {idx+1}:\nTitulo: {item['title']}\nURL: {item['url']}")
+    all_items = []
+    for cat in ["saf", "bio", "blend"]:
+        for item in items_by_cat.get(cat, []):
+            item["category"] = cat
+            title_lower = item["title"].lower()
+            if not any(n in title_lower for n in NOISE):
+                all_items.append(item)
 
-    news_block = "\n\n".join(prompt_items)
-
-    prompt = (
-        "Voce e um analista especialista em biocombustiveis (SAF, Biobunker, Blending de etanol).\n"
-        "Para CADA noticia abaixo, faca um resumo objetivo em portugues de 2 a 3 frases "
-        "focado no mercado e nos impactos comerciais/regulatorios.\n\n"
-        "Retorne APENAS um objeto JSON onde as chaves sejam os IDs (como string) "
-        "e o valor seja o texto do resumo.\n"
-        "Exemplo: {\"1\": \"Resumo...\", \"2\": \"Resumo...\"}\n\n"
-        f"NOTICIAS:\n{news_block}"
-    )
-
-    payload = json.dumps({
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": 0.2,
-            "maxOutputTokens": 2000
-        }
-    }).encode("utf-8")
-
-    try:
-        req = make_gemini_request(payload)
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-
-        text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-
-        # Parse robusto — limpa markdown e tenta varios formatos
-        text = re.sub(r"```json|```", "", text).strip()
-
-        # Tenta parse direto
-        try:
-            result = json.loads(text)
-            return {str(k): str(v) for k, v in result.items()}
-        except Exception:
-            pass
-
-        # Tenta extrair JSON do texto
-        m = re.search(r'\{.*\}', text, re.DOTALL)
-        if m:
-            result = json.loads(m.group(0))
-            return {str(k): str(v) for k, v in result.items()}
-
-        return {}
-
-    except Exception as e:
-        print(f"    AVISO resumo em lote: {e}")
-        return {}
+    print(f"    Filtro simples: {sum(len(v) for v in items_by_cat.values())} -> {len(all_items)} noticias")
+    return all_items
 
 
 def fetch_news():
@@ -294,6 +289,7 @@ def fetch_news():
                 "title":    title,
                 "url":      url,
                 "source":   r["source"],
+                "desc":     r.get("desc", ""),
                 "date_str": fmt_date(r["date"]),
                 "date_raw": r["date"],
                 "flag":     flag,
@@ -303,34 +299,26 @@ def fetch_news():
 
     print(f"  Total coletado: SAF={len(items_by_cat['saf'])} | Bio={len(items_by_cat['bio'])} | Blend={len(items_by_cat['blend'])}")
 
-    # 1. Filtra com Gemini
-    filtered = gemini_filter(items_by_cat)
+    # 1. Filtra com Gemini (ou palavras-chave se Gemini falhar)
+    if GEMINI_API_KEY:
+        filtered = gemini_filter(items_by_cat)
+    else:
+        filtered = simple_filter(items_by_cat)
 
     # 2. Ordena por data
     filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
 
-    # 3. Gera resumos em lotes (apenas top 20 para respeitar rate limit)
+    # 3. Gera resumos com Gemini (v1 API)
     if GEMINI_API_KEY and filtered:
-        top      = min(20, len(filtered))
-        to_summarize = filtered[:top]
-        batch_size   = 10
-        print(f"  Gerando resumos para {top} noticias em lotes de {batch_size}...")
-        time.sleep(60)  # Pausa de 1 minuto para resetar rate limit apos filtro
-
-        for i in range(0, top, batch_size):
-            batch = to_summarize[i:i + batch_size]
-            lote  = i // batch_size + 1
-            total = (top - 1) // batch_size + 1
-            print(f"    Lote {lote}/{total}...")
-
-            resumos = gemini_summarize_batch(batch)
-            for idx, item in enumerate(batch):
-                item["summary"] = resumos.get(str(idx + 1), "")
-
-            if i + batch_size < top:
-                time.sleep(60)  # 1 minuto entre lotes
-
-        for item in filtered[top:]:
+        print(f"  Gerando resumos para {min(20, len(filtered))} noticias...")
+        top = filtered[:20]
+        resumos = gemini_summarize_batch(top)
+        for idx, item in enumerate(top):
+            item["summary"] = resumos.get(str(idx + 1), "")
+        for item in filtered[20:]:
+            item["summary"] = ""
+    else:
+        for item in filtered:
             item["summary"] = ""
 
     return filtered
@@ -555,10 +543,7 @@ function renderCards() {{
 
 def main():
     print("BioFuel Monitor - iniciando...")
-    if not GEMINI_API_KEY:
-        print("AVISO: GEMINI_API_KEY nao encontrada.")
-    else:
-        print(f"GEMINI_API_KEY encontrada: {GEMINI_API_KEY[:8]}... (primeiros 8 chars)")
+    print("Modo: filtro por palavras-chave (sem IA)")
 
     items = fetch_news()
     print(f"Total final: {len(items)} noticias")
