@@ -1,1 +1,1 @@
-# Tavily usa urllib da stdlib — sem dependencias externas
+google-genai
