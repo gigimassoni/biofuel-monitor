@@ -22,6 +22,10 @@ SUMMARY_BATCH   = 10    # noticias por chamada de resumo
 MIN_INTERVAL    = 7.0   # segundos minimos entre chamadas ao Gemini (limite 10/min)
 CACHE_FILE      = "resumos.json"
 CACHE_DIAS      = 45    # descarta resumos mais antigos que isso
+MAPA_BLEND      = "mapa-mandatos.html"
+PEND_FILE       = "pendencias.json"
+PEND_HTML       = "pendencias.html"
+REPO            = os.environ.get("GITHUB_REPOSITORY", "gigimassoni/biofuel-monitor")
 
 # Descobertos automaticamente em tempo de execucao
 _MODEL = None
@@ -478,6 +482,142 @@ def gemini_summarize_batch(batch):
 
 
 # ==========================================================
+#  DETECCAO DE MUDANCA DE MANDATO (BLENDING)
+# ==========================================================
+
+def ler_mapa_blend():
+    """Le os paises e o percentual atual direto do mapa de blending."""
+    try:
+        html_src = open(MAPA_BLEND, encoding="utf-8").read()
+    except Exception as e:
+        print(f"  AVISO: nao consegui ler {MAPA_BLEND}: {e}")
+        return {}
+    paises = {}
+    for m in re.finditer(r'id:"([A-Z]{3})"\s*,\s*name:"([^"]+)"', html_src):
+        cid, nome = m.group(1), m.group(2)
+        trecho = html_src[m.start():m.start() + 1200]
+        mb = re.search(r'blend:"([^"]*)"', trecho)
+        if mb:
+            paises[cid] = {"nome": nome, "blend": mb.group(1)}
+    return paises
+
+
+def carregar_pendencias():
+    try:
+        with open(PEND_FILE, encoding="utf-8") as f:
+            d = json.load(f)
+        return {"pendentes": d.get("pendentes", []), "recusados": d.get("recusados", [])}
+    except Exception:
+        return {"pendentes": [], "recusados": []}
+
+
+def salvar_pendencias(dados):
+    try:
+        with open(PEND_FILE, "w", encoding="utf-8") as f:
+            json.dump(dados, f, ensure_ascii=False, indent=1)
+    except Exception as e:
+        print(f"  AVISO ao salvar pendencias: {e}")
+
+
+def detectar_mudancas_blend(items):
+    """Pergunta ao Gemini se alguma noticia indica novo percentual de mistura."""
+    dados = carregar_pendencias()
+    if not _GEMINI_OK or not GEMINI_API_KEY:
+        return dados
+
+    mapa = ler_mapa_blend()
+    if not mapa:
+        return dados
+
+    noticias = [i for i in items if i["category"] == "blend"][:40]
+    if not noticias:
+        return dados
+
+    atual = "\n".join(f"{cid} = {v['nome']}: {v['blend']}" for cid, v in sorted(mapa.items()))
+    lista = "\n\n".join(
+        f"ID {n+1}:\nTitulo: {it['title']}\nResumo: {it.get('desc', '')[:200]}"
+        for n, it in enumerate(noticias)
+    )
+
+    prompt = (
+        "Voce monitora mandatos de mistura de etanol na gasolina (blending).\n\n"
+        "VALORES ATUALMENTE REGISTRADOS NO MAPA:\n" + atual + "\n\n"
+        "NOTICIAS DE HOJE:\n" + lista + "\n\n"
+        "Identifique APENAS os casos em que uma noticia afirma explicitamente um NOVO "
+        "percentual obrigatorio de mistura que DIFERE do valor registrado acima.\n"
+        "Regras rigorosas:\n"
+        "- So proponha se a noticia declarar o percentual de forma clara (ex: E15, E20).\n"
+        "- Ignore metas futuras, estudos, propostas e discussoes sem aprovacao.\n"
+        "- Ignore se o valor da noticia for igual ao que ja esta no mapa.\n"
+        "- Na duvida, NAO proponha.\n\n"
+        "Responda SOMENTE com JSON:\n"
+        '{\"mudancas\": [{\"id\": \"VNM\", \"novo\": \"E15\", \"noticia\": 3, '
+        '\"justificativa\": \"frase curta\"}]}\n'
+        'Se nao houver nenhuma, responda {\"mudancas\": []}'
+    )
+
+    print("  Verificando se ha mudanca de mandato de blending...")
+    r = _parse_json(gemini_call(prompt, max_tokens=1200, temperature=0.0))
+    if not r or not isinstance(r.get("mudancas"), list):
+        print("    Nenhuma mudanca detectada.")
+        return dados
+
+    ja_pend = {p["id"] + "|" + p["novo"] for p in dados["pendentes"]}
+    achados = 0
+    for mud in r["mudancas"]:
+        cid  = str(mud.get("id", "")).upper().strip()
+        novo = str(mud.get("novo", "")).strip()
+        idx  = mud.get("noticia")
+        if cid not in mapa or not novo:
+            continue
+        if novo.lower() == mapa[cid]["blend"].lower():
+            continue
+        chave = cid + "|" + novo
+        if chave in ja_pend or chave in dados["recusados"]:
+            continue
+        if not isinstance(idx, int) or not (1 <= idx <= len(noticias)):
+            continue
+        fonte = noticias[idx - 1]
+        dados["pendentes"].append({
+            "id": cid,
+            "pais": mapa[cid]["nome"],
+            "atual": mapa[cid]["blend"],
+            "novo": novo,
+            "justificativa": str(mud.get("justificativa", ""))[:300],
+            "noticia_titulo": fonte["title"],
+            "noticia_url": fonte["url"],
+            "noticia_fonte": fonte["source"],
+            "detectado_em": datetime.now(timezone.utc).strftime("%d/%m/%Y"),
+        })
+        achados += 1
+        print(f"    PROPOSTA: {mapa[cid]['nome']} {mapa[cid]['blend']} -> {novo}")
+
+    if not achados:
+        print("    Nenhuma mudanca nova.")
+    salvar_pendencias(dados)
+    return dados
+
+
+def link_issue(p, acao):
+    """Monta o link do GitHub que registra a decisao."""
+    from urllib.parse import quote as q
+    tag = "[MAPA]" if acao == "aprovar" else "[MAPA-RECUSAR]"
+    titulo = f"{tag} {p['id']} blend -> {p['novo']}"
+    corpo = (
+        f"Pais: {p['pais']} ({p['id']})\n"
+        f"De: {p['atual']}\n"
+        f"Para: {p['novo']}\n\n"
+        f"Noticia: {p['noticia_titulo']}\n"
+        f"{p['noticia_url']}\n\n"
+        "```json\n"
+        + json.dumps({"id": p["id"], "novo": p["novo"]}, ensure_ascii=False)
+        + "\n```\n\n"
+        "Envie esta issue para confirmar. O robo aplica a alteracao e fecha sozinho."
+    )
+    return f"https://github.com/{REPO}/issues/new?title={q(titulo)}&body={q(corpo)}"
+
+
+# ==========================================================
 #  COLETA
 # ==========================================================
 
@@ -780,6 +920,128 @@ function renderCards() {{
 </body>
 </html>"""
 
+def render_pendencias(dados):
+    """Gera a pagina de solicitacoes de alteracao do mapa."""
+    pend = dados.get("pendentes", [])
+    now  = datetime.now(timezone.utc).strftime("%d/%m/%Y as %H:%M UTC")
+
+    cards = ""
+    for p in pend:
+        cards += f"""
+    <div class="req">
+      <div class="req-head">
+        <span class="req-pais">{html.escape(p['pais'])}</span>
+        <span class="req-data">detectado em {html.escape(p['detectado_em'])}</span>
+      </div>
+      <div class="req-mud">
+        <span class="pill old">{html.escape(p['atual'])}</span>
+        <span class="seta">passa a</span>
+        <span class="pill new">{html.escape(p['novo'])}</span>
+      </div>
+      <div class="req-just">{html.escape(p['justificativa'])}</div>
+      <div class="prova">
+        <div class="prova-tag">Noticia usada como prova</div>
+        <a class="prova-titulo" href="{html.escape(p['noticia_url'])}" target="_blank" rel="noopener">{html.escape(p['noticia_titulo'])}</a>
+        <div class="prova-fonte">{html.escape(p['noticia_fonte'])}</div>
+      </div>
+      <div class="req-acoes">
+        <a class="btn ok"  href="{link_issue(p, 'aprovar')}" target="_blank" rel="noopener">Aprovar e atualizar o mapa</a>
+        <a class="btn no"  href="{link_issue(p, 'recusar')}" target="_blank" rel="noopener">Recusar</a>
+      </div>
+    </div>"""
+
+    if not pend:
+        cards = """
+    <div class="vazio">
+      <div class="vazio-t">Nenhuma solicitacao pendente</div>
+      <div class="vazio-d">Quando uma noticia indicar mudanca de mandato de mistura,
+      a solicitacao aparece aqui para a sua aprovacao.</div>
+    </div>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aprovacoes - BioFuel Monitor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
+  :root{{
+    --bg:#111318;--bg2:#1c1f26;--bg3:#23272f;--border:#2a2f3a;--border2:#363c4a;
+    --text:#e8edf5;--text2:#7c8799;--text3:#404855;--accent:#2bc4a0;--accent-l:#3dd6a0;
+    --warn:#f0b84d;
+  }}
+  body{{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:50px}}
+  .navbar{{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}}
+  .nav-logo{{display:flex;align-items:center;gap:8px;text-decoration:none}}
+  .nav-logo-mark{{width:28px;height:28px;background:linear-gradient(135deg,#2bc4a0,#065c3d);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}}
+  .nav-logo-name{{font-size:13px;font-weight:700;color:var(--text)}}
+  .nav-tabs{{display:flex;gap:4px}}
+  .nav-tab{{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;border:1px solid transparent}}
+  .nav-tab:hover{{color:var(--text);background:var(--bg3)}}
+  .nav-tab.active{{background:var(--bg3);border-color:var(--border2);color:var(--text)}}
+  .header{{padding:22px 20px 6px}}
+  .header h1{{font-size:21px;font-weight:700;letter-spacing:-.3px}}
+  .header p{{font-size:12px;color:var(--text3);margin-top:6px}}
+  .aviso{{margin:16px 20px;padding:12px 14px;background:rgba(240,184,77,.07);border:1px solid rgba(240,184,77,.25);border-radius:10px;font-size:12px;color:#f0c877;line-height:1.6}}
+  .wrap{{padding:6px 20px;display:flex;flex-direction:column;gap:14px}}
+  .req{{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px}}
+  .req-head{{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}}
+  .req-pais{{font-size:17px;font-weight:700}}
+  .req-data{{font-size:11px;color:var(--text3)}}
+  .req-mud{{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}}
+  .pill{{padding:5px 14px;border-radius:8px;font-size:15px;font-weight:700;border:1px solid}}
+  .pill.old{{background:var(--bg3);border-color:var(--border2);color:var(--text2)}}
+  .pill.new{{background:rgba(43,196,160,.1);border-color:var(--accent);color:var(--accent-l)}}
+  .seta{{font-size:12px;color:var(--text3)}}
+  .req-just{{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px}}
+  .prova{{background:var(--bg3);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;margin-bottom:16px}}
+  .prova-tag{{font-size:10px;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);margin-bottom:7px}}
+  .prova-titulo{{font-size:13px;font-weight:500;color:var(--text);text-decoration:none;line-height:1.45;display:block}}
+  .prova-titulo:hover{{color:var(--accent-l);text-decoration:underline}}
+  .prova-fonte{{font-size:11px;color:var(--text3);margin-top:6px}}
+  .req-acoes{{display:flex;gap:10px;flex-wrap:wrap}}
+  .btn{{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none;border:1px solid;transition:all .15s}}
+  .btn.ok{{background:var(--accent);border-color:var(--accent);color:#08130f}}
+  .btn.ok:hover{{background:var(--accent-l)}}
+  .btn.no{{background:transparent;border-color:var(--border2);color:var(--text2)}}
+  .btn.no:hover{{border-color:#c05a5a;color:#e08080}}
+  .vazio{{padding:60px 20px;text-align:center}}
+  .vazio-t{{font-size:16px;font-weight:600;margin-bottom:10px}}
+  .vazio-d{{font-size:13px;color:var(--text2);line-height:1.65;max-width:420px;margin:0 auto}}
+  @media(max-width:640px){{.navbar{{padding:0 14px}}.header,.wrap,.aviso{{padding-left:14px;padding-right:14px}}}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-mark">B</div>
+    <span class="nav-logo-name">BioFuel Monitor</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="index.html">Noticias</a>
+    <a class="nav-tab" href="mapa-mandatos.html">Blending</a>
+    <a class="nav-tab" href="mapa-saf.html">SAF</a>
+    <a class="nav-tab active" href="pendencias.html">Aprovacoes</a>
+  </div>
+</nav>
+<div class="header">
+  <h1>Solicitacoes de alteracao do mapa</h1>
+  <p>Atualizado em {now} &middot; {len(pend)} pendente(s)</p>
+</div>
+<div class="aviso">
+  Nada e alterado sem a sua aprovacao. Ao clicar em Aprovar, o GitHub abre com a
+  solicitacao ja preenchida: basta enviar para confirmar. Esse passo existe porque o
+  site e publico, e so quem tem acesso ao repositorio pode alterar os mapas.
+  Apenas o campo de percentual de mistura e modificado.
+</div>
+<div class="wrap">{cards}
+</div>
+</body>
+</html>"""
+
+
 def main():
     print("=" * 60)
     print("BioFuel Monitor - iniciando...")
@@ -798,6 +1060,11 @@ def main():
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(output)
     print("index.html gerado com sucesso!")
+
+    dados = detectar_mudancas_blend(items)
+    with open(PEND_HTML, "w", encoding="utf-8") as f:
+        f.write(render_pendencias(dados))
+    print(f"{PEND_HTML} gerado ({len(dados['pendentes'])} pendencia(s)).")
 
 
 if __name__ == "__main__":
