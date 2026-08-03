@@ -20,9 +20,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Instalar dependências
-        run: pip install -r requirements.txt
-
       - name: Buscar notícias e gerar index.html
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
