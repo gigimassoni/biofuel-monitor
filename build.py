@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 BioFuel Monitor - Raizen Novos Negocios
-Google News RSS para buscar noticias com filtro por palavras-chave.
+Google News RSS + Gemini (modelo descoberto automaticamente via ListModels)
 """
 
 import html
@@ -13,7 +13,167 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from urllib.parse import quote
 
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 
+# Descobertos automaticamente em tempo de execucao
+_MODEL = None
+_API_VERSION = None
+_CANDIDATES = []    # modelos alternativos, em ordem de preferencia
+_GEMINI_OK = True   # vira False se a descoberta falhar (evita repetir chamadas)
+
+
+# ==========================================================
+#  DESCOBERTA AUTOMATICA DO MODELO (ListModels)
+# ==========================================================
+
+def _score_model(name: str) -> int:
+    """Pontua um modelo: preferimos flash/lite recentes e de texto."""
+    low = name.lower()
+    score = 0
+    # tipos que NAO servem para resumo de texto
+    for bad in ("embedding", "aqa", "imagen", "veo", "tts", "audio",
+                "image", "vision", "live", "learnlm", "gemma"):
+        if bad in low:
+            return -999
+    if "flash" in low:
+        score += 100
+    if "lite" in low:
+        score += 10
+    if "pro" in low:
+        score += 40
+    if "preview" in low or "-exp" in low or "experimental" in low:
+        score -= 8
+    if "thinking" in low:
+        score -= 15
+    # versao: gemini-3.1-... ou gemini-3-...
+    mv = re.search(r"gemini-(\d+)(?:\.(\d+))?", low)
+    if mv:
+        score += int(mv.group(1)) * 40
+        if mv.group(2):
+            score += int(mv.group(2)) * 4
+    return score
+
+
+def _list_models(version: str):
+    """Chama ListModels e devolve nomes que suportam generateContent."""
+    usable, page_token, pages = [], None, 0
+    while pages < 5:
+        url = f"https://generativelanguage.googleapis.com/{version}/models?pageSize=200"
+        if page_token:
+            url += f"&pageToken={page_token}"
+        req = urllib.request.Request(url, headers={"x-goog-api-key": GEMINI_API_KEY})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        for m in data.get("models", []):
+            name = m.get("name", "").replace("models/", "")
+            methods = m.get("supportedGenerationMethods") or m.get("supportedActions") or []
+            if "generateContent" in methods:
+                usable.append(name)
+        page_token = data.get("nextPageToken")
+        pages += 1
+        if not page_token:
+            break
+    return usable
+
+
+def discover_model():
+    """Descobre qual modelo a SUA chave pode usar. Roda uma unica vez."""
+    global _MODEL, _API_VERSION, _GEMINI_OK
+    if _MODEL or not _GEMINI_OK:
+        return _MODEL, _API_VERSION
+    if not GEMINI_API_KEY:
+        print("  [GEMINI] Nenhuma chave encontrada.")
+        _GEMINI_OK = False
+        return None, None
+
+    print("  [GEMINI] Descobrindo modelos disponiveis para a sua chave...")
+    for version in ("v1beta", "v1"):
+        try:
+            usable = _list_models(version)
+        except Exception as e:
+            print(f"    [{version}] ListModels falhou: {e}")
+            continue
+
+        if not usable:
+            print(f"    [{version}] nenhum modelo com generateContent.")
+            continue
+
+        print(f"    [{version}] modelos disponiveis ({len(usable)}):")
+        for n in usable:
+            print(f"        - {n}")
+
+        ranked = sorted(usable, key=_score_model, reverse=True)
+        best = [n for n in ranked if _score_model(n) > -999]
+        if not best:
+            continue
+        globals()["_CANDIDATES"] = best[1:6]
+        _MODEL, _API_VERSION = best[0], version
+        print(f"    >>> MODELO ESCOLHIDO: {_MODEL}  (API {version})")
+        return _MODEL, _API_VERSION
+
+    print("    [GEMINI] Nao foi possivel descobrir nenhum modelo utilizavel.")
+    _GEMINI_OK = False
+    return None, None
+
+
+def gemini_call(prompt: str, max_tokens: int = 2000, temperature: float = 0.2) -> str:
+    """Chama o Gemini com o modelo descoberto. Devolve texto ou string vazia."""
+    global _GEMINI_OK
+    if not _GEMINI_OK:
+        return ""
+    model, version = discover_model()
+    if not model:
+        return ""
+
+    payload = json.dumps({
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens},
+    }).encode("utf-8")
+
+    url = f"https://generativelanguage.googleapis.com/{version}/models/{model}:generateContent"
+    req = urllib.request.Request(
+        url, data=payload,
+        headers={"Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=90) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+    except Exception as e:
+        print(f"    [GEMINI] {model} falhou: {e}")
+        # troca para o proximo modelo da lista e tenta de novo (uma vez)
+        if _CANDIDATES:
+            proximo = _CANDIDATES.pop(0)
+            print(f"    [GEMINI] trocando para: {proximo}")
+            globals()["_MODEL"] = proximo
+            return gemini_call(prompt, max_tokens, temperature)
+        print("    [GEMINI] sem modelos alternativos - seguindo sem IA.")
+        globals()["_GEMINI_OK"] = False
+        return ""
+
+
+def _parse_json(text: str):
+    """Extrai JSON de uma resposta do modelo, tolerando markdown em volta."""
+    if not text:
+        return None
+    t = re.sub(r"```json|```", "", text).strip()
+    try:
+        return json.loads(t)
+    except Exception:
+        pass
+    m = re.search(r"[\{\[].*[\}\]]", t, re.DOTALL)
+    if m:
+        try:
+            return json.loads(m.group(0))
+        except Exception:
+            return None
+    return None
+
+
+# ==========================================================
+#  QUERIES E REGRAS
+# ==========================================================
 
 RSS_SEARCHES = [
     # SAF
@@ -40,44 +200,77 @@ RSS_SEARCHES = [
     {"cat": "blend", "query": '"ethanol blending" USA OR Canada OR "United States" policy 2026'},
 ]
 
-COUNTRY_RULES = [
-    ("🇧🇷", "Brasil",          ["brasil", "brazil", "brazilian", "petrobras", "anp", "renovabio", "embraer", "raizen"]),
-    ("🇺🇸", "EUA",             ["united states", " u.s.", "usa", "american", "faa", "epa", "washington", "california", "boeing"]),
-    ("🇪🇺", "Uniao Europeia",  ["european union", "eu commission", "brussels", "refueleu"]),
-    ("🇬🇧", "Reino Unido",     ["uk", "united kingdom", "britain", "british", "london", "heathrow"]),
-    ("🇩🇪", "Alemanha",        ["germany", "german", "berlin", "lufthansa"]),
-    ("🇫🇷", "Franca",          ["france", "french", "paris", "total energies", "airbus"]),
-    ("🇳🇱", "Paises Baixos",   ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
-    ("🇸🇬", "Singapura",       ["singapore", "singaporean", "changi"]),
-    ("🇨🇳", "China",           ["china", "chinese", "beijing", "sinopec"]),
-    ("🇯🇵", "Japao",           ["japan", "japanese", "tokyo"]),
-    ("🇮🇳", "India",           ["india", "indian", "delhi", "mumbai"]),
-    ("🇦🇺", "Australia",       ["australia", "australian", "qantas"]),
-    ("🇨🇦", "Canada",          ["canada", "canadian"]),
-    ("🇦🇪", "Emirados Arabes", ["uae", "emirates", "dubai", "abu dhabi"]),
-    ("🇮🇩", "Indonesia",       ["indonesia", "indonesian", "jakarta"]),
-    ("🇻🇳", "Vietna",          ["vietnam", "vietnamese", "hanoi"]),
-    ("🇹🇭", "Tailandia",       ["thailand", "thai", "bangkok"]),
-    ("🇵🇭", "Filipinas",       ["philippines", "manila"]),
-    ("🇳🇴", "Noruega",         ["norway", "norwegian"]),
-    ("🇿🇦", "Africa do Sul",   ["south africa", "johannesburg"]),
-    ("🇦🇷", "Argentina",       ["argentina", "buenos aires"]),
-    ("🇨🇴", "Colombia",        ["colombia", "bogota"]),
-    ("🇲🇾", "Malasia",         ["malaysia", "kuala lumpur", "petronas"]),
-    ("🇰🇷", "Coreia do Sul",   ["south korea", "korean", "seoul"]),
-    ("🇳🇬", "Nigeria",         ["nigeria", "lagos"]),
-    ("🇨🇱", "Chile",           ["chile", "chilean", "santiago"]),
-    ("🇪🇸", "Espanha",         ["spain", "spanish", "madrid", "repsol", "iberia"]),
-    ("🇮🇹", "Italia",          ["italy", "italian", "rome", "eni"]),
+NOISE = [
+    "golf", "golfe", "bunker shot", "british open", "ryder cup",
+    "football club", "futebol", "soccer", "premier league", "champions league",
+    "flamengo", "corinthians", "palmeiras", "sociedade anonima do futebol",
+    "arbitration report", "kluwer", "law review", "legal journal",
+    "week in technology", "capa airline leader summit",
+    "sign up to read", "start a free trial", "access newswire", "tradingview",
 ]
 
+COUNTRY_RULES = [
+    ("BR", "Brasil",          ["brasil", "brazil", "brazilian", "petrobras", "anp", "renovabio", "embraer", "raizen"]),
+    ("US", "EUA",             ["united states", " u.s.", "usa", "american", "faa", "epa", "washington", "california", "boeing"]),
+    ("EU", "Uniao Europeia",  ["european union", "eu commission", "brussels", "refueleu"]),
+    ("GB", "Reino Unido",     ["uk", "united kingdom", "britain", "british", "london", "heathrow"]),
+    ("DE", "Alemanha",        ["germany", "german", "berlin", "lufthansa"]),
+    ("FR", "Franca",          ["france", "french", "paris", "total energies", "airbus", "cma cgm"]),
+    ("NL", "Paises Baixos",   ["netherlands", "dutch", "rotterdam", "amsterdam", "shell"]),
+    ("SG", "Singapura",       ["singapore", "singaporean", "changi"]),
+    ("CN", "China",           ["china", "chinese", "beijing", "sinopec"]),
+    ("JP", "Japao",           ["japan", "japanese", "tokyo"]),
+    ("IN", "India",           ["india", "indian", "delhi", "mumbai"]),
+    ("AU", "Australia",       ["australia", "australian", "qantas"]),
+    ("CA", "Canada",          ["canada", "canadian"]),
+    ("AE", "Emirados Arabes", ["uae", "emirates", "dubai", "abu dhabi"]),
+    ("ID", "Indonesia",       ["indonesia", "indonesian", "jakarta"]),
+    ("VN", "Vietna",          ["vietnam", "vietnamese", "hanoi"]),
+    ("TH", "Tailandia",       ["thailand", "thai", "bangkok"]),
+    ("PH", "Filipinas",       ["philippines", "manila"]),
+    ("NO", "Noruega",         ["norway", "norwegian"]),
+    ("ZA", "Africa do Sul",   ["south africa", "johannesburg"]),
+    ("AR", "Argentina",       ["argentina", "buenos aires"]),
+    ("CO", "Colombia",        ["colombia", "bogota"]),
+    ("MY", "Malasia",         ["malaysia", "kuala lumpur", "petronas"]),
+    ("KR", "Coreia do Sul",   ["south korea", "korean", "seoul"]),
+    ("NG", "Nigeria",         ["nigeria", "lagos"]),
+    ("CL", "Chile",           ["chile", "chilean", "santiago"]),
+    ("ES", "Espanha",         ["spain", "spanish", "madrid", "repsol", "iberia"]),
+    ("IT", "Italia",          ["italy", "italian", "rome", "eni"]),
+]
 
-def detect_country(title, summary=""):
-    text = f" {title} {summary} ".lower()
-    for flag, name, keywords in COUNTRY_RULES:
+FLAGS = {
+    "BR": "\U0001F1E7\U0001F1F7", "US": "\U0001F1FA\U0001F1F8", "EU": "\U0001F1EA\U0001F1FA",
+    "GB": "\U0001F1EC\U0001F1E7", "DE": "\U0001F1E9\U0001F1EA", "FR": "\U0001F1EB\U0001F1F7",
+    "NL": "\U0001F1F3\U0001F1F1", "SG": "\U0001F1F8\U0001F1EC", "CN": "\U0001F1E8\U0001F1F3",
+    "JP": "\U0001F1EF\U0001F1F5", "IN": "\U0001F1EE\U0001F1F3", "AU": "\U0001F1E6\U0001F1FA",
+    "CA": "\U0001F1E8\U0001F1E6", "AE": "\U0001F1E6\U0001F1EA", "ID": "\U0001F1EE\U0001F1E9",
+    "VN": "\U0001F1FB\U0001F1F3", "TH": "\U0001F1F9\U0001F1ED", "PH": "\U0001F1F5\U0001F1ED",
+    "NO": "\U0001F1F3\U0001F1F4", "ZA": "\U0001F1FF\U0001F1E6", "AR": "\U0001F1E6\U0001F1F7",
+    "CO": "\U0001F1E8\U0001F1F4", "MY": "\U0001F1F2\U0001F1FE", "KR": "\U0001F1F0\U0001F1F7",
+    "NG": "\U0001F1F3\U0001F1EC", "CL": "\U0001F1E8\U0001F1F1", "ES": "\U0001F1EA\U0001F1F8",
+    "IT": "\U0001F1EE\U0001F1F9", "XX": "\U0001F310",
+}
+
+
+# ==========================================================
+#  HELPERS
+# ==========================================================
+
+def detect_country(title, desc=""):
+    text = f" {title} {desc} ".lower()
+    for code, name, keywords in COUNTRY_RULES:
         if any(k in text for k in keywords):
-            return flag, name
-    return "🌐", "Global"
+            return FLAGS.get(code, FLAGS["XX"]), name
+    return FLAGS["XX"], "Global"
+
+
+def is_noise(title, desc=""):
+    text = f"{title} {desc}".lower()
+    if title.strip().startswith("[PDF]"):
+        return True
+    return any(n in text for n in NOISE)
 
 
 def normalize_title(title):
@@ -122,161 +315,120 @@ def fetch_rss(query):
         root = ET.fromstring(raw)
         items = []
         for item in root.findall(".//item")[:5]:
-            title  = item.findtext("title") or ""
-            title  = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
-            link   = item.findtext("link") or ""
-            desc   = item.findtext("description") or ""
-            date   = item.findtext("pubDate") or ""
+            title = item.findtext("title") or ""
+            title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
+            link  = item.findtext("link") or ""
+            desc  = item.findtext("description") or ""
+            date  = item.findtext("pubDate") or ""
             source = ""
-            m = re.search(r"<font[^>]*>([^<]+)</font>", desc)
-            if m:
-                source = m.group(1).strip()
+            ms = re.search(r"<font[^>]*>([^<]+)</font>", desc)
+            if ms:
+                source = ms.group(1).strip()
+            desc_clean = re.sub(r"<[^>]+>", " ", desc)
+            desc_clean = re.sub(r"\s+", " ", desc_clean).strip()[:300]
             if title and link:
-                # Limpa a descricao do RSS (remove HTML)
-                desc_clean = re.sub(r"<[^>]+>", "", desc).strip()
-                desc_clean = re.sub(r"\s+", " ", desc_clean)[:300]
-                items.append({"title": title, "url": link, "date": date, "source": source, "desc": desc_clean})
+                items.append({"title": title, "url": link, "date": date,
+                              "source": source, "desc": desc_clean})
         return items
     except Exception as e:
         print(f"    AVISO RSS: {e}")
         return []
 
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+# ==========================================================
+#  FILTRO E RESUMO
+# ==========================================================
+
+def simple_filter(all_items):
+    """Fallback sem IA: descarta ruido obvio."""
+    kept = [i for i in all_items if not is_noise(i["title"], i.get("desc", ""))]
+    print(f"    Filtro por palavras-chave: {len(all_items)} -> {len(kept)}")
+    return kept
 
 
-def gemini_summarize_batch(items_batch: list) -> dict:
-    """Gera resumos em lote usando a biblioteca oficial google-genai."""
-    if not GEMINI_API_KEY or not items_batch:
-        return {}
-
-    try:
-        from google import genai
-        client = genai.Client(api_key=GEMINI_API_KEY, http_options={"api_version": "v1"})
-
-        prompt_items = []
-        for idx, item in enumerate(items_batch):
-            desc = item.get("desc", "")
-            entry = f"ID {idx+1}:\nTitulo: {item['title']}"
-            if desc:
-                entry += f"\nDescricao: {desc}"
-            prompt_items.append(entry)
-
-        news_block = "\n\n".join(prompt_items)
-        prompt = (
-            "Voce e um analista especialista em biocombustiveis (SAF, Biobunker, Blending).\n"
-            "Para CADA noticia abaixo, faca um resumo objetivo em portugues de 2 a 3 frases "
-            "focado no mercado e nos impactos comerciais e regulatorios.\n\n"
-            "Retorne APENAS um JSON: {\"1\": \"Resumo...\", \"2\": \"Resumo...\"}\n\n"
-            f"NOTICIAS:\n{news_block}"
-        )
-
-        response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
-            contents=prompt
-        )
-
-        text = response.text.strip()
-        text = re.sub(r"```json|```", "", text).strip()
-        try:
-            return json.loads(text)
-        except Exception:
-            m = re.search(r'\{.*\}', text, re.DOTALL)
-            if m:
-                return json.loads(m.group(0))
-        return {}
-
-    except Exception as e:
-        print(f"    AVISO Gemini: {e}")
-        return {}
-
-
-def gemini_filter(items_by_cat: dict) -> list:
-    """Usa Gemini para selecionar apenas noticias relevantes."""
-    all_items = []
-    for cat in ["saf", "bio", "blend"]:
-        for item in items_by_cat.get(cat, []):
-            item["category"] = cat
-            all_items.append(item)
-
-    if not all_items or not GEMINI_API_KEY:
-        return all_items
+def gemini_filter(all_items):
+    """Seleciona as noticias relevantes usando o Gemini."""
+    if not all_items:
+        return []
+    if not _GEMINI_OK or not GEMINI_API_KEY:
+        return simple_filter(all_items)
 
     print(f"  Filtrando {len(all_items)} noticias com Gemini...")
-
-    numbered = "\n".join([
-        f"{i+1}. [{item['category'].upper()}] {item['title']}"
-        for i, item in enumerate(all_items)
-    ])
-
+    numbered = "\n".join(
+        f"{i+1}. [{it['category'].upper()}] {it['title']}"
+        for i, it in enumerate(all_items)
+    )
     prompt = (
-        "Voce e um analista especializado em biocombustiveis para uma empresa de etanol (Raizen).\n"
-        "Avalie cada noticia e retorne APENAS os numeros das RELEVANTES.\n\n"
-        "Descarte: esportes, juridico, preco de gasolina sem etanol, agregadores, duplicatas.\n"
-        "Para BLENDING: nao selecione mais de 3 do mesmo pais.\n\n"
-        "Retorne APENAS JSON: {\"relevantes\": [1, 3, 5, ...]}\n\n"
+        "Voce e analista de novos negocios de etanol na Raizen.\n"
+        "Abaixo ha titulos de noticias sobre SAF (combustivel de aviacao), "
+        "Biobunker (combustivel maritimo) e Blending (mistura etanol+gasolina).\n\n"
+        "Retorne os numeros das noticias RELEVANTES para o setor.\n"
+        "Descarte: esporte, juridico, preco de gasolina sem contexto de biocombustivel, "
+        "agregadores de noticias, paginas de indice e duplicatas.\n"
+        "Em BLENDING, no maximo 3 noticias do mesmo pais - priorize diversidade geografica.\n\n"
+        "Responda SOMENTE com JSON: {\"relevantes\": [1, 3, 5]}\n\n"
         f"NOTICIAS:\n{numbered}"
     )
 
-    try:
-        from google import genai
-        client = genai.Client(api_key=GEMINI_API_KEY, http_options={"api_version": "v1"})
-        response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
-            contents=prompt
-        )
-        text = re.sub(r"```json|```", "", response.text).strip()
-        result = json.loads(text)
-        indices = [i - 1 for i in result.get("relevantes", []) if 1 <= i <= len(all_items)]
-        filtered = [all_items[i] for i in indices]
-        print(f"    Gemini: {len(all_items)} -> {len(filtered)} relevantes")
-        return filtered
-    except Exception as e:
-        print(f"    AVISO filtro Gemini: {e}")
-        return all_items
+    result = _parse_json(gemini_call(prompt, max_tokens=1500, temperature=0.1))
+    if not result or "relevantes" not in result:
+        print("    Gemini nao retornou lista valida - usando filtro por palavras-chave.")
+        return simple_filter(all_items)
+
+    idxs = [i - 1 for i in result["relevantes"] if isinstance(i, int) and 1 <= i <= len(all_items)]
+    kept = [all_items[i] for i in idxs]
+    if not kept:
+        return simple_filter(all_items)
+    print(f"    Gemini: {len(all_items)} -> {len(kept)} noticias relevantes")
+    return kept
 
 
-def simple_filter(items_by_cat: dict) -> list:
-    """Filtra noticias por palavras-chave relevantes."""
-    NOISE = [
-        "golf", "golfe", "bunker shot", "british open", "ryder cup",
-        "football club", "futebol", "soccer", "premier league",
-        "champions league", "flamengo", "corinthians", "palmeiras",
-        "arbitration report", "law review", "legal journal",
-        "week in technology", "sign up to read", "start a free trial",
-        "access newswire", "tradingview",
-    ]
+def gemini_summarize_batch(batch):
+    """Resume um lote de noticias em UMA chamada. Usa titulo + descricao do RSS."""
+    if not batch or not _GEMINI_OK or not GEMINI_API_KEY:
+        return {}
 
-    all_items = []
-    for cat in ["saf", "bio", "blend"]:
-        for item in items_by_cat.get(cat, []):
-            item["category"] = cat
-            title_lower = item["title"].lower()
-            if not any(n in title_lower for n in NOISE):
-                all_items.append(item)
+    blocks = []
+    for idx, it in enumerate(batch):
+        entry = f"ID {idx+1}:\nTitulo: {it['title']}"
+        if it.get("desc"):
+            entry += f"\nResumo da fonte: {it['desc']}"
+        blocks.append(entry)
 
-    print(f"    Filtro simples: {sum(len(v) for v in items_by_cat.values())} -> {len(all_items)} noticias")
-    return all_items
+    prompt = (
+        "Voce e analista do mercado de biocombustiveis (SAF, biobunker maritimo e "
+        "mistura etanol+gasolina).\n"
+        "Para CADA noticia abaixo, escreva 2 a 3 frases em portugues explicando o que "
+        "aconteceu e por que importa para o mercado de etanol. Baseie-se apenas nas "
+        "informacoes fornecidas, sem inventar dados.\n\n"
+        "Responda SOMENTE com JSON, chaves iguais aos IDs:\n"
+        "{\"1\": \"resumo...\", \"2\": \"resumo...\"}\n\n"
+        f"NOTICIAS:\n\n" + "\n\n".join(blocks)
+    )
 
+    result = _parse_json(gemini_call(prompt, max_tokens=4000, temperature=0.25))
+    if not isinstance(result, dict):
+        return {}
+    return {str(k).strip(): str(v).strip() for k, v in result.items()}
+
+
+# ==========================================================
+#  COLETA
+# ==========================================================
 
 def fetch_news():
-    seen_urls   = set()
-    seen_titles = set()
-    items_by_cat = {"saf": [], "bio": [], "blend": []}
+    seen_urls, seen_titles = set(), set()
+    all_items = []
 
     for search in RSS_SEARCHES:
-        cat   = search["cat"]
-        query = search["query"]
-        print(f"  [{cat.upper()}] {query[:60]}...")
+        cat, query = search["cat"], search["query"]
+        print(f"  [{cat.upper()}] {query[:58]}...")
         rss_items = fetch_rss(query)
         print(f"    Retornou {len(rss_items)} itens")
 
         for r in rss_items:
-            url   = r["url"]
-            title = r["title"]
-            if not url or not title:
-                continue
-            if url in seen_urls:
+            url, title = r["url"], r["title"]
+            if not url or not title or url in seen_urls:
                 continue
             norm = normalize_title(title)
             if norm in seen_titles:
@@ -284,45 +436,45 @@ def fetch_news():
             seen_urls.add(url)
             seen_titles.add(norm)
 
-            flag, country = detect_country(title)
-            items_by_cat[cat].append({
-                "title":    title,
-                "url":      url,
-                "source":   r["source"],
-                "desc":     r.get("desc", ""),
-                "date_str": fmt_date(r["date"]),
-                "date_raw": r["date"],
-                "flag":     flag,
-                "country":  country,
-                "summary":  ""
+            flag, country = detect_country(title, r.get("desc", ""))
+            all_items.append({
+                "title": title, "url": url, "source": r["source"],
+                "desc": r.get("desc", ""),
+                "date_str": fmt_date(r["date"]), "date_raw": r["date"],
+                "flag": flag, "country": country,
+                "category": cat, "summary": "",
             })
 
-    print(f"  Total coletado: SAF={len(items_by_cat['saf'])} | Bio={len(items_by_cat['bio'])} | Blend={len(items_by_cat['blend'])}")
+    n_saf   = sum(1 for i in all_items if i["category"] == "saf")
+    n_bio   = sum(1 for i in all_items if i["category"] == "bio")
+    n_blend = sum(1 for i in all_items if i["category"] == "blend")
+    print(f"  Total coletado: SAF={n_saf} | Bio={n_bio} | Blend={n_blend}")
 
-    # 1. Filtra com Gemini (ou palavras-chave se Gemini falhar)
-    if GEMINI_API_KEY:
-        filtered = gemini_filter(items_by_cat)
-    else:
-        filtered = simple_filter(items_by_cat)
-
-    # 2. Ordena por data
+    filtered = gemini_filter(all_items)
     filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
 
-    # 3. Gera resumos com Gemini (v1 API)
-    if GEMINI_API_KEY and filtered:
-        print(f"  Gerando resumos para {min(20, len(filtered))} noticias...")
-        top = filtered[:20]
-        resumos = gemini_summarize_batch(top)
-        for idx, item in enumerate(top):
-            item["summary"] = resumos.get(str(idx + 1), "")
-        for item in filtered[20:]:
-            item["summary"] = ""
-    else:
-        for item in filtered:
-            item["summary"] = ""
+    if _GEMINI_OK and GEMINI_API_KEY and filtered:
+        batch_size = 10
+        total_lotes = (len(filtered) - 1) // batch_size + 1
+        print(f"  Gerando resumos de {len(filtered)} noticias em {total_lotes} lote(s)...")
+        ok = 0
+        for i in range(0, len(filtered), batch_size):
+            batch = filtered[i:i + batch_size]
+            print(f"    Lote {i // batch_size + 1}/{total_lotes}...")
+            resumos = gemini_summarize_batch(batch)
+            for idx, item in enumerate(batch):
+                texto = resumos.get(str(idx + 1), "")
+                item["summary"] = texto
+                if texto:
+                    ok += 1
+        print(f"  Resumos gerados com sucesso: {ok}/{len(filtered)}")
 
     return filtered
 
+
+# ==========================================================
+#  HTML
+# ==========================================================
 
 def render_html(items):
     now    = datetime.now(timezone.utc).strftime("%d/%m/%Y as %H:%M UTC")
@@ -336,17 +488,17 @@ def render_html(items):
 
     cards_html = ""
     for idx, item in enumerate(items):
-        delay          = min(idx * 15, 500)
-        url_esc        = html.escape(item["url"])
-        title_esc      = html.escape(item["title"])
-        summary_esc    = html.escape(item.get("summary", "") or "Resumo nao disponivel para esta noticia.")
-        date_esc       = html.escape(item["date_str"])
-        country_esc    = html.escape(item["country"])
-        source_esc     = html.escape(item["source"])
-        title_low      = html.escape(item["title"].lower())
-        cat            = item["category"]
-        label          = labels[cat]
-        flag           = item["flag"]
+        delay       = min(idx * 15, 500)
+        url_esc     = html.escape(item["url"])
+        title_esc   = html.escape(item["title"])
+        summary_esc = html.escape(item.get("summary") or "Resumo nao disponivel para esta noticia.")
+        date_esc    = html.escape(item["date_str"])
+        country_esc = html.escape(item["country"])
+        source_esc  = html.escape(item["source"])
+        title_low   = html.escape(item["title"].lower())
+        cat         = item["category"]
+        label       = labels[cat]
+        flag        = item["flag"]
 
         cards_html += f"""
     <div class="news-card" data-cat="{cat}" data-title="{title_low}" style="animation-delay:{delay}ms">
@@ -359,10 +511,10 @@ def render_html(items):
       </div>
       <div class="news-summary" id="summary-{idx}" style="display:none">{summary_esc}</div>
       <div class="news-footer">
-        <span class="news-source">{flag} {country_esc} · {source_esc}</span>
+        <span class="news-source">{flag} {country_esc} &middot; {source_esc}</span>
         <div class="news-actions">
-          <button class="btn-resumo" onclick="toggleResumo({idx})" id="btn-{idx}">📄 Resumo</button>
-          <a class="news-read" href="{url_esc}" target="_blank" rel="noopener">Ler →</a>
+          <button class="btn-resumo" onclick="toggleResumo({idx})" id="btn-{idx}">Resumo</button>
+          <a class="news-read" href="{url_esc}" target="_blank" rel="noopener">Ler</a>
         </div>
       </div>
     </div>"""
@@ -370,7 +522,7 @@ def render_html(items):
     if not items:
         cards_html = """
     <div class="empty">
-      <div class="empty-icon">📭</div>
+      <div class="empty-icon">-</div>
       <div class="empty-title">Nenhuma noticia encontrada hoje</div>
       <div class="empty-desc">Tente rodar novamente mais tarde.</div>
     </div>"""
@@ -540,10 +692,16 @@ function renderCards() {{
 </body>
 </html>"""
 
-
 def main():
+    print("=" * 60)
     print("BioFuel Monitor - iniciando...")
-    print("Modo: filtro por palavras-chave (sem IA)")
+    if GEMINI_API_KEY:
+        print(f"GEMINI_API_KEY presente (inicio: {GEMINI_API_KEY[:6]}..., "
+              f"{len(GEMINI_API_KEY)} caracteres)")
+        discover_model()
+    else:
+        print("GEMINI_API_KEY AUSENTE - rodando sem IA (filtro por palavras-chave).")
+    print("=" * 60)
 
     items = fetch_news()
     print(f"Total final: {len(items)} noticias")
