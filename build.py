@@ -16,7 +16,9 @@ from urllib.parse import quote
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 
-MAX_PER_QUERY   = 15    # itens por busca no Google News (antes: 5)
+MAX_PER_QUERY   = 15    # itens por busca no Google News
+JANELA          = "when:7d"   # so noticias dos ultimos 7 dias.
+                              # use "when:1d" para so hoje, ou "" para desligar.
 FILTER_CHUNK    = 60    # titulos por chamada de filtro
 SUMMARY_BATCH   = 10    # noticias por chamada de resumo
 MIN_INTERVAL    = 7.0   # segundos minimos entre chamadas ao Gemini (limite 10/min)
@@ -308,7 +310,7 @@ def normalize_title(title):
 
 def fmt_date(date_str):
     if not date_str:
-        return "hoje"
+        return "sem data"
     try:
         from email.utils import parsedate_to_datetime
         d = parsedate_to_datetime(date_str)
@@ -322,15 +324,20 @@ def fmt_date(date_str):
 
 
 def parse_date_obj(date_str):
+    """Converte a data do RSS. Sempre devolve datetime com fuso, para ordenar sem erro."""
     try:
         from email.utils import parsedate_to_datetime
-        return parsedate_to_datetime(date_str)
+        d = parsedate_to_datetime(date_str)
+        if d.tzinfo is None:
+            d = d.replace(tzinfo=timezone.utc)
+        return d
     except Exception:
         return datetime.min.replace(tzinfo=timezone.utc)
 
 
 def build_rss_url(query):
-    return f"https://news.google.com/rss/search?q={quote(query)}&hl=en-US&gl=US&ceid=US:en"
+    q = f"{query} {JANELA}".strip() if JANELA else query
+    return f"https://news.google.com/rss/search?q={quote(q)}&hl=en-US&gl=US&ceid=US:en"
 
 
 def fetch_rss(query):
@@ -655,8 +662,27 @@ def fetch_news():
     n_blend = sum(1 for i in all_items if i["category"] == "blend")
     print(f"  Total coletado: SAF={n_saf} | Bio={n_bio} | Blend={n_blend}")
 
+    # ordena por data ANTES de filtrar, para que o primeiro bloco enviado ao Gemini
+    # seja sempre o das noticias mais recentes
+    all_items.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
+
     filtered = gemini_filter(all_items)
     filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
+
+    # quantas noticias de cada idade sobraram
+    agora = datetime.now(timezone.utc)
+    faixas = {"hoje": 0, "ontem": 0, "2-7 dias": 0, "mais antigas": 0}
+    for it in filtered:
+        d = parse_date_obj(it.get("date_raw", ""))
+        if d.year < 2000:
+            faixas["mais antigas"] += 1
+            continue
+        h = (agora - d).total_seconds() / 3600
+        if h < 24:    faixas["hoje"] += 1
+        elif h < 48:  faixas["ontem"] += 1
+        elif h < 168: faixas["2-7 dias"] += 1
+        else:         faixas["mais antigas"] += 1
+    print("  Idade das noticias: " + " | ".join(f"{k}={v}" for k, v in faixas.items()))
 
     if _GEMINI_OK and GEMINI_API_KEY and filtered:
         cache = carregar_cache()
