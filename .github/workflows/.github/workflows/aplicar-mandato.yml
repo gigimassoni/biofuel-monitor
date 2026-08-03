@@ -1,0 +1,53 @@
+name: Aplicar alteração de mandato
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  aplicar:
+    # só roda para issues criadas pelos botões da página de aprovações
+    if: startsWith(github.event.issue.title, '[MAPA]') || startsWith(github.event.issue.title, '[MAPA-RECUSAR]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Conferir quem solicitou
+        run: |
+          if [ "${{ github.event.issue.user.login }}" != "${{ github.repository_owner }}" ]; then
+            echo "Solicitação de terceiro (${{ github.event.issue.user.login }}). Ignorada."
+            exit 1
+          fi
+
+      - name: Aplicar alteração
+        id: aplicar
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: python aplicar_mandato.py | tee saida.txt
+
+      - name: Publicar alterações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add mapa-mandatos.html pendencias.json pendencias.html
+          git diff --staged --quiet || git commit -m "Mandato atualizado via aprovacao (issue #${{ github.event.issue.number }})"
+          git push
+
+      - name: Responder e fechar a solicitação
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MSG=$(grep '^RESULTADO=' saida.txt | sed 's/^RESULTADO=//')
+          gh issue comment ${{ github.event.issue.number }} --body "$MSG"
+          gh issue close ${{ github.event.issue.number }}
