@@ -8,12 +8,20 @@ import html
 import json
 import os
 import re
+import time
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from urllib.parse import quote
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+
+MAX_PER_QUERY   = 15    # itens por busca no Google News (antes: 5)
+FILTER_CHUNK    = 60    # titulos por chamada de filtro
+SUMMARY_BATCH   = 10    # noticias por chamada de resumo
+MIN_INTERVAL    = 7.0   # segundos minimos entre chamadas ao Gemini (limite 10/min)
+CACHE_FILE      = "resumos.json"
+CACHE_DIAS      = 45    # descarta resumos mais antigos que isso
 
 # Descobertos automaticamente em tempo de execucao
 _MODEL = None
@@ -116,11 +124,19 @@ def discover_model():
     return None, None
 
 
+_ULTIMA_CHAMADA = 0.0
+
+
 def gemini_call(prompt: str, max_tokens: int = 2000, temperature: float = 0.2) -> str:
     """Chama o Gemini com o modelo descoberto. Devolve texto ou string vazia."""
-    global _GEMINI_OK
+    global _GEMINI_OK, _ULTIMA_CHAMADA
     if not _GEMINI_OK:
         return ""
+    # respeita o limite de requisicoes por minuto
+    espera = MIN_INTERVAL - (time.time() - _ULTIMA_CHAMADA)
+    if espera > 0:
+        time.sleep(espera)
+    _ULTIMA_CHAMADA = time.time()
     model, version = discover_model()
     if not model:
         return ""
@@ -198,6 +214,14 @@ RSS_SEARCHES = [
     {"cat": "blend", "query": '"ethanol blend" Brazil OR Argentina OR Colombia OR Paraguay mandate'},
     {"cat": "blend", "query": '"ethanol blending" Indonesia OR Vietnam OR Thailand OR Philippines policy'},
     {"cat": "blend", "query": '"ethanol blending" USA OR Canada OR "United States" policy 2026'},
+    # cobertura adicional
+    {"cat": "saf",   "query": '"SAF" offtake OR agreement OR contract airline supply'},
+    {"cat": "saf",   "query": '"SAF" plant OR refinery construction capacity announcement'},
+    {"cat": "saf",   "query": '"SAF" ICAO OR ISCC OR RSB certification aviation fuel'},
+    {"cat": "bio",   "query": '"IMO" "Net-Zero Framework" OR "carbon intensity" shipping fuel'},
+    {"cat": "bio",   "query": '"green corridor" OR "green shipping" biofuel port bunkering'},
+    {"cat": "blend", "query": '"ethanol" export OR import market demand mandate country'},
+    {"cat": "blend", "query": '"flex fuel" OR "flex-fuel" ethanol gasoline vehicle policy'},
 ]
 
 NOISE = [
@@ -314,7 +338,7 @@ def fetch_rss(query):
             raw = resp.read()
         root = ET.fromstring(raw)
         items = []
-        for item in root.findall(".//item")[:5]:
+        for item in root.findall(".//item")[:MAX_PER_QUERY]:
             title = item.findtext("title") or ""
             title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
             link  = item.findtext("link") or ""
@@ -347,40 +371,81 @@ def simple_filter(all_items):
 
 
 def gemini_filter(all_items):
-    """Seleciona as noticias relevantes usando o Gemini."""
+    """Seleciona as noticias relevantes usando o Gemini, em blocos."""
     if not all_items:
         return []
     if not _GEMINI_OK or not GEMINI_API_KEY:
         return simple_filter(all_items)
 
-    print(f"  Filtrando {len(all_items)} noticias com Gemini...")
-    numbered = "\n".join(
-        f"{i+1}. [{it['category'].upper()}] {it['title']}"
-        for i, it in enumerate(all_items)
-    )
-    prompt = (
-        "Voce e analista de novos negocios de etanol na Raizen.\n"
-        "Abaixo ha titulos de noticias sobre SAF (combustivel de aviacao), "
-        "Biobunker (combustivel maritimo) e Blending (mistura etanol+gasolina).\n\n"
-        "Retorne os numeros das noticias RELEVANTES para o setor.\n"
-        "Descarte: esporte, juridico, preco de gasolina sem contexto de biocombustivel, "
-        "agregadores de noticias, paginas de indice e duplicatas.\n"
-        "Em BLENDING, no maximo 3 noticias do mesmo pais - priorize diversidade geografica.\n\n"
-        "Responda SOMENTE com JSON: {\"relevantes\": [1, 3, 5]}\n\n"
-        f"NOTICIAS:\n{numbered}"
-    )
+    # tira o ruido obvio antes de gastar chamada de IA
+    base = [i for i in all_items if not is_noise(i["title"], i.get("desc", ""))]
+    print(f"  Pre-filtro por palavras-chave: {len(all_items)} -> {len(base)}")
 
-    result = _parse_json(gemini_call(prompt, max_tokens=1500, temperature=0.1))
-    if not result or "relevantes" not in result:
-        print("    Gemini nao retornou lista valida - usando filtro por palavras-chave.")
-        return simple_filter(all_items)
+    total_blocos = (len(base) - 1) // FILTER_CHUNK + 1
+    print(f"  Filtrando {len(base)} noticias com Gemini em {total_blocos} bloco(s)...")
 
-    idxs = [i - 1 for i in result["relevantes"] if isinstance(i, int) and 1 <= i <= len(all_items)]
-    kept = [all_items[i] for i in idxs]
-    if not kept:
+    escolhidas = []
+    for b in range(total_blocos):
+        bloco = base[b * FILTER_CHUNK:(b + 1) * FILTER_CHUNK]
+        numbered = "\n".join(
+            f"{i+1}. [{it['category'].upper()}] {it['title']}"
+            for i, it in enumerate(bloco)
+        )
+        prompt = (
+            "Voce e analista de novos negocios de etanol na Raizen.\n"
+            "Abaixo ha titulos de noticias sobre SAF (combustivel de aviacao), "
+            "Biobunker (combustivel maritimo) e Blending (mistura etanol+gasolina).\n\n"
+            "Retorne os numeros de TODAS as noticias relevantes para o setor. "
+            "Seja INCLUSIVO: na duvida, mantenha a noticia. Politicas, mandatos, "
+            "producao, contratos, investimentos, tecnologia e mercado sao relevantes.\n"
+            "Descarte apenas: esporte, juridico sem ligacao com o setor, preco de "
+            "gasolina sem contexto de biocombustivel, agregadores, paginas de indice "
+            "e duplicatas.\n"
+            "Em BLENDING, no maximo 5 noticias do mesmo pais.\n\n"
+            "Responda SOMENTE com JSON: {\"relevantes\": [1, 3, 5]}\n\n"
+            f"NOTICIAS:\n{numbered}"
+        )
+        result = _parse_json(gemini_call(prompt, max_tokens=2000, temperature=0.1))
+        if not result or "relevantes" not in result:
+            print(f"    Bloco {b+1}: sem resposta valida - mantendo o bloco inteiro.")
+            escolhidas.extend(bloco)
+            continue
+        idxs = [i - 1 for i in result["relevantes"]
+                if isinstance(i, int) and 1 <= i <= len(bloco)]
+        sel = [bloco[i] for i in idxs]
+        print(f"    Bloco {b+1}/{total_blocos}: {len(bloco)} -> {len(sel)}")
+        escolhidas.extend(sel)
+
+    if not escolhidas:
         return simple_filter(all_items)
-    print(f"    Gemini: {len(all_items)} -> {len(kept)} noticias relevantes")
-    return kept
+    print(f"    Gemini selecionou {len(escolhidas)} noticias relevantes")
+    return escolhidas
+
+
+def carregar_cache():
+    """Le resumos ja gerados em execucoes anteriores."""
+    try:
+        with open(CACHE_FILE, encoding="utf-8") as f:
+            cache = json.load(f)
+        print(f"  Cache: {len(cache)} resumos guardados de execucoes anteriores.")
+        return cache
+    except Exception:
+        print("  Cache: nenhum arquivo anterior (primeira execucao).")
+        return {}
+
+
+def salvar_cache(cache):
+    """Grava o cache, descartando resumos antigos."""
+    limite = (datetime.now(timezone.utc) - timedelta(days=CACHE_DIAS)).strftime("%Y-%m-%d")
+    limpo = {k: v for k, v in cache.items()
+             if isinstance(v, dict) and v.get("data", "9999") >= limite}
+    try:
+        with open(CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(limpo, f, ensure_ascii=False, indent=1)
+        print(f"  Cache salvo: {len(limpo)} resumos "
+              f"({len(cache) - len(limpo)} antigos descartados).")
+    except Exception as e:
+        print(f"  AVISO ao salvar cache: {e}")
 
 
 def gemini_summarize_batch(batch):
@@ -454,20 +519,43 @@ def fetch_news():
     filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
 
     if _GEMINI_OK and GEMINI_API_KEY and filtered:
-        batch_size = 10
-        total_lotes = (len(filtered) - 1) // batch_size + 1
-        print(f"  Gerando resumos de {len(filtered)} noticias em {total_lotes} lote(s)...")
-        ok = 0
-        for i in range(0, len(filtered), batch_size):
-            batch = filtered[i:i + batch_size]
-            print(f"    Lote {i // batch_size + 1}/{total_lotes}...")
-            resumos = gemini_summarize_batch(batch)
-            for idx, item in enumerate(batch):
-                texto = resumos.get(str(idx + 1), "")
-                item["summary"] = texto
-                if texto:
-                    ok += 1
-        print(f"  Resumos gerados com sucesso: {ok}/{len(filtered)}")
+        cache = carregar_cache()
+        hoje  = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+        # aproveita o que ja foi resumido antes
+        novas = []
+        reaproveitados = 0
+        for item in filtered:
+            chave = normalize_title(item["title"])
+            guardado = cache.get(chave)
+            if isinstance(guardado, dict) and guardado.get("resumo"):
+                item["summary"] = guardado["resumo"]
+                guardado["data"] = hoje          # renova a validade
+                reaproveitados += 1
+            else:
+                novas.append(item)
+
+        print(f"  Resumos reaproveitados do cache: {reaproveitados}")
+        print(f"  Noticias novas para resumir: {len(novas)}")
+
+        if novas:
+            total_lotes = (len(novas) - 1) // SUMMARY_BATCH + 1
+            ok = 0
+            for i in range(0, len(novas), SUMMARY_BATCH):
+                lote = novas[i:i + SUMMARY_BATCH]
+                print(f"    Lote {i // SUMMARY_BATCH + 1}/{total_lotes}...")
+                resumos = gemini_summarize_batch(lote)
+                for idx, item in enumerate(lote):
+                    texto = resumos.get(str(idx + 1), "")
+                    item["summary"] = texto
+                    if texto:
+                        cache[normalize_title(item["title"])] = {
+                            "resumo": texto, "data": hoje,
+                        }
+                        ok += 1
+            print(f"  Resumos novos gerados: {ok}/{len(novas)}")
+
+        salvar_cache(cache)
 
     return filtered
 
