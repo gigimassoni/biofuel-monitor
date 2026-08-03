@@ -1,1 +1,1 @@
-google-genai
+# Sem dependencias externas - o script usa apenas a biblioteca padrao do Python
