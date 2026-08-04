@@ -1,59 +1,20 @@
 {
  "semana": "2026-S32",
- "itens": [
-  {
-   "titulo": "Governo Lula impõe 32% de etanol na gasolina a partir deste sábado (1º)",
-   "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQRUhnOHJGeC1XdHZCcVpBMzR4a1Q1cXRHTktCd3R4ZUNZNFZvcmkxWXVnSG54QndrSWZpYy1jOVY1YUVOZ0lUeGJoa056VmpDWkRzYjVZSVIxV1NjOHg2N041S1RGcm1JdG9UZ1MtOFdWR1JwZVRWQjBPajNvcmJBTWdsMkhEcWNWbktnakdsVjJPb0w3WUpwZklFSXJXUlVvUzkzRUYyOFV1eGN3U2gtWDdFdVZnZHF5bjJIcjZWUXZFTGFPZk5hT2Q4RdIBywFBVV95cUxQRUhnOHJGeC1XdHZCcVpBMzR4a1Q1cXRHTktCd3R4ZUNZNFZvcmkxWXVnSG54QndrSWZpYy1jOVY1YUVOZ0lUeGJoa056VmpDWkRzYjVZSVIxV1NjOHg2N041S1RGcm1JdG9UZ1MtOFdWR1JwZVRWQjBPajNvcmJBTWdsMkhEcWNWbktnakdsVjJPb0w3WUpwZklFSXJXUlVvUzkzRUYyOFV1eGN3U2gtWDdFdVZnZHF5bjJIcjZWUXZFTGFPZk5hT2Q4RQ?oc=5",
-   "fonte": "GP1",
-   "cat": "blend",
-   "data": "Sat, 01 Aug 2026 14:32:21 GMT",
-   "desde": "04/08",
-   "motivo": "A entrada em vigor da mistura de 32% de etanol na gasolina no Brasil eleva imediatamente o consumo interno do biocombustível e garante um patamar de demand robusto para a Raízen."
+ "temas": {
+  "saf": {
+   "texto": "Os Países Baixos obtiveram a aprovação da União Europeia para um subsídio de 290 milhões de euros destinado a combustíveis de aviação limpos sob o Clean Industrial Deal, enquanto a Air Canada e a Airbus lançaram uma plataforma de investimento para impulsionar a produção canadense de SAF. Além disso, a disputa global por matérias-primas essenciais, como o óleo de soja, tem gerado forte impacto nos preços devido à crescente demanda pelo biocombustível. Para quem vende etanol, o avanço regulatório e de subsídios na Europa e América do Norte consolida a demanda de longo prazo por insumos renováveis na aviação.",
+   "atualizado": "04/08",
+   "desde": "04/08"
   },
-  {
-   "titulo": "Brazil launches public consultation on biofuel bunkering rules overhaul",
-   "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPS3dBakZYWUVEUGd3d1NvTHRYaVJVVTJXVXMxOFhMTk90UWcxRjkzcWc3eUZsWERHbUdleVRnQmdwMC1EVlV2N0lNWFgyWE1CUGZGWEQ0bWw3WkgzaGpHRFhTSEZGTzZDdmpnaDJMZnZKVFRldVB3S0RPeVFPWmdqNzNLNVBjZU5LOTg2UWRDSXMtZGlQNDIxNHJxSFE1c0lUQTlRbk85dXRTWTQ?oc=5",
-   "fonte": "Manifold Times",
-   "cat": "bio",
-   "data": "Fri, 31 Jul 2026 03:00:27 GMT",
-   "desde": "04/08",
-   "motivo": "O início da consulta pública no Brasil para a reformulação das regras de biocombustíveis em bunkers marítimos abre caminho regulatório direto para o desenvolvimento de negócios em biobunker."
+  "bio": {
+   "texto": "O Porto de Roterdã registrou sua primeira operação de bunker com bioetanol em meio à alta volatilidade dos mercados energéticos globais, enquanto o Brasil deu início a uma consulta pública para reformular as regras de biocombustíveis voltadas ao setor marítimo. Paralelamente, a Organização Marítima Internacional avançou em seu Marco Net-Zero e a Argus destacou o crescimento expressivo das vendas de biomarine na Europa. Para quem vende etanol, a abertura e regulamentação de rotas para o uso de álcool no transporte marítimo criam um novo canal relevante de escoamento fora dos combustíveis terrestres tradicionais.",
+   "atualizado": "04/08",
+   "desde": "04/08"
   },
-  {
-   "titulo": "EU Commission approves state aid package to accelerate SAF production",
-   "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxON1Rhc3hXb1oyanEtTVQyX1h6cXdGeGFxTlJoQWFvUEVnYVdIc3NSajQ2d1Zvem5aeVcyb3ZCUzNWMFEyVTAtRmYyelNSelYwc29URmJuYy1UY3cyaTk3LVY0aXhROHlMekhqWDl0NmlKVFMwbjQzUHpFblNUQ3VfQmc1VkZ3XzFybVBvWThXQ05wU3NlM2RMaHVPLWtKUQ?oc=5",
-   "fonte": "starconcord.com.sg",
-   "cat": "saf",
-   "data": "Fri, 31 Jul 2026 07:00:00 GMT",
-   "desde": "04/08",
-   "motivo": "A aprovação pela Comissão Europeia de um pacote de auxílio estatal para acelerar a produção de SAF estimula investimentos e a viabilidade de projetos de combustíveis sustentáveis de aviação."
-  },
-  {
-   "titulo": "Ethanol producer opens Kansas CCS unit, eyes expansion",
-   "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNU00zNTNXT1U1MWtJR19saTNYUWoxZDV3VDRrMG5VdGUtVzQ5YkFydnI1UTFiV2FNTFpSeVRqYWUzZDA4QTh2UDdpaG9ETkZ3aUY2M1lMcWN6aEhZZzJ6SjRmUGJVbDZuX0FzMzByNzZmc3V6ZTZiOXBNUm5vY2NwRmRwbEFKanVrWHVodDQ4RlUtSnpqR1V3STBtckRRVkZIazdzSWlILU0?oc=5",
-   "fonte": "Quantum Commodity Intelligence",
-   "cat": "saf",
-   "data": "Thu, 30 Jul 2026 21:00:51 GMT",
-   "desde": "04/08",
-   "motivo": "A inauguração de nova unidade de captura e armazenamento de carbono (CCS) por produtor de etanol reduz a intensidade de carbono do insumo, fator crítico para a competitividade em SAF."
-  },
-  {
-   "titulo": "Bill Gates’ Breakthrough Energy Leads $43M Lydian Raise for SAF",
-   "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQaExiOEtPd3lOY2Q3MzNMTmo3MjdNOE1zUWNUR1U5QWZ6dUZ6dzd1cEJMR2V0ajBDbXctN01uZ3VJcGRFNlprUm5XYTBRWlJLUnFIUTBlMzJZVUE0Yml2NWVXU1ZGcW94WDJnaFNnM19pYjBlWUpJdnRndmEyMGZMaV84Zmhadm9GMVE?oc=5",
-   "fonte": "ESG News",
-   "cat": "saf",
-   "data": "Fri, 31 Jul 2026 13:51:53 GMT",
-   "desde": "04/08",
-   "motivo": "O aporte multibilionário liderado por fundos de peso em desenvolvedoras de e-fuels e SAF demonstra a injeção contínua de capital privado em tecnologias que utilizam etanol como matéria-prima."
-  },
-  {
-   "titulo": "Ethanol export opportunities emerge in Japan, Philippines during Nebraska trade mission",
-   "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQYUtubE9PckQ5N2hJUjgtanJzR283b3g5WHk2RnFjTGxJVDR4QzNVNGhyZGh1N2I5SUJRVFNJYTJ6OEVBM1BtQk0xSmpoWWF2cFAtaEh2MWVjWU1OQUpEbElzbUZiUGctekMtNjJqYVE0MEhnZzQxWVluMWc2NXNTVlpidTJvVzViY0NjbzRxc0NRcmhuSGc1d0hfRW4tdkFINFFPQnIwdWtvLXkzUWFzNFFqZXpDZERLOEVHeHpxRmt0bjVZ?oc=5",
-   "fonte": "Rural Radio Network",
-   "cat": "blend",
-   "data": "Thu, 30 Jul 2026 19:12:03 GMT",
-   "desde": "04/08",
-   "motivo": "A abertura de novas oportunidades de exportação de etanol para o Japão e Filipinas diversifica os mercados externos e amplia o escopo geográfico para o escoamento da produção."
+  "blend": {
+   "texto": "Entrou em vigor oficialmente a nova mistura obrigatória de etanol na gasolina, elevando o teor para 32% no Brasil, apesar de resistências políticas isoladas no Congresso e debates no setor. Na Índia, o uso consolidado do E20 protegeu consumidores locais com economia significativa durante picos de alta do petróleo bruto a US$ 135, fortalecendo o apoio de agricultores e governos à política. Para quem vende etanol, a consolidação e ampliação desses mandatos garantem um piso de consumo doméstico expressivo e de alta previsibilidade para a safra.",
+   "atualizado": "04/08",
+   "desde": "04/08"
   }
- ]
+ }
 }
