@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Arquivo - BioFuel Monitor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#05201E;--bg2:#0A302D;--bg3:#0F3D38;--border:#14463F;--border2:#1E5C53;
+    --text:#FFFFFF;--text2:#9FB8B2;--text3:#5F7A75;
+    --saf:#5E9BE0;--saf-bg:rgba(94,155,224,.10);
+    --bio:#8FCC58;--bio-bg:rgba(46,143,143,.10);
+    --blend:#EA792B;--blend-bg:rgba(234,121,43,.10);
+    --accent:#75B73B;--accent-l:#8FCC58;--r:14px;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}
+  .navbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+  .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+  .nav-logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#75B73B,#025050);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .nav-logo-name{font-size:13px;font-weight:700;color:var(--text)}
+  .nav-tabs{display:flex;gap:4px;flex-wrap:wrap}
+  .nav-tab{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;border:1px solid transparent}
+  .nav-tab:hover{color:var(--text);background:var(--bg3)}
+  .nav-tab.active{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+  .header{padding:20px 20px 10px}
+  .header h1{font-size:21px;font-weight:700;letter-spacing:-.3px}
+  .header p{font-size:12px;color:var(--text3);margin-top:6px}
+  .search-wrap{padding:8px 20px 14px}
+  .search-box{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+  .search-box input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px}
+  .search-box input::placeholder{color:var(--text3)}
+  .filtros{padding:0 20px 8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+  .filtros::-webkit-scrollbar{display:none}
+  .rot{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:0 20px 6px}
+  .chip{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .chip.a{background:var(--accent);border-color:var(--accent);color:#06231F}
+  .news-wrap{padding:10px 20px 0;display:flex;flex-direction:column;gap:10px}
+  .news-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+  .news-card:hover{border-color:var(--border2)}
+  .news-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .news-badge{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid}
+  .news-badge.saf{color:var(--saf);border-color:var(--saf);background:var(--saf-bg)}
+  .news-badge.bio{color:var(--bio);border-color:var(--bio);background:var(--bio-bg)}
+  .news-badge.blend{color:var(--blend);border-color:var(--blend);background:var(--blend-bg)}
+  .news-time{font-size:11px;color:var(--text3);margin-left:auto}
+  .news-title{font-size:14px;font-weight:500;line-height:1.45;margin-bottom:10px}
+  .news-title a{color:var(--text);text-decoration:none}
+  .news-title a:hover{color:var(--accent-l);text-decoration:underline}
+  .news-summary{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:10px;padding:12px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent)}
+  .news-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .news-source{font-size:11px;color:var(--text3)}
+  .news-actions{display:flex;align-items:center;gap:8px}
+  .btn-resumo{font-size:11px;font-weight:500;padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer}
+  .btn-resumo:hover{border-color:var(--accent);color:var(--accent-l)}
+  .btn-resumo.open{border-color:var(--accent);color:var(--accent-l);background:rgba(117,183,59,.08)}
+  .news-read{font-size:11px;color:var(--accent-l);text-decoration:none}
+  .vazio{padding:60px 20px;text-align:center}
+  .vazio-t{font-size:16px;font-weight:600;margin-bottom:10px}
+  .vazio-d{font-size:13px;color:var(--text2);line-height:1.65;max-width:430px;margin:0 auto}
+  .nada{display:none;padding:40px 20px;text-align:center;color:var(--text2);font-size:13px}
+  @media(max-width:640px){.navbar{padding:0 14px;height:auto;flex-direction:column;gap:8px;padding-top:10px;padding-bottom:10px}
+  .header,.search-wrap,.filtros,.news-wrap,.rot{padding-left:14px;padding-right:14px}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-mark">B</div><span class="nav-logo-name">BioFuel Monitor</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="index.html">Noticias</a>
+    <a class="nav-tab active" href="arquivo.html">Arquivo</a>
+    <a class="nav-tab" href="mapa-mandatos.html">Blending</a>
+    <a class="nav-tab" href="mapa-saf.html">SAF</a>
+    <a class="nav-tab" href="pendencias.html">Aprovacoes</a>
+  </div>
+</nav>
+<div class="header">
+  <h1>Arquivo de noticias</h1>
+  <p>Ultimos 90 dias &middot; 0 noticia(s) guardada(s). Atualizado em 04/08/2026 as 01:02 UTC</p>
+</div>
+<div class="search-wrap">
+  <div class="search-box"><span>Buscar</span>
+    <input type="text" id="q" placeholder="titulo, pais, tema..." oninput="render()"/>
+  </div>
+</div>
+<div class="rot">Tema</div>
+<div class="filtros">
+  <button class="chip a" id="c-all"   onclick="setCat('all')">Todos</button>
+  <button class="chip"   id="c-saf"   onclick="setCat('saf')">SAF</button>
+  <button class="chip"   id="c-bio"   onclick="setCat('bio')">Biobunker</button>
+  <button class="chip"   id="c-blend" onclick="setCat('blend')">Blending</button>
+</div>
+<div class="rot">Periodo</div>
+<div class="filtros">
+  <button class="chip a" id="m-all" onclick="setMes('all')">Tudo</button>
+  
+</div>
+<div class="news-wrap" id="lista"><div class="vazio">
+      <div class="vazio-t">O arquivo ainda esta vazio</div>
+      <div class="vazio-d">Ele vai sendo montado a cada atualizacao do monitor.
+      As noticias saem do painel principal depois de 7 dias e ficam guardadas aqui por 3 meses.</div>
+    </div>
+</div>
+<div class="nada" id="nada">Nenhuma noticia com esses filtros.</div>
+<script>
+let cat = 'all', mes = 'all';
+function toggleResumo(i) {
+  const b = document.getElementById('summary-' + i), t = document.getElementById('btn-' + i);
+  if (b.style.display !== 'none') { b.style.display = 'none'; t.textContent = 'Resumo'; t.classList.remove('open'); }
+  else { b.style.display = 'block'; t.textContent = 'Fechar'; t.classList.add('open'); }
+}
+function setCat(c) {
+  cat = c;
+  ['all','saf','bio','blend'].forEach(k => document.getElementById('c-'+k).className = 'chip' + (k===c?' a':''));
+  render();
+}
+function setMes(m) {
+  mes = m;
+  document.querySelectorAll('[id^="m-"]').forEach(b => b.className = 'chip');
+  const el = document.getElementById('m-' + m);
+  if (el) el.className = 'chip a';
+  render();
+}
+function render() {
+  const q = document.getElementById('q').value.toLowerCase();
+  let n = 0;
+  document.querySelectorAll('.news-card').forEach(c => {
+    const okc = cat === 'all' || c.dataset.cat === cat;
+    const okm = mes === 'all' || c.dataset.mes === mes;
+    const okq = !q || c.dataset.title.includes(q) || c.textContent.toLowerCase().includes(q);
+    const ok = okc && okm && okq;
+    c.style.display = ok ? 'block' : 'none';
+    if (ok) n++;
+  });
+  document.getElementById('nada').style.display = n ? 'none' : 'block';
+}
+</script>
+</body>
+</html>
