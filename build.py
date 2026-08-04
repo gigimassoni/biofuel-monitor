@@ -356,6 +356,12 @@ def fmt_date(date_str):
         return "hoje"
 
 
+def fmt_data_curta(date_str):
+    """Data no formato dd/mm, para o modelo saber quando o fato ocorreu."""
+    d = parse_date_obj(date_str)
+    return d.strftime("%d/%m") if d.year > 2000 else "sem data"
+
+
 def parse_date_obj(date_str):
     """Converte a data do RSS. Sempre devolve datetime com fuso, para ordenar sem erro."""
     try:
@@ -516,7 +522,7 @@ def gemini_summarize_batch(batch):
 
     blocks = []
     for idx, it in enumerate(batch):
-        entry = f"ID {idx+1}:\nTitulo: {it['title']}"
+        entry = f"ID {idx+1}:\nData: {fmt_data_curta(it.get('date_raw',''))}\nTitulo: {it['title']}"
         if it.get("desc"):
             entry += f"\nResumo da fonte: {it['desc']}"
         blocks.append(entry)
@@ -525,8 +531,15 @@ def gemini_summarize_batch(batch):
         "Voce e analista do mercado de biocombustiveis (SAF, biobunker maritimo e "
         "mistura etanol+gasolina).\n"
         "Para CADA noticia abaixo, escreva 2 a 3 frases em portugues explicando o que "
-        "aconteceu e por que importa para o mercado de etanol. Baseie-se apenas nas "
-        "informacoes fornecidas, sem inventar dados.\n\n"
+        "aconteceu e por que importa para o mercado de etanol.\n\n"
+        "Regras obrigatorias:\n"
+        "- Use SOMENTE o que esta no titulo e na descricao fornecidos. Nao complete com "
+        "conhecimento proprio e NAO INVENTE numero, data, empresa, pais ou percentual.\n"
+        "- Nao cite o nome do veiculo de imprensa.\n"
+        "- Diferencie o que ja esta valendo do que e proposta, meta, estudo ou expectativa.\n"
+        "- Se o fato descrito ocorreu antes da data da noticia, deixe claro quando ocorreu.\n"
+        "- Se a descricao for curta demais para um resumo seguro, escreva so o que da "
+        "para afirmar com certeza, mesmo que fique em uma frase.\n\n"
         "Responda SOMENTE com JSON, chaves iguais aos IDs:\n"
         "{\"1\": \"resumo...\", \"2\": \"resumo...\"}\n\n"
         f"NOTICIAS:\n\n" + "\n\n".join(blocks)
@@ -846,7 +859,8 @@ def atualizar_destaques(items):
             continue
         atual = d["temas"].get(tema, {}).get("texto", "")
         linhas = "\n".join(
-            f"- {n['title']}" + (f" | {n.get('summary','')[:150]}" if n.get("summary") else "")
+            f"- ({fmt_data_curta(n.get('date_raw',''))}) {n['title']}"
+            + (f" | {n.get('summary','')[:150]}" if n.get("summary") else "")
             for n in noticias
         )
         partes.append(
@@ -864,8 +878,17 @@ def atualizar_destaques(items):
         "Para CADA uma das tres frentes abaixo, escreva a sintese do que foi mais "
         "importante NA SEMANA - de 2 a 4 frases, em portugues, texto corrido.\n\n"
         "Como escrever:\n"
-        "- Fale dos fatos, nao das materias. Nao escreva 'segundo noticia' nem cite veiculo.\n"
-        "- Seja concreto: cite pais, empresa, percentual, valor quando houver.\n"
+        "- Fale dos fatos, nao das materias. NUNCA cite o nome de veiculo de imprensa "
+        "(Reuters, Argus, Platts, Bloomberg e afins) nem escreva 'segundo noticia'.\n"
+        "- Seja concreto: cite pais, empresa, percentual, valor.\n"
+        "- NAO INVENTE NUMERO. So use cifra, percentual, data ou volume que esteja "
+        "escrito no texto que voce recebeu. Na duvida, escreva sem o numero.\n"
+        "- Cada noticia vem com a data entre parenteses. Se o fato em si aconteceu "
+        "ANTES desta semana e o que e novo e apenas a repercussao, um dado ou um balanco, "
+        "deixe isso claro (ex: 'a operacao, feita em maio, aparece agora nos dados do "
+        "trimestre'). Nunca apresente marco antigo como se tivesse acontecido agora.\n"
+        "- Diferencie o que ESTA EM VIGOR do que e proposta, estudo, meta ou expectativa. "
+        "Nao escreva que algo entrou em vigor se o texto fala em discussao ou plano.\n"
         "- Priorize mudanca de regra ou mandato, contrato e investimento, movimento de "
         "concorrente, abertura ou fechamento de mercado.\n"
         "- Termine com o que isso significa para quem vende etanol, quando fizer sentido.\n"
