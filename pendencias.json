@@ -1,4 +1,16 @@
 {
- "pendentes": [],
+ "pendentes": [
+  {
+   "id": "BRA",
+   "pais": "Brasil",
+   "atual": "E30 (E32 em discussão)",
+   "novo": "E32",
+   "justificativa": "Aumento da mistura de etanol na gasolina sobe para 32% e entra em vigor",
+   "noticia_titulo": "Mistura de etanol na gasolina sobe para 32% e especialistas alertam para cuidados com veículos mais antigos",
+   "noticia_url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQSmNncGwtdWJibHFOVDU1WF9Vd0RNTjBOLUJBcmdKWEdPb203MFg1Tmd3V05xNWY4RTVqTU1USnRtNEE4NUV1SVlpTVl3ZGRIekRjMDRBalZnR1BuMzVyRTZ3dVBFY2RuWkZ4V3otRWxPOTkyNTlWMmJPcVpoNUdSRUI3OHUxLUhOODBQUGxLakVEaWVtZGF2NTNOeXF6cXlzOTByS3pLZ0JQNk9sQ2xpNldjWE44R05KUThSRWZqWU1xVzJ2X2xWeGtBcHBoLVk?oc=5",
+   "noticia_fonte": "cbnribeirao.com.br",
+   "detectado_em": "04/08/2026"
+  }
+ ],
  "recusados": []
 }
