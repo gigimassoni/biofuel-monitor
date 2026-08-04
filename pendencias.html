@@ -29,7 +29,11 @@
   .req{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px}
   .req-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
   .req-pais{font-size:17px;font-weight:700}
-  .req-data{font-size:11px;color:var(--text3)}
+  .req-data{font-size:11px;color:var(--text3);margin-left:auto}
+  .req-mapa{font-size:10px;font-weight:600;letter-spacing:.4px;padding:3px 9px;border-radius:20px;border:1px solid}
+  .req-mapa.blend{color:#EA792B;border-color:#EA792B;background:rgba(234,121,43,.10)}
+  .req-mapa.saf{color:#5E9BE0;border-color:#5E9BE0;background:rgba(94,155,224,.10)}
+  .req-campo{font-size:11px;color:var(--text3);margin-bottom:10px;font-family:monospace}
   .req-mud{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
   .pill{padding:5px 14px;border-radius:8px;font-size:15px;font-weight:700;border:1px solid}
   .pill.old{background:var(--bg3);border-color:var(--border2);color:var(--text2)}
@@ -68,21 +72,23 @@
   </div>
 </nav>
 <div class="header">
-  <h1>Solicitacoes de alteracao do mapa</h1>
-  <p>Atualizado em 04/08/2026 as 09:38 UTC &middot; 1 pendente(s)</p>
+  <h1>Solicitacoes de alteracao dos mapas</h1>
+  <p>Atualizado em 04/08/2026 as 16:23 UTC &middot; 1 pendente(s)</p>
 </div>
 <div class="aviso">
   Nada e alterado sem a sua aprovacao. Ao clicar em Aprovar, o GitHub abre com a
   solicitacao ja preenchida: basta enviar para confirmar. Esse passo existe porque o
   site e publico, e so quem tem acesso ao repositorio pode alterar os mapas.
-  Apenas o campo de percentual de mistura e modificado.
+  Apenas o campo de percentual e modificado - nome, status, notas e demais dados ficam intactos.
 </div>
 <div class="wrap">
     <div class="req">
       <div class="req-head">
         <span class="req-pais">Brasil</span>
+        <span class="req-mapa blend">mapa de Blending</span>
         <span class="req-data">detectado em 04/08/2026</span>
       </div>
+      <div class="req-campo">campo: blend</div>
       <div class="req-mud">
         <span class="pill old">E30 (E32 em discussão)</span>
         <span class="seta">passa a</span>
@@ -95,8 +101,8 @@
         <div class="prova-fonte">cbnribeirao.com.br</div>
       </div>
       <div class="req-acoes">
-        <a class="btn ok"  href="https://github.com/gigimassoni/biofuel-monitor/issues/new?title=%5BMAPA%5D%20BRA%20blend%20-%3E%20E32&body=Pais%3A%20Brasil%20%28BRA%29%0ADe%3A%20E30%20%28E32%20em%20discuss%C3%A3o%29%0APara%3A%20E32%0A%0ANoticia%3A%20Mistura%20de%20etanol%20na%20gasolina%20sobe%20para%2032%25%20e%20especialistas%20alertam%20para%20cuidados%20com%20ve%C3%ADculos%20mais%20antigos%0Ahttps%3A//news.google.com/rss/articles/CBMizwFBVV95cUxQSmNncGwtdWJibHFOVDU1WF9Vd0RNTjBOLUJBcmdKWEdPb203MFg1Tmd3V05xNWY4RTVqTU1USnRtNEE4NUV1SVlpTVl3ZGRIekRjMDRBalZnR1BuMzVyRTZ3dVBFY2RuWkZ4V3otRWxPOTkyNTlWMmJPcVpoNUdSRUI3OHUxLUhOODBQUGxLakVEaWVtZGF2NTNOeXF6cXlzOTByS3pLZ0JQNk9sQ2xpNldjWE44R05KUThSRWZqWU1xVzJ2X2xWeGtBcHBoLVk%3Foc%3D5%0A%0A%60%60%60json%0A%7B%22id%22%3A%20%22BRA%22%2C%20%22novo%22%3A%20%22E32%22%7D%0A%60%60%60%0A%0AEnvie%20esta%20issue%20para%20confirmar.%20O%20robo%20aplica%20a%20alteracao%20e%20fecha%20sozinho." target="_blank" rel="noopener">Aprovar e atualizar o mapa</a>
-        <a class="btn no"  href="https://github.com/gigimassoni/biofuel-monitor/issues/new?title=%5BMAPA-RECUSAR%5D%20BRA%20blend%20-%3E%20E32&body=Pais%3A%20Brasil%20%28BRA%29%0ADe%3A%20E30%20%28E32%20em%20discuss%C3%A3o%29%0APara%3A%20E32%0A%0ANoticia%3A%20Mistura%20de%20etanol%20na%20gasolina%20sobe%20para%2032%25%20e%20especialistas%20alertam%20para%20cuidados%20com%20ve%C3%ADculos%20mais%20antigos%0Ahttps%3A//news.google.com/rss/articles/CBMizwFBVV95cUxQSmNncGwtdWJibHFOVDU1WF9Vd0RNTjBOLUJBcmdKWEdPb203MFg1Tmd3V05xNWY4RTVqTU1USnRtNEE4NUV1SVlpTVl3ZGRIekRjMDRBalZnR1BuMzVyRTZ3dVBFY2RuWkZ4V3otRWxPOTkyNTlWMmJPcVpoNUdSRUI3OHUxLUhOODBQUGxLakVEaWVtZGF2NTNOeXF6cXlzOTByS3pLZ0JQNk9sQ2xpNldjWE44R05KUThSRWZqWU1xVzJ2X2xWeGtBcHBoLVk%3Foc%3D5%0A%0A%60%60%60json%0A%7B%22id%22%3A%20%22BRA%22%2C%20%22novo%22%3A%20%22E32%22%7D%0A%60%60%60%0A%0AEnvie%20esta%20issue%20para%20confirmar.%20O%20robo%20aplica%20a%20alteracao%20e%20fecha%20sozinho." target="_blank" rel="noopener">Recusar</a>
+        <a class="btn ok"  href="https://github.com/gigimassoni/biofuel-monitor/issues/new?title=%5BMAPA%5D%20blend/BRA%20blend%20-%3E%20E32&body=Mapa%3A%20blend%0APais%3A%20Brasil%20%28BRA%29%0ACampo%3A%20blend%0ADe%3A%20E30%20%28E32%20em%20discuss%C3%A3o%29%0APara%3A%20E32%0A%0ANoticia%3A%20Mistura%20de%20etanol%20na%20gasolina%20sobe%20para%2032%25%20e%20especialistas%20alertam%20para%20cuidados%20com%20ve%C3%ADculos%20mais%20antigos%0Ahttps%3A//news.google.com/rss/articles/CBMizwFBVV95cUxQSmNncGwtdWJibHFOVDU1WF9Vd0RNTjBOLUJBcmdKWEdPb203MFg1Tmd3V05xNWY4RTVqTU1USnRtNEE4NUV1SVlpTVl3ZGRIekRjMDRBalZnR1BuMzVyRTZ3dVBFY2RuWkZ4V3otRWxPOTkyNTlWMmJPcVpoNUdSRUI3OHUxLUhOODBQUGxLakVEaWVtZGF2NTNOeXF6cXlzOTByS3pLZ0JQNk9sQ2xpNldjWE44R05KUThSRWZqWU1xVzJ2X2xWeGtBcHBoLVk%3Foc%3D5%0A%0A%60%60%60json%0A%7B%22mapa%22%3A%20%22blend%22%2C%20%22id%22%3A%20%22BRA%22%2C%20%22campo%22%3A%20%22blend%22%2C%20%22novo%22%3A%20%22E32%22%7D%0A%60%60%60%0A%0AEnvie%20esta%20issue%20para%20confirmar.%20O%20robo%20aplica%20a%20alteracao%20e%20fecha%20sozinho." target="_blank" rel="noopener">Aprovar e atualizar o mapa</a>
+        <a class="btn no"  href="https://github.com/gigimassoni/biofuel-monitor/issues/new?title=%5BMAPA-RECUSAR%5D%20blend/BRA%20blend%20-%3E%20E32&body=Mapa%3A%20blend%0APais%3A%20Brasil%20%28BRA%29%0ACampo%3A%20blend%0ADe%3A%20E30%20%28E32%20em%20discuss%C3%A3o%29%0APara%3A%20E32%0A%0ANoticia%3A%20Mistura%20de%20etanol%20na%20gasolina%20sobe%20para%2032%25%20e%20especialistas%20alertam%20para%20cuidados%20com%20ve%C3%ADculos%20mais%20antigos%0Ahttps%3A//news.google.com/rss/articles/CBMizwFBVV95cUxQSmNncGwtdWJibHFOVDU1WF9Vd0RNTjBOLUJBcmdKWEdPb203MFg1Tmd3V05xNWY4RTVqTU1USnRtNEE4NUV1SVlpTVl3ZGRIekRjMDRBalZnR1BuMzVyRTZ3dVBFY2RuWkZ4V3otRWxPOTkyNTlWMmJPcVpoNUdSRUI3OHUxLUhOODBQUGxLakVEaWVtZGF2NTNOeXF6cXlzOTByS3pLZ0JQNk9sQ2xpNldjWE44R05KUThSRWZqWU1xVzJ2X2xWeGtBcHBoLVk%3Foc%3D5%0A%0A%60%60%60json%0A%7B%22mapa%22%3A%20%22blend%22%2C%20%22id%22%3A%20%22BRA%22%2C%20%22campo%22%3A%20%22blend%22%2C%20%22novo%22%3A%20%22E32%22%7D%0A%60%60%60%0A%0AEnvie%20esta%20issue%20para%20confirmar.%20O%20robo%20aplica%20a%20alteracao%20e%20fecha%20sozinho." target="_blank" rel="noopener">Recusar</a>
       </div>
     </div>
 </div>
