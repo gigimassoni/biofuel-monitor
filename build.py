@@ -17,8 +17,8 @@ from urllib.parse import quote
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 
 MAX_PER_QUERY   = 15    # itens por busca no Google News
-JANELA          = "when:7d"   # so noticias dos ultimos 7 dias.
-                              # use "when:1d" para so hoje, ou "" para desligar.
+JANELA          = "when:14d"  # noticias das ultimas 2 semanas.
+                              # "when:7d" so a semana, "when:30d" o mes, "" sem limite.
 FILTER_CHUNK    = 60    # titulos por chamada de filtro
 SUMMARY_BATCH   = 10    # noticias por chamada de resumo
 MIN_INTERVAL    = 7.0   # segundos minimos entre chamadas ao Gemini (limite 10/min)
@@ -27,6 +27,7 @@ RSS_TENTATIVAS  = 3     # quantas vezes reptir uma busca que falhou
 CACHE_FILE      = "resumos.json"
 CACHE_DIAS      = 45    # descarta resumos mais antigos que isso
 MAPA_BLEND      = "mapa-mandatos.html"
+MAPA_SAF        = "mapa-saf.html"
 PEND_FILE       = "pendencias.json"
 PEND_HTML       = "pendencias.html"
 REPO            = os.environ.get("GITHUB_REPOSITORY", "gigimassoni/biofuel-monitor")
@@ -261,6 +262,14 @@ RSS_SEARCHES = [
     {"cat": "saf",   "query": '"combustivel do futuro" OR ProBioQAV OR SAF aviacao etanol', "lang": "pt"},
     {"cat": "saf",   "query": 'querosene sustentavel OR "combustivel sustentavel de aviacao" etanol', "lang": "pt"},
     {"cat": "bio",   "query": 'etanol combustivel maritimo OR bunker OR navio descarbonizacao', "lang": "pt"},
+
+    # --- RECUO: mandato adiado, reduzido, revisado ou suspenso ---
+    {"cat": "saf",   "query": '"SAF mandate" delay OR delayed OR postpone OR cut OR slash OR reduce OR suspend'},
+    {"cat": "saf",   "query": '"sustainable aviation fuel" target lowered OR "scaled back" OR weaken OR rollback OR review'},
+    {"cat": "blend", "query": '"blending mandate" OR "ethanol blend" delay OR reduce OR suspend OR rollback OR waiver'},
+    {"cat": "bio",   "query": 'IMO OR "FuelEU Maritime" delay OR weaken OR revise OR postpone shipping fuel rule'},
+    # --- mandato de SAF por pais, sem depender da expressao completa ---
+    {"cat": "saf",   "query": '"SAF mandate" Japan OR Korea OR Singapore OR India OR Malaysia OR Indonesia OR China'},
 ]
 
 NOISE = [
@@ -463,6 +472,8 @@ def gemini_filter(all_items):
             "Abaixo ha titulos de noticias sobre SAF (combustivel de aviacao), "
             "Biobunker (combustivel maritimo) e Blending (mistura etanol+gasolina).\n\n"
             "Retorne os numeros de TODAS as noticias relevantes para o setor. "
+        "ATENCAO: mandato ADIADO, REDUZIDO, REVISADO, SUSPENSO ou FLEXIBILIZADO e tao "
+        "relevante quanto mandato criado ou ampliado - nunca descarte esse tipo de noticia. "
             "Seja INCLUSIVO: na duvida, mantenha a noticia. Politicas, mandatos, "
             "producao, contratos, investimentos, tecnologia e mercado sao relevantes.\n"
             "Descarte apenas: esporte, juridico sem ligacao com o setor, preco de "
@@ -555,20 +566,24 @@ def gemini_summarize_batch(batch):
 #  DETECCAO DE MUDANCA DE MANDATO (BLENDING)
 # ==========================================================
 
-def ler_mapa_blend():
-    """Le os paises e o percentual atual direto do mapa de blending."""
+def ler_mapa(arquivo, campos):
+    """Le id, nome e os campos pedidos de um mapa."""
     try:
-        html_src = open(MAPA_BLEND, encoding="utf-8").read()
+        html_src = open(arquivo, encoding="utf-8").read()
     except Exception as e:
-        print(f"  AVISO: nao consegui ler {MAPA_BLEND}: {e}")
+        print(f"  AVISO: nao consegui ler {arquivo}: {e}")
         return {}
     paises = {}
     for m in re.finditer(r'id:"([A-Z]{3})"\s*,\s*name:"([^"]+)"', html_src):
         cid, nome = m.group(1), m.group(2)
-        trecho = html_src[m.start():m.start() + 1200]
-        mb = re.search(r'blend:"([^"]*)"', trecho)
-        if mb:
-            paises[cid] = {"nome": nome, "blend": mb.group(1)}
+        trecho = html_src[m.start():m.start() + 1400]
+        valores = {}
+        for campo in campos:
+            mc = re.search(campo + r':"([^"]*)"', trecho)
+            if mc:
+                valores[campo] = mc.group(1)
+        if valores:
+            paises[cid] = {"nome": nome, "valores": valores}
     return paises
 
 
@@ -576,7 +591,11 @@ def carregar_pendencias():
     try:
         with open(PEND_FILE, encoding="utf-8") as f:
             d = json.load(f)
-        return {"pendentes": d.get("pendentes", []), "recusados": d.get("recusados", [])}
+        pend = d.get("pendentes", [])
+        for p in pend:                       # compatibilidade com o formato antigo
+            p.setdefault("mapa", "blend")
+            p.setdefault("campo", "blend")
+        return {"pendentes": pend, "recusados": d.get("recusados", [])}
     except Exception:
         return {"pendentes": [], "recusados": []}
 
@@ -589,78 +608,106 @@ def salvar_pendencias(dados):
         print(f"  AVISO ao salvar pendencias: {e}")
 
 
-def detectar_mudancas_blend(items):
-    """Pergunta ao Gemini se alguma noticia indica novo percentual de mistura."""
+CONFIG_MAPAS = {
+    "blend": {
+        "arquivo": MAPA_BLEND, "campos": ["blend"], "cat": "blend",
+        "rotulo": "Blending",
+        "oque": "percentual obrigatorio de mistura de etanol na gasolina",
+        "regras": "So proponha se a noticia declarar o novo percentual de forma clara "
+                  "(ex: E15, E20). Ignore metas futuras, estudos e propostas sem aprovacao.",
+    },
+    "saf": {
+        "arquivo": MAPA_SAF,
+        "campos": ["meta2025", "meta2030", "meta2040", "meta2050"], "cat": "saf",
+        "rotulo": "SAF",
+        "oque": "percentual de SAF exigido em cada ano-alvo",
+        "regras": "So proponha se a noticia declarar percentual e ano de forma clara. "
+                  "Atencao: meta aspiracional e mandato obrigatorio sao coisas diferentes - "
+                  "o mapa registra a exigencia, entao prefira o percentual que passa a ser "
+                  "obrigatorio. Ignore estudos e consultas sem decisao.",
+    },
+}
+
+
+def detectar_mudancas(items, qual):
+    """Procura mudanca de mandato em um dos mapas. qual = 'blend' ou 'saf'."""
     dados = carregar_pendencias()
+    cfg = CONFIG_MAPAS[qual]
     if not _GEMINI_OK or not GEMINI_API_KEY:
         return dados
 
-    mapa = ler_mapa_blend()
+    mapa = ler_mapa(cfg["arquivo"], cfg["campos"])
     if not mapa:
         return dados
 
-    noticias = [i for i in items if i["category"] == "blend"][:40]
+    noticias = [i for i in items if i["category"] == cfg["cat"]][:40]
     if not noticias:
         return dados
 
-    atual = "\n".join(f"{cid} = {v['nome']}: {v['blend']}" for cid, v in sorted(mapa.items()))
+    linhas_mapa = []
+    for cid, v in sorted(mapa.items()):
+        vals = ", ".join(f"{k}={x}" for k, x in v["valores"].items())
+        linhas_mapa.append(f"{cid} = {v['nome']}: {vals}")
+    atual = "\n".join(linhas_mapa)
+
     lista = "\n\n".join(
         f"ID {n+1}:\nTitulo: {it['title']}\nResumo: {it.get('desc', '')[:200]}"
         for n, it in enumerate(noticias)
     )
+    campos_txt = " ou ".join(cfg["campos"])
 
     prompt = (
-        "Voce monitora mandatos de mistura de etanol na gasolina (blending).\n\n"
+        f"Voce monitora mandatos de {cfg['oque']}.\n\n"
         "VALORES ATUALMENTE REGISTRADOS NO MAPA:\n" + atual + "\n\n"
-        "NOTICIAS DE HOJE:\n" + lista + "\n\n"
-        "Identifique APENAS os casos em que uma noticia afirma explicitamente um NOVO "
-        "percentual obrigatorio de mistura que DIFERE do valor registrado acima.\n"
+        "NOTICIAS RECENTES:\n" + lista + "\n\n"
+        "Identifique APENAS os casos em que uma noticia informa um valor NOVO que DIFERE "
+        "do registrado acima.\n"
         "Regras rigorosas:\n"
-        "- So proponha se a noticia declarar o percentual de forma clara (ex: E15, E20).\n"
-        "- Ignore metas futuras, estudos, propostas e discussoes sem aprovacao.\n"
+        f"- {cfg['regras']}\n"
         "- Ignore se o valor da noticia for igual ao que ja esta no mapa.\n"
         "- Na duvida, NAO proponha.\n\n"
         "Responda SOMENTE com JSON:\n"
-        '{\"mudancas\": [{\"id\": \"VNM\", \"novo\": \"E15\", \"noticia\": 3, '
-        '\"justificativa\": \"frase curta\"}]}\n'
-        'Se nao houver nenhuma, responda {\"mudancas\": []}'
+        '{"mudancas": [{"id": "JPN", "campo": "' + cfg["campos"][0] + '", "novo": "1%", '
+        '"noticia": 3, "justificativa": "frase curta"}]}\n'
+        f'O campo deve ser um destes: {campos_txt}.\n'
+        'Se nao houver nenhuma, responda {"mudancas": []}'
     )
 
-    print("  Verificando se ha mudanca de mandato de blending...")
+    print(f"  Verificando mudanca de mandato em {cfg['rotulo']}...")
     r = _parse_json(gemini_call(prompt, max_tokens=1200, temperature=0.0))
     if not r or not isinstance(r.get("mudancas"), list):
         print("    Nenhuma mudanca detectada.")
         return dados
 
-    ja_pend = {p["id"] + "|" + p["novo"] for p in dados["pendentes"]}
+    ja = {f"{p['mapa']}|{p['id']}|{p['campo']}|{p['novo']}" for p in dados["pendentes"]}
     achados = 0
     for mud in r["mudancas"]:
-        cid  = str(mud.get("id", "")).upper().strip()
-        novo = str(mud.get("novo", "")).strip()
-        idx  = mud.get("noticia")
-        if cid not in mapa or not novo:
+        cid   = str(mud.get("id", "")).upper().strip()
+        campo = str(mud.get("campo", "")).strip()
+        novo  = str(mud.get("novo", "")).strip()
+        idx   = mud.get("noticia")
+        if cid not in mapa or campo not in cfg["campos"] or not novo:
             continue
-        if novo.lower() == mapa[cid]["blend"].lower():
+        atual_v = mapa[cid]["valores"].get(campo, "")
+        if novo.lower() == atual_v.lower():
             continue
-        chave = cid + "|" + novo
-        if chave in ja_pend or chave in dados["recusados"]:
+        chave = f"{qual}|{cid}|{campo}|{novo}"
+        if chave in ja or chave in dados["recusados"]:
             continue
         if not isinstance(idx, int) or not (1 <= idx <= len(noticias)):
             continue
         fonte = noticias[idx - 1]
         dados["pendentes"].append({
-            "id": cid,
-            "pais": mapa[cid]["nome"],
-            "atual": mapa[cid]["blend"],
-            "novo": novo,
+            "mapa": qual, "campo": campo, "id": cid, "pais": mapa[cid]["nome"],
+            "atual": atual_v or "(vazio)", "novo": novo,
             "justificativa": str(mud.get("justificativa", ""))[:300],
-            "noticia_titulo": fonte["title"],
-            "noticia_url": fonte["url"],
+            "noticia_titulo": fonte["title"], "noticia_url": fonte["url"],
             "noticia_fonte": fonte["source"],
             "detectado_em": datetime.now(timezone.utc).strftime("%d/%m/%Y"),
         })
         achados += 1
-        print(f"    PROPOSTA: {mapa[cid]['nome']} {mapa[cid]['blend']} -> {novo}")
+        print(f"    PROPOSTA [{cfg['rotulo']}]: {mapa[cid]['nome']} {campo} "
+              f"{atual_v} -> {novo}")
 
     if not achados:
         print("    Nenhuma mudanca nova.")
@@ -672,15 +719,19 @@ def link_issue(p, acao):
     """Monta o link do GitHub que registra a decisao."""
     from urllib.parse import quote as q
     tag = "[MAPA]" if acao == "aprovar" else "[MAPA-RECUSAR]"
-    titulo = f"{tag} {p['id']} blend -> {p['novo']}"
+    mapa, campo = p.get("mapa", "blend"), p.get("campo", "blend")
+    titulo = f"{tag} {mapa}/{p['id']} {campo} -> {p['novo']}"
     corpo = (
+        f"Mapa: {mapa}\n"
         f"Pais: {p['pais']} ({p['id']})\n"
+        f"Campo: {campo}\n"
         f"De: {p['atual']}\n"
         f"Para: {p['novo']}\n\n"
         f"Noticia: {p['noticia_titulo']}\n"
         f"{p['noticia_url']}\n\n"
         "```json\n"
-        + json.dumps({"id": p["id"], "novo": p["novo"]}, ensure_ascii=False)
+        + json.dumps({"mapa": mapa, "id": p["id"], "campo": campo, "novo": p["novo"]},
+                     ensure_ascii=False)
         + "\n```\n\n"
         "Envie esta issue para confirmar. O robo aplica a alteracao e fecha sozinho."
     )
@@ -690,6 +741,137 @@ def link_issue(p, acao):
 # ==========================================================
 #  COLETA
 # ==========================================================
+
+# ==========================================================
+#  FEEDS DIRETOS DE VEICULOS DO SETOR
+#  Lidos sem passar pelo Google News. Feed que falhar e apenas
+#  ignorado e reportado no log - nao quebra a execucao.
+#  cat=None significa "classificar pelo titulo".
+# ==========================================================
+
+FEEDS_DIRETOS = [
+    # --- aviacao / SAF ---
+    {"nome": "GreenAir News",        "url": "https://www.greenairnews.com/?feed=rss2",            "cat": "saf"},
+    {"nome": "SAF Magazine",         "url": "https://www.safmagazine.com/rss",                    "cat": "saf"},
+    # --- biocombustiveis em geral ---
+    {"nome": "Biofuels Digest",      "url": "https://www.biofuelsdigest.com/bdigest/feed/",       "cat": None},
+    {"nome": "Ethanol Producer",     "url": "https://www.ethanolproducer.com/rss",                "cat": None},
+    {"nome": "Biomass Magazine",     "url": "https://www.biomassmagazine.com/rss",                "cat": None},
+    {"nome": "Biofuels International","url": "https://biofuels-news.com/feed/",                   "cat": None},
+    # --- maritimo / bunker ---
+    {"nome": "Ship & Bunker",        "url": "https://shipandbunker.com/news.rss",                 "cat": "bio"},
+    {"nome": "Manifold Times",       "url": "https://www.manifoldtimes.com/feed",                 "cat": "bio"},
+    {"nome": "Bunkerspot",           "url": "https://www.bunkerspot.com/rss/news",                "cat": "bio"},
+    # --- Brasil ---
+    {"nome": "NovaCana",             "url": "https://www.novacana.com/rss",                       "cat": None},
+    {"nome": "UNICA",                "url": "https://unica.com.br/feed/",                         "cat": None},
+    {"nome": "EPBR",                 "url": "https://epbr.com.br/feed/",                          "cat": None},
+]
+
+CHAVES_CAT = {
+    "saf":   ["saf", "aviation fuel", "jet fuel", "aviacao", "aviação", "querosene",
+              "alcohol-to-jet", "alcohol to jet", "atj", "airline", "airport", "aeroporto",
+              "refueleu", "corsia", "aviation"],
+    "bio":   ["bunker", "marine", "maritime", "maritimo", "marítimo", "shipping", "vessel",
+              "navio", "imo ", "fueleu", "porto", "port of", "shipowner", "tanker"],
+    "blend": ["blend", "blending", "mistura", "gasolina", "gasoline", "e10", "e15", "e20",
+              "e25", "e27", "e30", "e32", "e35", "anidro", "rfs", "renovabio", "cbio"],
+}
+
+
+def classificar(titulo, desc=""):
+    """Descobre a frente de uma noticia pelo texto. None = fora do escopo."""
+    texto = f" {titulo} {desc} ".lower()
+    pontos = {}
+    for cat, chaves in CHAVES_CAT.items():
+        pontos[cat] = sum(1 for k in chaves if k in texto)
+    melhor = max(pontos, key=pontos.get)
+    return melhor if pontos[melhor] > 0 else None
+
+
+def fetch_feed(url):
+    """Le um feed RSS ou Atom. Devolve lista de itens."""
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                             "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        raw = resp.read()
+    root = ET.fromstring(raw)
+
+    itens = []
+    # RSS
+    for item in root.findall(".//item")[:20]:
+        titulo = (item.findtext("title") or "").strip()
+        link   = (item.findtext("link") or "").strip()
+        desc   = item.findtext("description") or ""
+        data   = item.findtext("pubDate") or ""
+        if titulo and link:
+            itens.append((titulo, link, desc, data))
+    # Atom
+    if not itens:
+        ns = "{http://www.w3.org/2005/Atom}"
+        for e in root.findall(f".//{ns}entry")[:20]:
+            titulo = (e.findtext(f"{ns}title") or "").strip()
+            link_el = e.find(f"{ns}link")
+            link = link_el.get("href") if link_el is not None else ""
+            desc = e.findtext(f"{ns}summary") or e.findtext(f"{ns}content") or ""
+            data = e.findtext(f"{ns}updated") or e.findtext(f"{ns}published") or ""
+            if titulo and link:
+                itens.append((titulo, link, desc, data))
+
+    saida = []
+    for titulo, link, desc, data in itens:
+        limpo = re.sub(r"<[^>]+>", " ", desc)
+        limpo = re.sub(r"\s+", " ", limpo).strip()[:300]
+        saida.append({"title": titulo, "url": link, "date": data, "desc": limpo})
+    return saida
+
+
+def coletar_feeds_diretos(seen_urls, seen_titles):
+    """Le os feeds do setor. Devolve itens ja classificados."""
+    print("\n  --- Feeds diretos de veiculos do setor ---")
+    itens, ok, falhou = [], [], []
+
+    for feed in FEEDS_DIRETOS:
+        try:
+            brutos = fetch_feed(feed["url"])
+        except Exception as e:
+            falhou.append(f"{feed['nome']} ({str(e)[:40]})")
+            continue
+
+        n = 0
+        for r in brutos:
+            url, titulo = r["url"], r["title"]
+            if not url or not titulo or url in seen_urls:
+                continue
+            norm = normalize_title(titulo)
+            if norm in seen_titles:
+                continue
+            cat = feed["cat"] or classificar(titulo, r["desc"])
+            if not cat:
+                continue
+            if is_noise(titulo, r["desc"]):
+                continue
+            seen_urls.add(url)
+            seen_titles.add(norm)
+            flag, pais = detect_country(titulo, r["desc"])
+            itens.append({
+                "title": titulo, "url": url, "source": feed["nome"], "desc": r["desc"],
+                "date_str": fmt_date(r["date"]), "date_raw": r["date"],
+                "flag": flag, "country": pais, "category": cat, "summary": "",
+                "origem": "feed",
+            })
+            n += 1
+        ok.append(f"{feed['nome']} ({n})")
+        time.sleep(0.5)
+
+    print(f"    Funcionaram ({len(ok)}): {', '.join(ok) if ok else 'nenhum'}")
+    if falhou:
+        print(f"    Falharam ({len(falhou)}): {'; '.join(falhou)}")
+    print(f"    Total vindo de feeds diretos: {len(itens)}")
+    return itens
+
+
 
 def fetch_news():
     seen_urls, seen_titles = set(), set()
@@ -721,22 +903,34 @@ def fetch_news():
                 "desc": r.get("desc", ""),
                 "date_str": fmt_date(r["date"]), "date_raw": r["date"],
                 "flag": flag, "country": country,
-                "category": cat, "summary": "",
+                "category": cat, "summary": "", "origem": "google",
             })
 
     if falhas:
         print(f"  ATENCAO: {falhas} de {len(RSS_SEARCHES)} buscas nao retornaram nada.")
+
+    all_items.extend(coletar_feeds_diretos(seen_urls, seen_titles))
+
+    n_google = sum(1 for i in all_items if i.get("origem") == "google")
+    n_feed   = sum(1 for i in all_items if i.get("origem") == "feed")
+    print(f"\n  Origem: Google News = {n_google} | Feeds diretos = {n_feed}")
 
     n_saf   = sum(1 for i in all_items if i["category"] == "saf")
     n_bio   = sum(1 for i in all_items if i["category"] == "bio")
     n_blend = sum(1 for i in all_items if i["category"] == "blend")
     print(f"  Total coletado: SAF={n_saf} | Bio={n_bio} | Blend={n_blend}")
 
+    def por_origem(lista):
+        g = sum(1 for i in lista if i.get("origem") == "google")
+        f = sum(1 for i in lista if i.get("origem") == "feed")
+        return f"Google={g} Feeds={f}"
+
     # ordena por data ANTES de filtrar, para que o primeiro bloco enviado ao Gemini
     # seja sempre o das noticias mais recentes
     all_items.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
 
     filtered = gemini_filter(all_items)
+    print(f"  Apos o filtro: {por_origem(filtered)}")
     filtered.sort(key=lambda x: parse_date_obj(x.get("date_raw", "")), reverse=True)
 
     # quantas noticias de cada idade sobraram
@@ -845,7 +1039,7 @@ def atualizar_destaques(items):
         return d
 
     hoje = datetime.now(timezone.utc).strftime("%d/%m")
-    limite = datetime.now(timezone.utc) - timedelta(days=7)
+    limite = datetime.now(timezone.utc) - timedelta(days=7)   # destaques seguem sendo da semana
     nomes = {"saf": "SAF (combustivel sustentavel de aviacao)",
              "bio": "Biobunker (combustivel maritimo sustentavel)",
              "blend": "Blending (mistura etanol+gasolina)"}
@@ -889,8 +1083,9 @@ def atualizar_destaques(items):
         "trimestre'). Nunca apresente marco antigo como se tivesse acontecido agora.\n"
         "- Diferencie o que ESTA EM VIGOR do que e proposta, estudo, meta ou expectativa. "
         "Nao escreva que algo entrou em vigor se o texto fala em discussao ou plano.\n"
-        "- Priorize mudanca de regra ou mandato, contrato e investimento, movimento de "
-        "concorrente, abertura ou fechamento de mercado.\n"
+        "- Priorize mudanca de regra ou mandato (inclusive quando o mandato e adiado, "
+        "reduzido ou suspenso), contrato e investimento, movimento de concorrente, "
+        "abertura ou fechamento de mercado.\n"
         "- Termine com o que isso significa para quem vende etanol, quando fizer sentido.\n"
         "- Se ja existe uma SINTESE ATUAL, atualize-a incorporando o que e novo e "
         "removendo o que perdeu importancia. Nao recomece do zero sem motivo.\n"
@@ -1202,8 +1397,11 @@ function renderCards() {{
 </body>
 </html>"""
 
+ROT_MAPA = {"blend": "mapa de Blending", "saf": "mapa de SAF"}
+
+
 def render_pendencias(dados):
-    """Gera a pagina de solicitacoes de alteracao do mapa."""
+    """Gera a pagina de solicitacoes de alteracao dos mapas."""
     pend = dados.get("pendentes", [])
     now  = datetime.now(timezone.utc).strftime("%d/%m/%Y as %H:%M UTC")
 
@@ -1213,8 +1411,10 @@ def render_pendencias(dados):
     <div class="req">
       <div class="req-head">
         <span class="req-pais">{html.escape(p['pais'])}</span>
+        <span class="req-mapa {p.get('mapa','blend')}">{ROT_MAPA.get(p.get('mapa','blend'), '')}</span>
         <span class="req-data">detectado em {html.escape(p['detectado_em'])}</span>
       </div>
+      <div class="req-campo">campo: {html.escape(p.get('campo','blend'))}</div>
       <div class="req-mud">
         <span class="pill old">{html.escape(p['atual'])}</span>
         <span class="seta">passa a</span>
@@ -1271,7 +1471,11 @@ def render_pendencias(dados):
   .req{{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px}}
   .req-head{{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}}
   .req-pais{{font-size:17px;font-weight:700}}
-  .req-data{{font-size:11px;color:var(--text3)}}
+  .req-data{{font-size:11px;color:var(--text3);margin-left:auto}}
+  .req-mapa{{font-size:10px;font-weight:600;letter-spacing:.4px;padding:3px 9px;border-radius:20px;border:1px solid}}
+  .req-mapa.blend{{color:#EA792B;border-color:#EA792B;background:rgba(234,121,43,.10)}}
+  .req-mapa.saf{{color:#5E9BE0;border-color:#5E9BE0;background:rgba(94,155,224,.10)}}
+  .req-campo{{font-size:11px;color:var(--text3);margin-bottom:10px;font-family:monospace}}
   .req-mud{{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}}
   .pill{{padding:5px 14px;border-radius:8px;font-size:15px;font-weight:700;border:1px solid}}
   .pill.old{{background:var(--bg3);border-color:var(--border2);color:var(--text2)}}
@@ -1310,14 +1514,14 @@ def render_pendencias(dados):
   </div>
 </nav>
 <div class="header">
-  <h1>Solicitacoes de alteracao do mapa</h1>
+  <h1>Solicitacoes de alteracao dos mapas</h1>
   <p>Atualizado em {now} &middot; {len(pend)} pendente(s)</p>
 </div>
 <div class="aviso">
   Nada e alterado sem a sua aprovacao. Ao clicar em Aprovar, o GitHub abre com a
   solicitacao ja preenchida: basta enviar para confirmar. Esse passo existe porque o
   site e publico, e so quem tem acesso ao repositorio pode alterar os mapas.
-  Apenas o campo de percentual de mistura e modificado.
+  Apenas o campo de percentual e modificado - nome, status, notas e demais dados ficam intactos.
 </div>
 <div class="wrap">{cards}
 </div>
@@ -1617,7 +1821,8 @@ def main():
         f.write(render_arquivo(arq))
     print(f"{ARQUIVO_HTML} gerado.")
 
-    dados = detectar_mudancas_blend(items)
+    detectar_mudancas(items, "blend")
+    dados = detectar_mudancas(items, "saf")
     with open(PEND_HTML, "w", encoding="utf-8") as f:
         f.write(render_pendencias(dados))
     print(f"{PEND_HTML} gerado ({len(dados['pendentes'])} pendencia(s)).")
