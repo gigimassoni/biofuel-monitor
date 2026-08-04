@@ -772,6 +772,14 @@ def semana_atual():
     return f"{iso[0]}-S{iso[1]:02d}"
 
 
+def salvar_destaques(d):
+    try:
+        with open(DESTAQUES_FILE, "w", encoding="utf-8") as f:
+            json.dump(d, f, ensure_ascii=False, indent=1)
+    except Exception as e:
+        print(f"  AVISO ao salvar destaques: {e}")
+
+
 def carregar_destaques():
     try:
         with open(DESTAQUES_FILE, encoding="utf-8") as f:
@@ -792,6 +800,7 @@ def atualizar_destaques(items):
         d = {"semana": semana_atual(), "itens": []}
 
     if not _GEMINI_OK or not GEMINI_API_KEY or not items:
+        salvar_destaques(d)
         return d
 
     hoje = datetime.now(timezone.utc).strftime("%d/%m")
@@ -816,6 +825,7 @@ def atualizar_destaques(items):
                       "resumo": it.get("summary", ""), "desde": hoje})
 
     if not cands:
+        salvar_destaques(d)
         return d
 
     cands = cands[:80]
@@ -843,6 +853,7 @@ def atualizar_destaques(items):
     r = _parse_json(gemini_call(prompt, max_tokens=1500, temperature=0.2))
     if not r or not isinstance(r.get("destaques"), list):
         print("  Destaques: Gemini nao respondeu, mantendo a lista anterior.")
+        salvar_destaques(d)
         return d
 
     novos = []
@@ -863,11 +874,7 @@ def atualizar_destaques(items):
         d["itens"] = novos
         print(f"  Destaques da semana: {len(novos)} no total, {entraram} novo(s) hoje.")
 
-    try:
-        with open(DESTAQUES_FILE, "w", encoding="utf-8") as f:
-            json.dump(d, f, ensure_ascii=False, indent=1)
-    except Exception as e:
-        print(f"  AVISO ao salvar destaques: {e}")
+    salvar_destaques(d)
     return d
 
 
