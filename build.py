@@ -750,23 +750,29 @@ def link_issue(p, acao):
 # ==========================================================
 
 FEEDS_DIRETOS = [
-    # --- aviacao / SAF ---
-    {"nome": "GreenAir News",        "url": "https://www.greenairnews.com/?feed=rss2",            "cat": "saf"},
-    {"nome": "SAF Magazine",         "url": "https://www.safmagazine.com/rss",                    "cat": "saf"},
-    # --- biocombustiveis em geral ---
-    {"nome": "Biofuels Digest",      "url": "https://www.biofuelsdigest.com/bdigest/feed/",       "cat": None},
-    {"nome": "Ethanol Producer",     "url": "https://www.ethanolproducer.com/rss",                "cat": None},
-    {"nome": "Biomass Magazine",     "url": "https://www.biomassmagazine.com/rss",                "cat": None},
-    {"nome": "Biofuels International","url": "https://biofuels-news.com/feed/",                   "cat": None},
-    # --- maritimo / bunker ---
-    {"nome": "Ship & Bunker",        "url": "https://shipandbunker.com/news.rss",                 "cat": "bio"},
-    {"nome": "Manifold Times",       "url": "https://www.manifoldtimes.com/feed",                 "cat": "bio"},
-    {"nome": "Bunkerspot",           "url": "https://www.bunkerspot.com/rss/news",                "cat": "bio"},
-    # --- Brasil ---
-    {"nome": "NovaCana",             "url": "https://www.novacana.com/rss",                       "cat": None},
-    {"nome": "UNICA",                "url": "https://unica.com.br/feed/",                         "cat": None},
-    {"nome": "EPBR",                 "url": "https://epbr.com.br/feed/",                          "cat": None},
+    # Mantidos porque responderam no teste real. Feed que falhar e so ignorado.
+    {"nome": "GreenAir News",         "url": "https://www.greenairnews.com/?feed=rss2",      "cat": "saf"},
+    {"nome": "Biofuels Digest",       "url": "https://www.biofuelsdigest.com/bdigest/feed/", "cat": None},
+    {"nome": "Biofuels International","url": "https://biofuels-news.com/feed/",              "cat": None},
+    {"nome": "UNICA",                 "url": "https://unica.com.br/feed/",                   "cat": None},
 ]
+
+# Veiculos do setor buscados via Google News com o operador site:
+# Serve para quem nao publica RSS aberto ou bloqueia leitor automatizado.
+FONTES_SITE = [
+    "novacana.com",          # etanol Brasil - o principal do setor
+    "epbr.com.br",           # energia e politica Brasil
+    "udop.com.br",           # setor sucroenergetico
+    "shipandbunker.com",     # bunker maritimo
+    "manifoldtimes.com",     # bunker Asia
+    "bunkerspot.com",        # bunker global
+    "ethanolproducer.com",   # etanol EUA
+    "biomassmagazine.com",   # biomassa e SAF
+    "spglobal.com",          # Platts
+    "argusmedia.com",        # Argus
+]
+MAX_POR_SITE = 10
+
 
 CHAVES_CAT = {
     "saf":   ["saf", "aviation fuel", "jet fuel", "aviacao", "aviação", "querosene",
@@ -825,6 +831,42 @@ def fetch_feed(url):
         limpo = re.sub(r"\s+", " ", limpo).strip()[:300]
         saida.append({"title": titulo, "url": link, "date": data, "desc": limpo})
     return saida
+
+
+def coletar_por_site(seen_urls, seen_titles):
+    """Puxa as noticias recentes de veiculos especificos via Google News."""
+    print("\n  --- Veiculos do setor via Google News (site:) ---")
+    itens, resumo = [], []
+
+    for dominio in FONTES_SITE:
+        brutos = fetch_rss(f"site:{dominio}")
+        n = 0
+        for r in brutos[:MAX_POR_SITE]:
+            url, titulo = r["url"], r["title"]
+            if not url or not titulo or url in seen_urls:
+                continue
+            norm = normalize_title(titulo)
+            if norm in seen_titles:
+                continue
+            cat = classificar(titulo, r.get("desc", ""))
+            if not cat or is_noise(titulo, r.get("desc", "")):
+                continue
+            seen_urls.add(url)
+            seen_titles.add(norm)
+            flag, pais = detect_country(titulo, r.get("desc", ""))
+            itens.append({
+                "title": titulo, "url": url, "source": r.get("source") or dominio,
+                "desc": r.get("desc", ""), "date_str": fmt_date(r["date"]),
+                "date_raw": r["date"], "flag": flag, "country": pais,
+                "category": cat, "summary": "", "origem": "site",
+            })
+            n += 1
+        resumo.append(f"{dominio} ({n})")
+        time.sleep(RSS_PAUSA)
+
+    print(f"    {', '.join(resumo)}")
+    print(f"    Total vindo de veiculos do setor: {len(itens)}")
+    return itens
 
 
 def coletar_feeds_diretos(seen_urls, seen_titles):
@@ -910,10 +952,13 @@ def fetch_news():
         print(f"  ATENCAO: {falhas} de {len(RSS_SEARCHES)} buscas nao retornaram nada.")
 
     all_items.extend(coletar_feeds_diretos(seen_urls, seen_titles))
+    all_items.extend(coletar_por_site(seen_urls, seen_titles))
 
     n_google = sum(1 for i in all_items if i.get("origem") == "google")
     n_feed   = sum(1 for i in all_items if i.get("origem") == "feed")
-    print(f"\n  Origem: Google News = {n_google} | Feeds diretos = {n_feed}")
+    n_site   = sum(1 for i in all_items if i.get("origem") == "site")
+    print(f"\n  Origem: buscas gerais = {n_google} | feeds diretos = {n_feed} "
+          f"| veiculos do setor = {n_site}")
 
     n_saf   = sum(1 for i in all_items if i["category"] == "saf")
     n_bio   = sum(1 for i in all_items if i["category"] == "bio")
@@ -923,7 +968,8 @@ def fetch_news():
     def por_origem(lista):
         g = sum(1 for i in lista if i.get("origem") == "google")
         f = sum(1 for i in lista if i.get("origem") == "feed")
-        return f"Google={g} Feeds={f}"
+        s = sum(1 for i in lista if i.get("origem") == "site")
+        return f"buscas gerais={g} feeds={f} veiculos={s}"
 
     # ordena por data ANTES de filtrar, para que o primeiro bloco enviado ao Gemini
     # seja sempre o das noticias mais recentes
@@ -1466,7 +1512,6 @@ def render_pendencias(dados):
   .header{{padding:22px 20px 6px}}
   .header h1{{font-size:21px;font-weight:700;letter-spacing:-.3px}}
   .header p{{font-size:12px;color:var(--text3);margin-top:6px}}
-  .aviso{{margin:16px 20px;padding:12px 14px;background:rgba(234,121,43,.07);border:1px solid rgba(234,121,43,.25);border-radius:10px;font-size:12px;color:#F5A46A;line-height:1.6}}
   .wrap{{padding:6px 20px;display:flex;flex-direction:column;gap:14px}}
   .req{{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px}}
   .req-head{{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}}
@@ -1496,7 +1541,7 @@ def render_pendencias(dados):
   .vazio{{padding:60px 20px;text-align:center}}
   .vazio-t{{font-size:16px;font-weight:600;margin-bottom:10px}}
   .vazio-d{{font-size:13px;color:var(--text2);line-height:1.65;max-width:420px;margin:0 auto}}
-  @media(max-width:640px){{.navbar{{padding:0 14px}}.header,.wrap,.aviso{{padding-left:14px;padding-right:14px}}}}
+  @media(max-width:640px){{.navbar{{padding:0 14px}}.header,.wrap{{padding-left:14px;padding-right:14px}}}}
 </style>
 </head>
 <body>
@@ -1516,12 +1561,6 @@ def render_pendencias(dados):
 <div class="header">
   <h1>Solicitacoes de alteracao dos mapas</h1>
   <p>Atualizado em {now} &middot; {len(pend)} pendente(s)</p>
-</div>
-<div class="aviso">
-  Nada e alterado sem a sua aprovacao. Ao clicar em Aprovar, o GitHub abre com a
-  solicitacao ja preenchida: basta enviar para confirmar. Esse passo existe porque o
-  site e publico, e so quem tem acesso ao repositorio pode alterar os mapas.
-  Apenas o campo de percentual e modificado - nome, status, notas e demais dados ficam intactos.
 </div>
 <div class="wrap">{cards}
 </div>
