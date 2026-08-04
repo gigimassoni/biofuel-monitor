@@ -28,6 +28,12 @@ MAPA_BLEND      = "mapa-mandatos.html"
 PEND_FILE       = "pendencias.json"
 PEND_HTML       = "pendencias.html"
 REPO            = os.environ.get("GITHUB_REPOSITORY", "gigimassoni/biofuel-monitor")
+ARQUIVO_FILE    = "arquivo.json"
+ARQUIVO_HTML    = "arquivo.html"
+ARQUIVO_DIAS    = 90    # quanto tempo o arquivo guarda (3 meses)
+ARQUIVO_MOSTRAR = 600   # quantas noticias a pagina de arquivo exibe
+DESTAQUES_FILE  = "destaques.json"
+MAX_DESTAQUES   = 6     # quantos destaques a semana carrega
 
 # Descobertos automaticamente em tempo de execucao
 _MODEL = None
@@ -228,6 +234,31 @@ RSS_SEARCHES = [
     {"cat": "bio",   "query": '"green corridor" OR "green shipping" biofuel port bunkering'},
     {"cat": "blend", "query": '"ethanol" export OR import market demand mandate country'},
     {"cat": "blend", "query": '"flex fuel" OR "flex-fuel" ethanol gasoline vehicle policy'},
+
+    # --- rota ATJ: quem produz SAF a partir de etanol ---
+    {"cat": "saf",   "query": '"LanzaJet" OR "Gevo" OR "Summit Next Gen" OR "Vertimass"'},
+    {"cat": "saf",   "query": '"ethanol-to-jet" OR "alcohol-to-jet" plant OR investment OR offtake'},
+
+    # --- etanol de milho, apenas quando ligado as tres frentes ---
+    {"cat": "saf",   "query": '"corn ethanol" SAF OR "aviation fuel" OR "alcohol to jet"'},
+    {"cat": "blend", "query": '"corn ethanol" blending mandate OR blend rate policy'},
+
+    # --- barreiras comerciais e acesso a mercado ---
+    {"cat": "blend", "query": 'ethanol tariff OR "import duty" OR "trade barrier" fuel market'},
+    {"cat": "blend", "query": '"RED III" OR "Renewable Energy Directive" ethanol OR biofuel'},
+    {"cat": "saf",   "query": 'SAF tariff OR "trade barrier" OR "import rules" aviation fuel'},
+
+    # --- concorrentes e pares, apenas ligados as tres frentes ---
+    {"cat": "saf",   "query": '"Raizen" OR "Cosan" OR "Sao Martinho" OR "BP Bunge" SAF OR "aviation fuel"'},
+    {"cat": "blend", "query": '"POET" OR "Green Plains" OR "Valero" OR "ADM" ethanol blending OR SAF'},
+    {"cat": "bio",   "query": '"Raizen" OR "Cosan" OR "Vertex" OR "Petrobras" marine fuel OR bunker biofuel'},
+
+    # --- Brasil, em portugues (edicao BR do Google Noticias) ---
+    {"cat": "blend", "query": 'CNPE OR MME OR ANP etanol mistura gasolina mandato', "lang": "pt"},
+    {"cat": "blend", "query": '"mistura de etanol" OR "teor de etanol" gasolina aumento', "lang": "pt"},
+    {"cat": "saf",   "query": '"combustivel do futuro" OR ProBioQAV OR SAF aviacao etanol', "lang": "pt"},
+    {"cat": "saf",   "query": 'querosene sustentavel OR "combustivel sustentavel de aviacao" etanol', "lang": "pt"},
+    {"cat": "bio",   "query": 'etanol combustivel maritimo OR bunker OR navio descarbonizacao', "lang": "pt"},
 ]
 
 NOISE = [
@@ -335,13 +366,15 @@ def parse_date_obj(date_str):
         return datetime.min.replace(tzinfo=timezone.utc)
 
 
-def build_rss_url(query):
+def build_rss_url(query, lang="en"):
     q = f"{query} {JANELA}".strip() if JANELA else query
+    if lang == "pt":
+        return f"https://news.google.com/rss/search?q={quote(q)}&hl=pt-BR&gl=BR&ceid=BR:pt"
     return f"https://news.google.com/rss/search?q={quote(q)}&hl=en-US&gl=US&ceid=US:en"
 
 
-def fetch_rss(query):
-    url = build_rss_url(query)
+def fetch_rss(query, lang="en"):
+    url = build_rss_url(query, lang)
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     try:
         req = urllib.request.Request(url, headers=headers)
@@ -635,7 +668,7 @@ def fetch_news():
     for search in RSS_SEARCHES:
         cat, query = search["cat"], search["query"]
         print(f"  [{cat.upper()}] {query[:58]}...")
-        rss_items = fetch_rss(query)
+        rss_items = fetch_rss(query, search.get("lang", "en"))
         print(f"    Retornou {len(rss_items)} itens")
 
         for r in rss_items:
@@ -730,8 +763,152 @@ def fetch_news():
 #  HTML
 # ==========================================================
 
-def render_html(items):
+# ==========================================================
+#  DESTAQUES DA SEMANA
+# ==========================================================
+
+def semana_atual():
+    iso = datetime.now(timezone.utc).isocalendar()
+    return f"{iso[0]}-S{iso[1]:02d}"
+
+
+def carregar_destaques():
+    try:
+        with open(DESTAQUES_FILE, encoding="utf-8") as f:
+            d = json.load(f)
+        if isinstance(d, dict) and "itens" in d:
+            return d
+    except Exception:
+        pass
+    return {"semana": semana_atual(), "itens": []}
+
+
+def atualizar_destaques(items):
+    """Reavalia os destaques da semana: mantem, incrementa e substitui."""
+    d = carregar_destaques()
+
+    if d.get("semana") != semana_atual():
+        print(f"  Destaques: semana nova ({semana_atual()}), recomecando a lista.")
+        d = {"semana": semana_atual(), "itens": []}
+
+    if not _GEMINI_OK or not GEMINI_API_KEY or not items:
+        return d
+
+    hoje = datetime.now(timezone.utc).strftime("%d/%m")
+    atuais = d["itens"]
+    chaves_atuais = {normalize_title(x["titulo"]) for x in atuais}
+
+    # candidatos: destaques atuais + noticias dos ultimos 7 dias
+    cands = [{"titulo": x["titulo"], "url": x["url"], "fonte": x.get("fonte", ""),
+              "cat": x.get("cat", "saf"), "data": x.get("data", ""),
+              "desde": x.get("desde", hoje)} for x in atuais]
+
+    limite = datetime.now(timezone.utc) - timedelta(days=7)
+    for it in items:
+        k = normalize_title(it["title"])
+        if k in chaves_atuais:
+            continue
+        if parse_date_obj(it.get("date_raw", "")) < limite:
+            continue
+        chaves_atuais.add(k)
+        cands.append({"titulo": it["title"], "url": it["url"], "fonte": it.get("source", ""),
+                      "cat": it["category"], "data": it.get("date_raw", ""),
+                      "resumo": it.get("summary", ""), "desde": hoje})
+
+    if not cands:
+        return d
+
+    cands = cands[:80]
+    lista = "\n".join(
+        f"{i+1}. [{c['cat'].upper()}]{' [JA E DESTAQUE]' if i < len(atuais) else ''} {c['titulo']}"
+        + (f"\n   {c.get('resumo','')[:160]}" if c.get("resumo") else "")
+        for i, c in enumerate(cands)
+    )
+
+    prompt = (
+        "Voce e analista de novos negocios de etanol na Raizen (SAF, biobunker e blending).\n"
+        f"Escolha os {MAX_DESTAQUES} fatos MAIS IMPORTANTES da semana para essa area, "
+        "entre as noticias abaixo.\n\n"
+        "Criterios de importancia: mudanca de regra ou mandato, contrato e investimento "
+        "relevante, movimento de concorrente, abertura ou fechamento de mercado. "
+        "Prefira fato consumado a opiniao, analise de mercado ou previsao.\n"
+        "As marcadas como [JA E DESTAQUE] continuam valendo: mantenha as que seguem entre "
+        "as mais importantes e troque as que ja foram superadas por noticias melhores.\n\n"
+        "Para cada escolhida escreva um motivo de UMA frase, dizendo por que importa "
+        "para o negocio de etanol.\n\n"
+        'Responda SOMENTE com JSON: {"destaques": [{"id": 3, "motivo": "..."}]}\n\n'
+        f"NOTICIAS:\n{lista}"
+    )
+
+    r = _parse_json(gemini_call(prompt, max_tokens=1500, temperature=0.2))
+    if not r or not isinstance(r.get("destaques"), list):
+        print("  Destaques: Gemini nao respondeu, mantendo a lista anterior.")
+        return d
+
+    novos = []
+    for esc in r["destaques"][:MAX_DESTAQUES]:
+        i = esc.get("id")
+        if not isinstance(i, int) or not (1 <= i <= len(cands)):
+            continue
+        c = cands[i - 1]
+        novos.append({
+            "titulo": c["titulo"], "url": c["url"], "fonte": c["fonte"],
+            "cat": c["cat"], "data": c["data"], "desde": c["desde"],
+            "motivo": str(esc.get("motivo", ""))[:220],
+        })
+
+    if novos:
+        entraram = sum(1 for x in novos if normalize_title(x["titulo"]) not in
+                       {normalize_title(y["titulo"]) for y in atuais})
+        d["itens"] = novos
+        print(f"  Destaques da semana: {len(novos)} no total, {entraram} novo(s) hoje.")
+
+    try:
+        with open(DESTAQUES_FILE, "w", encoding="utf-8") as f:
+            json.dump(d, f, ensure_ascii=False, indent=1)
+    except Exception as e:
+        print(f"  AVISO ao salvar destaques: {e}")
+    return d
+
+
+def render_destaques(d):
+    """Bloco de destaques que vai no topo da pagina de noticias."""
+    itens = d.get("itens", [])
+    if not itens:
+        return ""
+    labels = {"saf": "SAF", "bio": "Biobunker", "blend": "Blending"}
+    hoje = datetime.now(timezone.utc).strftime("%d/%m")
+
+    linhas = ""
+    for i, x in enumerate(itens):
+        novo = '<span class="tag-novo">novo</span>' if x.get("desde") == hoje else ""
+        cat = x.get("cat", "saf")
+        linhas += f"""
+      <div class="dq">
+        <div class="dq-n">{i+1}</div>
+        <div class="dq-corpo">
+          <div class="dq-topo">
+            <span class="news-badge {cat}">{labels.get(cat, cat)}</span>{novo}
+            <span class="dq-desde">desde {html.escape(x.get('desde',''))}</span>
+          </div>
+          <a class="dq-titulo" href="{html.escape(x['url'])}" target="_blank" rel="noopener">{html.escape(x['titulo'])}</a>
+          <div class="dq-motivo">{html.escape(x.get('motivo',''))}</div>
+          <div class="dq-fonte">{html.escape(x.get('fonte',''))}</div>
+        </div>
+      </div>"""
+
+    return f"""
+<div class="destaques">
+  <div class="dq-cab">
+    <span class="dq-tit">Destaques da semana</span>
+    <span class="dq-sub">{html.escape(d.get('semana',''))} &middot; atualizado a cada dia</span>
+  </div>{linhas}
+</div>"""
+
+
+def render_html(items, destaques=None):
     now    = datetime.now(timezone.utc).strftime("%d/%m/%Y as %H:%M UTC")
+    bloco_destaques = render_destaques(destaques or {})
     labels = {"saf": "SAF", "bio": "Biobunker", "blend": "Blending"}
     counts = {
         "all":   len(items),
@@ -791,18 +968,18 @@ def render_html(items):
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
   *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
   :root{{
-    --bg:#111318;--bg2:#1c1f26;--bg3:#23272f;
-    --border:#2a2f3a;--border2:#363c4a;
-    --text:#e8edf5;--text2:#7c8799;--text3:#404855;
-    --saf:#4db8f0;--saf-bg:rgba(77,184,240,0.10);
-    --bio:#3dd6a0;--bio-bg:rgba(61,214,160,0.10);
-    --blend:#f0b84d;--blend-bg:rgba(240,184,77,0.10);
-    --accent:#2bc4a0;--accent-l:#3dd6a0;--r:14px;
+    --bg:#05201E;--bg2:#0A302D;--bg3:#0F3D38;
+    --border:#14463F;--border2:#1E5C53;
+    --text:#FFFFFF;--text2:#9FB8B2;--text3:#5F7A75;
+    --saf:#5E9BE0;--saf-bg:rgba(94,155,224,0.10);
+    --bio:#8FCC58;--bio-bg:rgba(46,143,143,0.10);
+    --blend:#EA792B;--blend-bg:rgba(234,121,43,0.10);
+    --accent:#75B73B;--accent-l:#8FCC58;--r:14px;
   }}
   body{{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}}
   .navbar{{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}}
   .nav-logo{{display:flex;align-items:center;gap:8px;text-decoration:none}}
-  .nav-logo-mark{{width:28px;height:28px;background:linear-gradient(135deg,#2bc4a0,#065c3d);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}}
+  .nav-logo-mark{{width:28px;height:28px;background:linear-gradient(135deg,#75B73B,#025050);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}}
   .nav-logo-name{{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.3px}}
   .nav-tabs{{display:flex;gap:4px}}
   .nav-tab{{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all .15s;border:1px solid transparent}}
@@ -815,13 +992,28 @@ def render_html(items):
   .search-box{{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}}
   .search-box input{{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px}}
   .search-box input::placeholder{{color:var(--text3)}}
+  .destaques{{margin:0 20px 22px;background:linear-gradient(160deg,#0A302D,#06413D);border:1px solid #1E5C53;border-radius:16px;padding:18px 18px 8px}}
+  .dq-cab{{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #1E5C53}}
+  .dq-tit{{font-size:15px;font-weight:700;color:#FFFFFF;letter-spacing:-.2px}}
+  .dq-sub{{font-size:11px;color:#9FB8B2}}
+  .dq{{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid rgba(30,92,83,.5)}}
+  .dq:last-child{{border-bottom:none}}
+  .dq-n{{flex-shrink:0;width:23px;height:23px;border-radius:7px;background:#75B73B;color:#06231F;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}}
+  .dq-corpo{{flex:1;min-width:0}}
+  .dq-topo{{display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap}}
+  .tag-novo{{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:#75B73B;color:#06231F}}
+  .dq-desde{{font-size:10px;color:#5F7A75;margin-left:auto}}
+  .dq-titulo{{font-size:14px;font-weight:600;color:#FFFFFF;text-decoration:none;line-height:1.4;display:block;margin-bottom:6px}}
+  .dq-titulo:hover{{color:#8FCC58;text-decoration:underline}}
+  .dq-motivo{{font-size:12px;color:#9FB8B2;line-height:1.55}}
+  .dq-fonte{{font-size:10px;color:#5F7A75;margin-top:6px}}
   .stats{{padding:0 20px;display:flex;flex-direction:column;gap:10px;margin-bottom:20px}}
   .stat-card{{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:all .15s}}
   .stat-card:hover{{border-color:var(--border2)}}
   .stat-card.active-saf  {{border-color:var(--saf);background:var(--saf-bg)}}
   .stat-card.active-bio  {{border-color:var(--bio);background:var(--bio-bg)}}
   .stat-card.active-blend{{border-color:var(--blend);background:var(--blend-bg)}}
-  .stat-card.active-all  {{border-color:var(--accent);background:rgba(43,196,160,0.08)}}
+  .stat-card.active-all  {{border-color:var(--accent);background:rgba(117,183,59,0.08)}}
   .stat-head{{display:flex;align-items:center;gap:8px;margin-bottom:6px}}
   .stat-dot{{width:9px;height:9px;border-radius:50%;flex-shrink:0}}
   .stat-label{{font-size:12px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text2)}}
@@ -850,7 +1042,7 @@ def render_html(items):
   .news-actions{{display:flex;align-items:center;gap:8px}}
   .btn-resumo{{font-size:11px;font-weight:500;padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s}}
   .btn-resumo:hover{{border-color:var(--accent);color:var(--accent-l)}}
-  .btn-resumo.open{{border-color:var(--accent);color:var(--accent-l);background:rgba(43,196,160,0.08)}}
+  .btn-resumo.open{{border-color:var(--accent);color:var(--accent-l);background:rgba(117,183,59,0.08)}}
   .news-read{{font-size:11px;color:var(--accent-l);text-decoration:none}}
   .news-read:hover{{text-decoration:underline}}
   .empty{{padding:60px 20px;text-align:center;color:var(--text2)}}
@@ -879,6 +1071,7 @@ def render_html(items):
   <div class="header-title">Ferramenta de monitoramento de noticias para novos mercados</div>
   <div class="updated">Atualizado em {now}</div>
 </div>
+{bloco_destaques}
 <div class="search-wrap">
   <div class="search-box">
     <span>🔍</span>
@@ -994,14 +1187,14 @@ def render_pendencias(dados):
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
   *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
   :root{{
-    --bg:#111318;--bg2:#1c1f26;--bg3:#23272f;--border:#2a2f3a;--border2:#363c4a;
-    --text:#e8edf5;--text2:#7c8799;--text3:#404855;--accent:#2bc4a0;--accent-l:#3dd6a0;
-    --warn:#f0b84d;
+    --bg:#05201E;--bg2:#0A302D;--bg3:#0F3D38;--border:#14463F;--border2:#1E5C53;
+    --text:#FFFFFF;--text2:#9FB8B2;--text3:#5F7A75;--accent:#75B73B;--accent-l:#8FCC58;
+    --warn:#EA792B;
   }}
   body{{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:50px}}
   .navbar{{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}}
   .nav-logo{{display:flex;align-items:center;gap:8px;text-decoration:none}}
-  .nav-logo-mark{{width:28px;height:28px;background:linear-gradient(135deg,#2bc4a0,#065c3d);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}}
+  .nav-logo-mark{{width:28px;height:28px;background:linear-gradient(135deg,#75B73B,#025050);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}}
   .nav-logo-name{{font-size:13px;font-weight:700;color:var(--text)}}
   .nav-tabs{{display:flex;gap:4px}}
   .nav-tab{{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;border:1px solid transparent}}
@@ -1010,7 +1203,7 @@ def render_pendencias(dados):
   .header{{padding:22px 20px 6px}}
   .header h1{{font-size:21px;font-weight:700;letter-spacing:-.3px}}
   .header p{{font-size:12px;color:var(--text3);margin-top:6px}}
-  .aviso{{margin:16px 20px;padding:12px 14px;background:rgba(240,184,77,.07);border:1px solid rgba(240,184,77,.25);border-radius:10px;font-size:12px;color:#f0c877;line-height:1.6}}
+  .aviso{{margin:16px 20px;padding:12px 14px;background:rgba(234,121,43,.07);border:1px solid rgba(234,121,43,.25);border-radius:10px;font-size:12px;color:#F5A46A;line-height:1.6}}
   .wrap{{padding:6px 20px;display:flex;flex-direction:column;gap:14px}}
   .req{{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px}}
   .req-head{{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}}
@@ -1019,7 +1212,7 @@ def render_pendencias(dados):
   .req-mud{{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}}
   .pill{{padding:5px 14px;border-radius:8px;font-size:15px;font-weight:700;border:1px solid}}
   .pill.old{{background:var(--bg3);border-color:var(--border2);color:var(--text2)}}
-  .pill.new{{background:rgba(43,196,160,.1);border-color:var(--accent);color:var(--accent-l)}}
+  .pill.new{{background:rgba(117,183,59,.1);border-color:var(--accent);color:var(--accent-l)}}
   .seta{{font-size:12px;color:var(--text3)}}
   .req-just{{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px}}
   .prova{{background:var(--bg3);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;margin-bottom:16px}}
@@ -1029,10 +1222,10 @@ def render_pendencias(dados):
   .prova-fonte{{font-size:11px;color:var(--text3);margin-top:6px}}
   .req-acoes{{display:flex;gap:10px;flex-wrap:wrap}}
   .btn{{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none;border:1px solid;transition:all .15s}}
-  .btn.ok{{background:var(--accent);border-color:var(--accent);color:#08130f}}
+  .btn.ok{{background:var(--accent);border-color:var(--accent);color:#06231F}}
   .btn.ok:hover{{background:var(--accent-l)}}
   .btn.no{{background:transparent;border-color:var(--border2);color:var(--text2)}}
-  .btn.no:hover{{border-color:#c05a5a;color:#e08080}}
+  .btn.no:hover{{border-color:#DC2720;color:#E8635C}}
   .vazio{{padding:60px 20px;text-align:center}}
   .vazio-t{{font-size:16px;font-weight:600;margin-bottom:10px}}
   .vazio-d{{font-size:13px;color:var(--text2);line-height:1.65;max-width:420px;margin:0 auto}}
@@ -1047,6 +1240,7 @@ def render_pendencias(dados):
   </a>
   <div class="nav-tabs">
     <a class="nav-tab" href="index.html">Noticias</a>
+    <a class="nav-tab" href="arquivo.html">Arquivo</a>
     <a class="nav-tab" href="mapa-mandatos.html">Blending</a>
     <a class="nav-tab" href="mapa-saf.html">SAF</a>
     <a class="nav-tab active" href="pendencias.html">Aprovacoes</a>
@@ -1068,6 +1262,268 @@ def render_pendencias(dados):
 </html>"""
 
 
+# ==========================================================
+#  ARQUIVO (memoria de 3 meses)
+# ==========================================================
+
+def carregar_arquivo():
+    try:
+        with open(ARQUIVO_FILE, encoding="utf-8") as f:
+            d = json.load(f)
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def atualizar_arquivo(items):
+    """Guarda as noticias do dia e descarta o que passou de ARQUIVO_DIAS."""
+    arq = carregar_arquivo()
+    antes = len(arq)
+    hoje = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    for it in items:
+        chave = normalize_title(it["title"])
+        reg = arq.get(chave, {})
+        arq[chave] = {
+            "titulo":   it["title"],
+            "url":      it["url"],
+            "fonte":    it.get("source", ""),
+            "cat":      it["category"],
+            "data":     it.get("date_raw", ""),
+            "flag":     it.get("flag", ""),
+            "pais":     it.get("country", ""),
+            "resumo":   it.get("summary") or reg.get("resumo", ""),
+            "visto_em": reg.get("visto_em", hoje),
+        }
+
+    # poda
+    limite = datetime.now(timezone.utc) - timedelta(days=ARQUIVO_DIAS)
+    limpo = {}
+    for k, v in arq.items():
+        d = parse_date_obj(v.get("data", ""))
+        if d.year < 2000:
+            try:
+                d = datetime.strptime(v.get("visto_em", hoje), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            except Exception:
+                d = datetime.now(timezone.utc)
+        if d >= limite:
+            limpo[k] = v
+
+    try:
+        with open(ARQUIVO_FILE, "w", encoding="utf-8") as f:
+            json.dump(limpo, f, ensure_ascii=False, indent=1)
+    except Exception as e:
+        print(f"  AVISO ao salvar arquivo: {e}")
+
+    novas = len(limpo) - antes
+    print(f"  Arquivo: {len(limpo)} noticias guardadas "
+          f"({max(novas, 0)} novas, {max(antes + len(items) - len(limpo), 0)} podadas por idade)")
+    return limpo
+
+
+MESES_PT = {1: "janeiro", 2: "fevereiro", 3: "marco", 4: "abril", 5: "maio", 6: "junho",
+            7: "julho", 8: "agosto", 9: "setembro", 10: "outubro", 11: "novembro", 12: "dezembro"}
+
+
+def render_arquivo(arq):
+    """Pagina com o historico de 3 meses."""
+    now = datetime.now(timezone.utc).strftime("%d/%m/%Y as %H:%M UTC")
+    labels = {"saf": "SAF", "bio": "Biobunker", "blend": "Blending"}
+
+    regs = list(arq.values())
+    regs.sort(key=lambda r: parse_date_obj(r.get("data", "")), reverse=True)
+    total = len(regs)
+    regs = regs[:ARQUIVO_MOSTRAR]
+
+    meses = []
+    for r in regs:
+        d = parse_date_obj(r.get("data", ""))
+        if d.year > 2000:
+            chave = f"{d.year}-{d.month:02d}"
+            rotulo = f"{MESES_PT[d.month]}/{str(d.year)[2:]}"
+            if (chave, rotulo) not in meses:
+                meses.append((chave, rotulo))
+    meses.sort(reverse=True)
+
+    botoes_mes = "".join(
+        f'<button class="chip" data-mes="{c}" onclick="setMes(\'{c}\')" id="m-{c}">{r}</button>'
+        for c, r in meses
+    )
+
+    cards = ""
+    for i, r in enumerate(regs):
+        d = parse_date_obj(r.get("data", ""))
+        mes = f"{d.year}-{d.month:02d}" if d.year > 2000 else "sd"
+        data_txt = d.strftime("%d/%m/%Y") if d.year > 2000 else "sem data"
+        cat = r.get("cat", "saf")
+        resumo = html.escape(r.get("resumo") or "Resumo nao disponivel para esta noticia.")
+        cards += f"""
+    <div class="news-card" data-cat="{cat}" data-mes="{mes}" data-title="{html.escape(r['titulo'].lower())}">
+      <div class="news-top">
+        <span class="news-badge {cat}">{labels.get(cat, cat)}</span>
+        <span class="news-time">{data_txt}</span>
+      </div>
+      <div class="news-title"><a href="{html.escape(r['url'])}" target="_blank" rel="noopener">{html.escape(r['titulo'])}</a></div>
+      <div class="news-summary" id="summary-{i}" style="display:none">{resumo}</div>
+      <div class="news-footer">
+        <span class="news-source">{r.get('flag','')} {html.escape(r.get('pais',''))} &middot; {html.escape(r.get('fonte',''))}</span>
+        <div class="news-actions">
+          <button class="btn-resumo" onclick="toggleResumo({i})" id="btn-{i}">Resumo</button>
+          <a class="news-read" href="{html.escape(r['url'])}" target="_blank" rel="noopener">Ler</a>
+        </div>
+      </div>
+    </div>"""
+
+    if not regs:
+        cards = """<div class="vazio">
+      <div class="vazio-t">O arquivo ainda esta vazio</div>
+      <div class="vazio-d">Ele vai sendo montado a cada atualizacao do monitor.
+      As noticias saem do painel principal depois de 7 dias e ficam guardadas aqui por 3 meses.</div>
+    </div>"""
+
+    nota = (f"Mostrando as {len(regs)} mais recentes de {total} guardadas."
+            if total > len(regs) else f"{total} noticia(s) guardada(s).")
+
+    return f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Arquivo - BioFuel Monitor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
+  :root{{
+    --bg:#05201E;--bg2:#0A302D;--bg3:#0F3D38;--border:#14463F;--border2:#1E5C53;
+    --text:#FFFFFF;--text2:#9FB8B2;--text3:#5F7A75;
+    --saf:#5E9BE0;--saf-bg:rgba(94,155,224,.10);
+    --bio:#8FCC58;--bio-bg:rgba(46,143,143,.10);
+    --blend:#EA792B;--blend-bg:rgba(234,121,43,.10);
+    --accent:#75B73B;--accent-l:#8FCC58;--r:14px;
+  }}
+  body{{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding-bottom:40px}}
+  .navbar{{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}}
+  .nav-logo{{display:flex;align-items:center;gap:8px;text-decoration:none}}
+  .nav-logo-mark{{width:28px;height:28px;background:linear-gradient(135deg,#75B73B,#025050);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}}
+  .nav-logo-name{{font-size:13px;font-weight:700;color:var(--text)}}
+  .nav-tabs{{display:flex;gap:4px;flex-wrap:wrap}}
+  .nav-tab{{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;border:1px solid transparent}}
+  .nav-tab:hover{{color:var(--text);background:var(--bg3)}}
+  .nav-tab.active{{background:var(--bg3);border-color:var(--border2);color:var(--text)}}
+  .header{{padding:20px 20px 10px}}
+  .header h1{{font-size:21px;font-weight:700;letter-spacing:-.3px}}
+  .header p{{font-size:12px;color:var(--text3);margin-top:6px}}
+  .search-wrap{{padding:8px 20px 14px}}
+  .search-box{{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}}
+  .search-box input{{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px}}
+  .search-box input::placeholder{{color:var(--text3)}}
+  .filtros{{padding:0 20px 8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}}
+  .filtros::-webkit-scrollbar{{display:none}}
+  .rot{{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:0 20px 6px}}
+  .chip{{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0}}
+  .chip.a{{background:var(--accent);border-color:var(--accent);color:#06231F}}
+  .news-wrap{{padding:10px 20px 0;display:flex;flex-direction:column;gap:10px}}
+  .news-card{{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px}}
+  .news-card:hover{{border-color:var(--border2)}}
+  .news-top{{display:flex;align-items:center;gap:8px;margin-bottom:10px}}
+  .news-badge{{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid}}
+  .news-badge.saf{{color:var(--saf);border-color:var(--saf);background:var(--saf-bg)}}
+  .news-badge.bio{{color:var(--bio);border-color:var(--bio);background:var(--bio-bg)}}
+  .news-badge.blend{{color:var(--blend);border-color:var(--blend);background:var(--blend-bg)}}
+  .news-time{{font-size:11px;color:var(--text3);margin-left:auto}}
+  .news-title{{font-size:14px;font-weight:500;line-height:1.45;margin-bottom:10px}}
+  .news-title a{{color:var(--text);text-decoration:none}}
+  .news-title a:hover{{color:var(--accent-l);text-decoration:underline}}
+  .news-summary{{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:10px;padding:12px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent)}}
+  .news-footer{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}}
+  .news-source{{font-size:11px;color:var(--text3)}}
+  .news-actions{{display:flex;align-items:center;gap:8px}}
+  .btn-resumo{{font-size:11px;font-weight:500;padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer}}
+  .btn-resumo:hover{{border-color:var(--accent);color:var(--accent-l)}}
+  .btn-resumo.open{{border-color:var(--accent);color:var(--accent-l);background:rgba(117,183,59,.08)}}
+  .news-read{{font-size:11px;color:var(--accent-l);text-decoration:none}}
+  .vazio{{padding:60px 20px;text-align:center}}
+  .vazio-t{{font-size:16px;font-weight:600;margin-bottom:10px}}
+  .vazio-d{{font-size:13px;color:var(--text2);line-height:1.65;max-width:430px;margin:0 auto}}
+  .nada{{display:none;padding:40px 20px;text-align:center;color:var(--text2);font-size:13px}}
+  @media(max-width:640px){{.navbar{{padding:0 14px;height:auto;flex-direction:column;gap:8px;padding-top:10px;padding-bottom:10px}}
+  .header,.search-wrap,.filtros,.news-wrap,.rot{{padding-left:14px;padding-right:14px}}}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-mark">B</div><span class="nav-logo-name">BioFuel Monitor</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="index.html">Noticias</a>
+    <a class="nav-tab active" href="arquivo.html">Arquivo</a>
+    <a class="nav-tab" href="mapa-mandatos.html">Blending</a>
+    <a class="nav-tab" href="mapa-saf.html">SAF</a>
+    <a class="nav-tab" href="pendencias.html">Aprovacoes</a>
+  </div>
+</nav>
+<div class="header">
+  <h1>Arquivo de noticias</h1>
+  <p>Ultimos {ARQUIVO_DIAS} dias &middot; {nota} Atualizado em {now}</p>
+</div>
+<div class="search-wrap">
+  <div class="search-box"><span>Buscar</span>
+    <input type="text" id="q" placeholder="titulo, pais, tema..." oninput="render()"/>
+  </div>
+</div>
+<div class="rot">Tema</div>
+<div class="filtros">
+  <button class="chip a" id="c-all"   onclick="setCat('all')">Todos</button>
+  <button class="chip"   id="c-saf"   onclick="setCat('saf')">SAF</button>
+  <button class="chip"   id="c-bio"   onclick="setCat('bio')">Biobunker</button>
+  <button class="chip"   id="c-blend" onclick="setCat('blend')">Blending</button>
+</div>
+<div class="rot">Periodo</div>
+<div class="filtros">
+  <button class="chip a" id="m-all" onclick="setMes('all')">Tudo</button>
+  {botoes_mes}
+</div>
+<div class="news-wrap" id="lista">{cards}
+</div>
+<div class="nada" id="nada">Nenhuma noticia com esses filtros.</div>
+<script>
+let cat = 'all', mes = 'all';
+function toggleResumo(i) {{
+  const b = document.getElementById('summary-' + i), t = document.getElementById('btn-' + i);
+  if (b.style.display !== 'none') {{ b.style.display = 'none'; t.textContent = 'Resumo'; t.classList.remove('open'); }}
+  else {{ b.style.display = 'block'; t.textContent = 'Fechar'; t.classList.add('open'); }}
+}}
+function setCat(c) {{
+  cat = c;
+  ['all','saf','bio','blend'].forEach(k => document.getElementById('c-'+k).className = 'chip' + (k===c?' a':''));
+  render();
+}}
+function setMes(m) {{
+  mes = m;
+  document.querySelectorAll('[id^="m-"]').forEach(b => b.className = 'chip');
+  const el = document.getElementById('m-' + m);
+  if (el) el.className = 'chip a';
+  render();
+}}
+function render() {{
+  const q = document.getElementById('q').value.toLowerCase();
+  let n = 0;
+  document.querySelectorAll('.news-card').forEach(c => {{
+    const okc = cat === 'all' || c.dataset.cat === cat;
+    const okm = mes === 'all' || c.dataset.mes === mes;
+    const okq = !q || c.dataset.title.includes(q) || c.textContent.toLowerCase().includes(q);
+    const ok = okc && okm && okq;
+    c.style.display = ok ? 'block' : 'none';
+    if (ok) n++;
+  }});
+  document.getElementById('nada').style.display = n ? 'none' : 'block';
+}}
+</script>
+</body>
+</html>"""
+
+
 def main():
     print("=" * 60)
     print("BioFuel Monitor - iniciando...")
@@ -1082,10 +1538,16 @@ def main():
     items = fetch_news()
     print(f"Total final: {len(items)} noticias")
 
-    output = render_html(items)
+    dq = atualizar_destaques(items)
+    output = render_html(items, dq)
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(output)
     print("index.html gerado com sucesso!")
+
+    arq = atualizar_arquivo(items)
+    with open(ARQUIVO_HTML, "w", encoding="utf-8") as f:
+        f.write(render_arquivo(arq))
+    print(f"{ARQUIVO_HTML} gerado.")
 
     dados = detectar_mudancas_blend(items)
     with open(PEND_HTML, "w", encoding="utf-8") as f:
