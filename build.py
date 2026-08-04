@@ -805,136 +805,139 @@ def salvar_destaques(d):
 
 
 def carregar_destaques():
+    vazio = {"semana": semana_atual(),
+             "temas": {"saf": {}, "bio": {}, "blend": {}}}
     try:
         with open(DESTAQUES_FILE, encoding="utf-8") as f:
             d = json.load(f)
-        if isinstance(d, dict) and "itens" in d:
+        if isinstance(d, dict) and isinstance(d.get("temas"), dict):
+            for t in ("saf", "bio", "blend"):
+                d["temas"].setdefault(t, {})
             return d
     except Exception:
         pass
-    return {"semana": semana_atual(), "itens": []}
+    return vazio
 
 
 def atualizar_destaques(items):
-    """Reavalia os destaques da semana: mantem, incrementa e substitui."""
+    """Mantem uma sintese por frente (SAF, Biobunker, Blending), atualizada a cada dia."""
     d = carregar_destaques()
 
     if d.get("semana") != semana_atual():
-        print(f"  Destaques: semana nova ({semana_atual()}), recomecando a lista.")
-        d = {"semana": semana_atual(), "itens": []}
+        print(f"  Destaques: semana nova ({semana_atual()}), sinteses zeradas.")
+        d = {"semana": semana_atual(), "temas": {"saf": {}, "bio": {}, "blend": {}}}
 
     if not _GEMINI_OK or not GEMINI_API_KEY or not items:
         salvar_destaques(d)
         return d
 
     hoje = datetime.now(timezone.utc).strftime("%d/%m")
-    atuais = d["itens"]
-    chaves_atuais = {normalize_title(x["titulo"]) for x in atuais}
-
-    # candidatos: destaques atuais + noticias dos ultimos 7 dias
-    cands = [{"titulo": x["titulo"], "url": x["url"], "fonte": x.get("fonte", ""),
-              "cat": x.get("cat", "saf"), "data": x.get("data", ""),
-              "desde": x.get("desde", hoje)} for x in atuais]
-
     limite = datetime.now(timezone.utc) - timedelta(days=7)
-    for it in items:
-        k = normalize_title(it["title"])
-        if k in chaves_atuais:
-            continue
-        if parse_date_obj(it.get("date_raw", "")) < limite:
-            continue
-        chaves_atuais.add(k)
-        cands.append({"titulo": it["title"], "url": it["url"], "fonte": it.get("source", ""),
-                      "cat": it["category"], "data": it.get("date_raw", ""),
-                      "resumo": it.get("summary", ""), "desde": hoje})
+    nomes = {"saf": "SAF (combustivel sustentavel de aviacao)",
+             "bio": "Biobunker (combustivel maritimo sustentavel)",
+             "blend": "Blending (mistura etanol+gasolina)"}
 
-    if not cands:
+    partes = []
+    for tema in ("saf", "bio", "blend"):
+        noticias = [i for i in items
+                    if i["category"] == tema
+                    and parse_date_obj(i.get("date_raw", "")) >= limite][:25]
+        if not noticias:
+            continue
+        atual = d["temas"].get(tema, {}).get("texto", "")
+        linhas = "\n".join(
+            f"- {n['title']}" + (f" | {n.get('summary','')[:150]}" if n.get("summary") else "")
+            for n in noticias
+        )
+        partes.append(
+            f"### {tema} = {nomes[tema]}\n"
+            f"SINTESE ATUAL: {atual if atual else '(ainda nao existe)'}\n"
+            f"NOTICIAS DA SEMANA:\n{linhas}"
+        )
+
+    if not partes:
         salvar_destaques(d)
         return d
-
-    cands = cands[:80]
-    lista = "\n".join(
-        f"{i+1}. [{c['cat'].upper()}]{' [JA E DESTAQUE]' if i < len(atuais) else ''} {c['titulo']}"
-        + (f"\n   {c.get('resumo','')[:160]}" if c.get("resumo") else "")
-        for i, c in enumerate(cands)
-    )
 
     prompt = (
-        "Voce e analista de novos negocios de etanol na Raizen (SAF, biobunker e blending).\n"
-        f"Escolha os {MAX_DESTAQUES} fatos MAIS IMPORTANTES da semana para essa area, "
-        "entre as noticias abaixo.\n\n"
-        "Criterios de importancia: mudanca de regra ou mandato, contrato e investimento "
-        "relevante, movimento de concorrente, abertura ou fechamento de mercado. "
-        "Prefira fato consumado a opiniao, analise de mercado ou previsao.\n"
-        "As marcadas como [JA E DESTAQUE] continuam valendo: mantenha as que seguem entre "
-        "as mais importantes e troque as que ja foram superadas por noticias melhores.\n\n"
-        "Para cada escolhida escreva um motivo de UMA frase, dizendo por que importa "
-        "para o negocio de etanol.\n\n"
-        'Responda SOMENTE com JSON: {"destaques": [{"id": 3, "motivo": "..."}]}\n\n'
-        f"NOTICIAS:\n{lista}"
+        "Voce e analista de novos negocios de etanol na Raizen.\n"
+        "Para CADA uma das tres frentes abaixo, escreva a sintese do que foi mais "
+        "importante NA SEMANA - de 2 a 4 frases, em portugues, texto corrido.\n\n"
+        "Como escrever:\n"
+        "- Fale dos fatos, nao das materias. Nao escreva 'segundo noticia' nem cite veiculo.\n"
+        "- Seja concreto: cite pais, empresa, percentual, valor quando houver.\n"
+        "- Priorize mudanca de regra ou mandato, contrato e investimento, movimento de "
+        "concorrente, abertura ou fechamento de mercado.\n"
+        "- Termine com o que isso significa para quem vende etanol, quando fizer sentido.\n"
+        "- Se ja existe uma SINTESE ATUAL, atualize-a incorporando o que e novo e "
+        "removendo o que perdeu importancia. Nao recomece do zero sem motivo.\n"
+        "- Se a frente teve pouca coisa relevante, diga isso em uma frase, sem inventar.\n\n"
+        'Responda SOMENTE com JSON: {"saf": "...", "bio": "...", "blend": "..."}\n\n'
+        + "\n\n".join(partes)
     )
 
-    r = _parse_json(gemini_call(prompt, max_tokens=1500, temperature=0.2))
-    if not r or not isinstance(r.get("destaques"), list):
-        print("  Destaques: Gemini nao respondeu, mantendo a lista anterior.")
+    r = _parse_json(gemini_call(prompt, max_tokens=1600, temperature=0.3))
+    if not isinstance(r, dict):
+        print("  Destaques: Gemini nao respondeu, sinteses anteriores mantidas.")
         salvar_destaques(d)
         return d
 
-    novos = []
-    for esc in r["destaques"][:MAX_DESTAQUES]:
-        i = esc.get("id")
-        if not isinstance(i, int) or not (1 <= i <= len(cands)):
+    mudou = []
+    for tema in ("saf", "bio", "blend"):
+        texto = str(r.get(tema, "")).strip()
+        if len(texto) < 25:
             continue
-        c = cands[i - 1]
-        novos.append({
-            "titulo": c["titulo"], "url": c["url"], "fonte": c["fonte"],
-            "cat": c["cat"], "data": c["data"], "desde": c["desde"],
-            "motivo": str(esc.get("motivo", ""))[:220],
-        })
+        anterior = d["temas"].get(tema, {}).get("texto", "")
+        d["temas"][tema] = {"texto": texto, "atualizado": hoje,
+                            "desde": d["temas"].get(tema, {}).get("desde", hoje)}
+        if texto != anterior:
+            mudou.append(tema.upper())
 
-    if novos:
-        entraram = sum(1 for x in novos if normalize_title(x["titulo"]) not in
-                       {normalize_title(y["titulo"]) for y in atuais})
-        d["itens"] = novos
-        print(f"  Destaques da semana: {len(novos)} no total, {entraram} novo(s) hoje.")
-
+    print(f"  Destaques da semana: {len(mudou)} frente(s) atualizada(s)"
+          + (f" ({', '.join(mudou)})" if mudou else ""))
     salvar_destaques(d)
     return d
 
 
 def render_destaques(d):
-    """Bloco de destaques que vai no topo da pagina de noticias."""
-    itens = d.get("itens", [])
-    if not itens:
+    """Tres quadros com a sintese da semana, um por frente."""
+    temas = d.get("temas", {})
+    if not any(temas.get(t, {}).get("texto") for t in ("saf", "bio", "blend")):
         return ""
-    labels = {"saf": "SAF", "bio": "Biobunker", "blend": "Blending"}
-    hoje = datetime.now(timezone.utc).strftime("%d/%m")
 
-    linhas = ""
-    for i, x in enumerate(itens):
-        novo = '<span class="tag-novo">novo</span>' if x.get("desde") == hoje else ""
-        cat = x.get("cat", "saf")
-        linhas += f"""
-      <div class="dq">
-        <div class="dq-n">{i+1}</div>
-        <div class="dq-corpo">
-          <div class="dq-topo">
-            <span class="news-badge {cat}">{labels.get(cat, cat)}</span>{novo}
-            <span class="dq-desde">desde {html.escape(x.get('desde',''))}</span>
-          </div>
-          <a class="dq-titulo" href="{html.escape(x['url'])}" target="_blank" rel="noopener">{html.escape(x['titulo'])}</a>
-          <div class="dq-motivo">{html.escape(x.get('motivo',''))}</div>
-          <div class="dq-fonte">{html.escape(x.get('fonte',''))}</div>
-        </div>
-      </div>"""
+    rotulos = {"saf": ("SAF", "Combustivel de aviacao"),
+               "bio": ("Biobunker", "Combustivel maritimo"),
+               "blend": ("Blending", "Mistura etanol+gasolina")}
+
+    quadros = ""
+    for tema in ("saf", "bio", "blend"):
+        info = temas.get(tema, {})
+        texto = info.get("texto", "")
+        titulo, sub = rotulos[tema]
+        corpo = (html.escape(texto) if texto
+                 else '<span class="dq-sem">Sem movimentacao relevante ate agora nesta semana.</span>')
+        atualizado = (f'<span class="dq-quando">atualizado em {html.escape(info["atualizado"])}</span>'
+                      if info.get("atualizado") else "")
+        quadros += f"""
+    <div class="dq-card {tema}">
+      <div class="dq-card-topo">
+        <span class="dq-card-tit">{titulo}</span>
+        {atualizado}
+      </div>
+      <div class="dq-card-sub">{sub}</div>
+      <div class="dq-card-txt">{corpo}</div>
+    </div>"""
 
     return f"""
 <div class="destaques">
   <div class="dq-cab">
     <span class="dq-tit">Destaques da semana</span>
-    <span class="dq-sub">{html.escape(d.get('semana',''))} &middot; atualizado a cada dia</span>
-  </div>{linhas}
-</div>"""
+    <span class="dq-sub">{html.escape(d.get('semana',''))} &middot; a sintese vai sendo atualizada a cada dia</span>
+  </div>
+  <div class="dq-grade">{quadros}
+  </div>
+</div>
+"""
 
 
 def render_html(items, destaques=None):
@@ -1023,21 +1026,25 @@ def render_html(items, destaques=None):
   .search-box{{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}}
   .search-box input{{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px}}
   .search-box input::placeholder{{color:var(--text3)}}
-  .destaques{{margin:0 20px 22px;background:linear-gradient(160deg,#0A302D,#06413D);border:1px solid #1E5C53;border-radius:16px;padding:18px 18px 8px}}
-  .dq-cab{{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #1E5C53}}
+  .destaques{{margin:0 20px 22px}}
+  .dq-cab{{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}}
   .dq-tit{{font-size:15px;font-weight:700;color:#FFFFFF;letter-spacing:-.2px}}
-  .dq-sub{{font-size:11px;color:#9FB8B2}}
-  .dq{{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid rgba(30,92,83,.5)}}
-  .dq:last-child{{border-bottom:none}}
-  .dq-n{{flex-shrink:0;width:23px;height:23px;border-radius:7px;background:#75B73B;color:#06231F;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}}
-  .dq-corpo{{flex:1;min-width:0}}
-  .dq-topo{{display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap}}
-  .tag-novo{{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:#75B73B;color:#06231F}}
-  .dq-desde{{font-size:10px;color:#5F7A75;margin-left:auto}}
-  .dq-titulo{{font-size:14px;font-weight:600;color:#FFFFFF;text-decoration:none;line-height:1.4;display:block;margin-bottom:6px}}
-  .dq-titulo:hover{{color:#8FCC58;text-decoration:underline}}
-  .dq-motivo{{font-size:12px;color:#9FB8B2;line-height:1.55}}
-  .dq-fonte{{font-size:10px;color:#5F7A75;margin-top:6px}}
+  .dq-sub{{font-size:11px;color:#5F7A75}}
+  .dq-grade{{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}}
+  .dq-card{{background:linear-gradient(165deg,#0A302D,#06413D);border:1px solid #1E5C53;border-radius:14px;padding:16px;border-top:3px solid}}
+  .dq-card.saf{{border-top-color:#5E9BE0}}
+  .dq-card.bio{{border-top-color:#2E8F8F}}
+  .dq-card.blend{{border-top-color:#EA792B}}
+  .dq-card-topo{{display:flex;align-items:baseline;justify-content:space-between;gap:8px}}
+  .dq-card-tit{{font-size:14px;font-weight:700;letter-spacing:.2px}}
+  .dq-card.saf .dq-card-tit{{color:#5E9BE0}}
+  .dq-card.bio .dq-card-tit{{color:#2E8F8F}}
+  .dq-card.blend .dq-card-tit{{color:#EA792B}}
+  .dq-quando{{font-size:10px;color:#5F7A75;white-space:nowrap}}
+  .dq-card-sub{{font-size:10px;color:#5F7A75;text-transform:uppercase;letter-spacing:.6px;margin:3px 0 10px}}
+  .dq-card-txt{{font-size:12.5px;color:#FFFFFF;line-height:1.65;opacity:.92}}
+  .dq-sem{{color:#5F7A75;font-style:italic}}
+  @media(max-width:860px){{.dq-grade{{grid-template-columns:1fr}}}}
   .stats{{padding:0 20px;display:flex;flex-direction:column;gap:10px;margin-bottom:20px}}
   .stat-card{{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:all .15s}}
   .stat-card:hover{{border-color:var(--border2)}}
