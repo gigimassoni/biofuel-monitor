@@ -22,6 +22,8 @@ JANELA          = "when:7d"   # so noticias dos ultimos 7 dias.
 FILTER_CHUNK    = 60    # titulos por chamada de filtro
 SUMMARY_BATCH   = 10    # noticias por chamada de resumo
 MIN_INTERVAL    = 7.0   # segundos minimos entre chamadas ao Gemini (limite 10/min)
+RSS_PAUSA       = 1.5   # segundos entre buscas no Google News (evita bloqueio 503)
+RSS_TENTATIVAS  = 3     # quantas vezes reptir uma busca que falhou
 CACHE_FILE      = "resumos.json"
 CACHE_DIAS      = 45    # descarta resumos mais antigos que isso
 MAPA_BLEND      = "mapa-mandatos.html"
@@ -374,33 +376,48 @@ def build_rss_url(query, lang="en"):
 
 
 def fetch_rss(query, lang="en"):
+    """Busca no Google News. Repete com espera crescente se levar bloqueio (503)."""
     url = build_rss_url(query, lang)
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-    try:
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            raw = resp.read()
-        root = ET.fromstring(raw)
-        items = []
-        for item in root.findall(".//item")[:MAX_PER_QUERY]:
-            title = item.findtext("title") or ""
-            title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
-            link  = item.findtext("link") or ""
-            desc  = item.findtext("description") or ""
-            date  = item.findtext("pubDate") or ""
-            source = ""
-            ms = re.search(r"<font[^>]*>([^<]+)</font>", desc)
-            if ms:
-                source = ms.group(1).strip()
-            desc_clean = re.sub(r"<[^>]+>", " ", desc)
-            desc_clean = re.sub(r"\s+", " ", desc_clean).strip()[:300]
-            if title and link:
-                items.append({"title": title, "url": link, "date": date,
-                              "source": source, "desc": desc_clean})
-        return items
-    except Exception as e:
-        print(f"    AVISO RSS: {e}")
-        return []
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8" if lang == "pt" else "en-US,en;q=0.9",
+    }
+
+    for tentativa in range(1, RSS_TENTATIVAS + 1):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                raw = resp.read()
+            root = ET.fromstring(raw)
+            items = []
+            for item in root.findall(".//item")[:MAX_PER_QUERY]:
+                title = item.findtext("title") or ""
+                title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
+                link  = item.findtext("link") or ""
+                desc  = item.findtext("description") or ""
+                date  = item.findtext("pubDate") or ""
+                source = ""
+                ms = re.search(r"<font[^>]*>([^<]+)</font>", desc)
+                if ms:
+                    source = ms.group(1).strip()
+                desc_clean = re.sub(r"<[^>]+>", " ", desc)
+                desc_clean = re.sub(r"\s+", " ", desc_clean).strip()[:300]
+                if title and link:
+                    items.append({"title": title, "url": link, "date": date,
+                                  "source": source, "desc": desc_clean})
+            return items
+
+        except Exception as e:
+            bloqueio = "503" in str(e) or "429" in str(e)
+            if tentativa < RSS_TENTATIVAS:
+                espera = tentativa * (6 if bloqueio else 2)
+                print(f"    tentativa {tentativa} falhou ({e}) - repetindo em {espera}s")
+                time.sleep(espera)
+            else:
+                print(f"    AVISO RSS apos {RSS_TENTATIVAS} tentativas: {e}")
+    return []
+
 
 
 # ==========================================================
@@ -664,12 +681,16 @@ def link_issue(p, acao):
 def fetch_news():
     seen_urls, seen_titles = set(), set()
     all_items = []
+    falhas = 0
 
     for search in RSS_SEARCHES:
         cat, query = search["cat"], search["query"]
         print(f"  [{cat.upper()}] {query[:58]}...")
         rss_items = fetch_rss(query, search.get("lang", "en"))
         print(f"    Retornou {len(rss_items)} itens")
+        if not rss_items:
+            falhas += 1
+        time.sleep(RSS_PAUSA)
 
         for r in rss_items:
             url, title = r["url"], r["title"]
@@ -689,6 +710,9 @@ def fetch_news():
                 "flag": flag, "country": country,
                 "category": cat, "summary": "",
             })
+
+    if falhas:
+        print(f"  ATENCAO: {falhas} de {len(RSS_SEARCHES)} buscas nao retornaram nada.")
 
     n_saf   = sum(1 for i in all_items if i["category"] == "saf")
     n_bio   = sum(1 for i in all_items if i["category"] == "bio")
@@ -1070,8 +1094,10 @@ def render_html(items, destaques=None):
   </a>
   <div class="nav-tabs">
     <a class="nav-tab active" href="index.html">📰 Noticias</a>
+    <a class="nav-tab" href="arquivo.html">🗂️ Arquivo</a>
     <a class="nav-tab" href="mapa-mandatos.html">🗺️ Blending</a>
     <a class="nav-tab" href="mapa-saf.html">✈️ SAF</a>
+    <a class="nav-tab" href="pendencias.html">✅ Aprovacoes</a>
   </div>
 </nav>
 <div class="header">
@@ -1246,11 +1272,11 @@ def render_pendencias(dados):
     <span class="nav-logo-name">BioFuel Monitor</span>
   </a>
   <div class="nav-tabs">
-    <a class="nav-tab" href="index.html">Noticias</a>
-    <a class="nav-tab" href="arquivo.html">Arquivo</a>
-    <a class="nav-tab" href="mapa-mandatos.html">Blending</a>
-    <a class="nav-tab" href="mapa-saf.html">SAF</a>
-    <a class="nav-tab active" href="pendencias.html">Aprovacoes</a>
+    <a class="nav-tab" href="index.html">📰 Noticias</a>
+    <a class="nav-tab" href="arquivo.html">🗂️ Arquivo</a>
+    <a class="nav-tab" href="mapa-mandatos.html">🗺️ Blending</a>
+    <a class="nav-tab" href="mapa-saf.html">✈️ SAF</a>
+    <a class="nav-tab active" href="pendencias.html">✅ Aprovacoes</a>
   </div>
 </nav>
 <div class="header">
@@ -1463,11 +1489,11 @@ def render_arquivo(arq):
     <div class="nav-logo-mark">B</div><span class="nav-logo-name">BioFuel Monitor</span>
   </a>
   <div class="nav-tabs">
-    <a class="nav-tab" href="index.html">Noticias</a>
-    <a class="nav-tab active" href="arquivo.html">Arquivo</a>
-    <a class="nav-tab" href="mapa-mandatos.html">Blending</a>
-    <a class="nav-tab" href="mapa-saf.html">SAF</a>
-    <a class="nav-tab" href="pendencias.html">Aprovacoes</a>
+    <a class="nav-tab" href="index.html">📰 Noticias</a>
+    <a class="nav-tab active" href="arquivo.html">🗂️ Arquivo</a>
+    <a class="nav-tab" href="mapa-mandatos.html">🗺️ Blending</a>
+    <a class="nav-tab" href="mapa-saf.html">✈️ SAF</a>
+    <a class="nav-tab" href="pendencias.html">✅ Aprovacoes</a>
   </div>
 </nav>
 <div class="header">
@@ -1544,6 +1570,11 @@ def main():
 
     items = fetch_news()
     print(f"Total final: {len(items)} noticias")
+
+    if not items and os.path.exists("index.html"):
+        print("ATENCAO: nenhuma noticia coletada (provavel bloqueio do Google).")
+        print("O painel anterior foi mantido. Nada foi sobrescrito.")
+        return
 
     dq = atualizar_destaques(items)
     output = render_html(items, dq)
