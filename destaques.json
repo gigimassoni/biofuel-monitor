@@ -1,20 +1,8 @@
 {
- "semana": "2026-S32",
+ "semana": "2026-S33",
  "temas": {
-  "saf": {
-   "texto": "A Petrobras vendeu seu primeiro lote de SAF produzido com óleo de soja certificado pela CORSIA em parceria com a Bunge, enquanto a American Airlines realizou um voo comercial utilizando eSAF. A Sumitomo Corporation do Brasil e a Cemvita firmaram parceria para integrar a produção de biometano e bio-óleo no país. Por outro lado, a Gevo encerrou suas atividades de etanol e SAF em Dakota do Sul após registrar um encargo de 176 milhões de dólares no segundo trimestre, e a Índia descartou a mistura de etanol no combustível de jato. Para quem vende etanol, o avanço de iniciativas comerciais pontuais contrasta com a reestruturação de empresas do setor e a resistência regulatória externa.",
-   "atualizado": "09/08",
-   "desde": "04/08"
-  },
-  "bio": {
-   "texto": "A CSSC Beihai Shipbuilding fechou um pedido com a Polaris Shipping para a construção de quatro navios graneleiros movidos a etanol, reforçando a expansão de alternativas para o transporte marítimo. O Brasil intensificou articulações para utilizar o etanol na descarbonização do setor, alinhando-se a discussões sobre competitividade e diretrizes governamentais. Além disso, parcerias para o desenvolvimento de infraestrutura de armazenamento de biocombustíveis avançaram em portos internacionais. Para quem vende etanol, o registro de novas encomendas de embarcações consolida a abertura de um mercado promissor para o biobunker.",
-   "atualizado": "09/08",
-   "desde": "04/08"
-  },
-  "blend": {
-   "texto": "O governo indiano negou veementemente acordos para a importação de etanol dos Estados Unidos, mantendo o foco total na proteção da produção doméstica e acelerando o programa de veículos flex-fuel. Nos Estados Unidos, o plano para viabilizar o uso o ano todo da mistura E15 sofreu um revés após o travamento de uma proposta na lei agrícola no Senado. No Brasil, autoridades debateram o avanço de ajustes na proporção de renováveis na matriz de combustíveis. Para quem vende etanol, a blindagem do mercado interno na Índia e a disputa regulatória por mandatos mais ambiciosos sustentam a firmeza da demanda.",
-   "atualizado": "09/08",
-   "desde": "04/08"
-  }
+  "saf": {},
+  "bio": {},
+  "blend": {}
  }
 }
