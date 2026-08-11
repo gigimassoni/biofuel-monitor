@@ -1,8 +1,20 @@
 {
  "semana": "2026-S33",
  "temas": {
-  "saf": {},
-  "bio": {},
-  "blend": {}
+  "saf": {
+   "texto": "A semana foi marcada por ajustes estratégicos na produção global de SAF, com a Gevo cancelando projetos em Dakota do Sul para redirecionar seus esforços para a Dakota do Norte, enquanto a Montana Renewables avançou na expansão do MaxSAF. No cenário internacional, a American Airlines realizou voos comerciais com eSAF, e governos como o da Índia intensificaram discussões para finalizar políticas e relatórios do CORSIA até 2027. Para quem vende etanol, essas movimentações consolidam a rota do SAF como um mercado de longo prazo em expansão, embora dependente de marcos regulatórios firmes.",
+   "atualizado": "11/08",
+   "desde": "11/08"
+  },
+  "bio": {
+   "texto": "O Brasil intensificou articulações institucionais para inserir o etanol na matriz de descarbonização do transporte marítimo, abrindo perspectivas comerciais promissoras para a indústria nacional, alinhado a debates globais sobre custos e regras de carbono. No exterior, portos como o de Roterdã mantêm a liderança na adoção de biobunkers, enquanto o Porto de Algeciras avança em parcerias para infraestrutura de armazenamento de biocombustíveis. Para os produtores de etanol, o biobunker emerge como um novo mercado potencial de alta escala para a escoação da produção.",
+   "atualizado": "11/08",
+   "desde": "11/08"
+  },
+  "blend": {
+   "texto": "O governo brasileiro sinalizou expectativas para o anúncio de aumento na mistura de etanol à gasolina, reforçando que a medida não causa danos aos veículos, enquanto nos Estados Unidos o plano para o uso o ano todo do E15 ficou estagnado após impasses no Senado. Na Índia, o programa da mistura E20 gerou debates políticos intensos, com autoridades defendendo a política e negando firmemente planos de importação de etanol dos Estados Unidos para atender à demanda interna. Para quem vende etanol, a consolidação e expansão de mandatos de mistura sustentam a previsibilidade e a força da demanda doméstica.",
+   "atualizado": "11/08",
+   "desde": "11/08"
+  }
  }
 }
