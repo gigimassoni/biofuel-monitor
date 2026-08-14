@@ -15,6 +15,9 @@ CAMPOS_OK = {"blend": {"blend"},
              "saf":   {"meta2025", "meta2030", "meta2040", "meta2050"}}
 PEND = "pendencias.json"
 
+PAIS_NOVO = False
+NOME_PAIS = ""
+
 titulo  = os.environ.get("ISSUE_TITLE", "")
 corpo   = os.environ.get("ISSUE_BODY", "")
 recusar = titulo.startswith("[MAPA-RECUSAR]")
@@ -27,6 +30,9 @@ def extrair_pedido():
         try:
             d = json.loads(m.group(1))
             if d.get("id") and d.get("novo"):
+                global PAIS_NOVO, NOME_PAIS
+                PAIS_NOVO = bool(d.get("pais_novo"))
+                NOME_PAIS = str(d.get("pais", "")).strip()
                 return (d.get("mapa", "blend"), d["id"].upper().strip(),
                         d.get("campo", "blend"), str(d["novo"]).strip())
         except Exception:
@@ -38,6 +44,47 @@ def extrair_pedido():
     if m:
         return "blend", m.group(1), "blend", m.group(2)
     return None, None, None, None
+
+
+PADRAO_PAIS = {
+    "blend": ('  {{ id:"{cid}", name:"{pais}", flag:"{flag}", region:"{regiao}", '
+              'status:"vigente", blend:"{novo}", year:{ano},\n'
+              '    notes:"Registrado automaticamente a partir de noticia aprovada em {hoje}. '
+              'Descricao ainda nao revisada." }},\n'),
+    "saf":   ('  {{\n    id:"{cid}", name:"{pais}", flag:"{flag}", region:"{regiao}", '
+              'status:"volumetrico", tipo:"volumetrico", mandato:"A revisar",\n'
+              '    inicio:{ano}, meta2025:"—", meta2030:"—", meta2040:"—", meta2050:"—",\n'
+              '    desc:"Registrado automaticamente a partir de noticia aprovada em {hoje}. '
+              'Descricao ainda nao revisada."\n  }},\n'),
+}
+
+
+def inserir_pais(mapa, cid, pais, campo, novo):
+    """Acrescenta um pais que ainda nao existe no mapa."""
+    from datetime import datetime
+    arquivo = ARQUIVOS[mapa]
+    src = open(arquivo, encoding="utf-8").read()
+
+    if re.search(r'id:"' + re.escape(cid) + r'"', src):
+        return False, f"{cid} ja existe no mapa"
+
+    m = re.search(r'(const COUNTRIES\s*=\s*\[)', src)
+    if not m:
+        return False, "nao encontrei a lista de paises no arquivo"
+
+    ano = datetime.now().year
+    hoje = datetime.now().strftime("%d/%m/%Y")
+    linha = PADRAO_PAIS[mapa].format(cid=cid, pais=pais, flag="\U0001F310",
+                                     regiao="A revisar", novo=novo, ano=ano, hoje=hoje)
+    # o campo pedido pode nao ser o do padrao (ex: meta2040 no mapa de SAF)
+    if mapa == "saf" and campo != "meta2030":
+        linha = linha.replace(f'{campo}:"—"', f'{campo}:"{novo}"')
+    elif mapa == "saf":
+        linha = linha.replace('meta2030:"—"', f'meta2030:"{novo}"')
+
+    novo_src = src[:m.end()] + "\n" + linha + src[m.end():]
+    open(arquivo, "w", encoding="utf-8").write(novo_src)
+    return True, "inserido"
 
 
 def aplicar(mapa, cid, campo, novo):
@@ -98,6 +145,15 @@ def main():
     if recusar:
         limpar_pendencia(mapa, cid, campo, novo, True)
         print(f"RESULTADO=Solicitacao recusada. {cid} nao sera alterado e a proposta nao volta.")
+    elif PAIS_NOVO:
+        ok, info = inserir_pais(mapa, cid, NOME_PAIS or cid, campo, novo)
+        if ok:
+            limpar_pendencia(mapa, cid, campo, novo, False)
+            print(f"RESULTADO=Pais adicionado ao mapa de {mapa}: {NOME_PAIS or cid} "
+                  f"com {campo}={novo}. Regiao, bandeira e descricao entraram como "
+                  f"'A revisar' - complete no arquivo quando puder.")
+        else:
+            print(f"RESULTADO=Nada foi alterado ({info}).")
     else:
         ok, info = aplicar(mapa, cid, campo, novo)
         if ok:
