@@ -12,6 +12,20 @@
    "detectado_em": "04/08/2026",
    "mapa": "blend",
    "campo": "blend"
+  },
+  {
+   "mapa": "blend",
+   "campo": "blend",
+   "id": "GTM",
+   "pais": "Guatemala",
+   "pais_novo": true,
+   "atual": "(pais ainda nao esta no mapa)",
+   "novo": "E10",
+   "justificativa": "A notícia confirma o lançamento oficial do mandato E10 na Guatemala.",
+   "noticia_titulo": "Guatemala Launches E10 Mandate",
+   "noticia_url": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBlLXNQUlB3X0dVQkRMNHhYaGFQcWQ4Wkt6WThBSUQ3M2JPZVNNb3Q4ZThjRGpmQW9aS29zV1V4d01jZF9EakJCczJRelpuRVNqZmNsMF8wUVp6a3FNM0lnc0pqS1d0SllxdEdOSW1ROFZvVjluemk2RA?oc=5",
+   "noticia_fonte": "AgWired",
+   "detectado_em": "14/08/2026"
   }
  ],
  "recusados": []
