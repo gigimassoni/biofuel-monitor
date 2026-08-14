@@ -8,6 +8,7 @@ import html as html_mod
 import html
 import json
 import os
+import base64
 import re
 import time
 import urllib.request
@@ -450,18 +451,65 @@ def simple_filter(all_items):
 
 
 
+def _url_de_base64(url):
+    """As URLs do Google News trazem o endereco real embutido em base64."""
+    m = re.search(r"/(?:articles|read)/([A-Za-z0-9_\-]+)", url)
+    if not m:
+        return ""
+    dado = m.group(1)
+    dado += "=" * (-len(dado) % 4)
+    try:
+        bruto = base64.urlsafe_b64decode(dado)
+    except Exception:
+        return ""
+
+    # o protobuf guarda o tamanho da URL no byte anterior a ela
+    for m2 in re.finditer(rb"https?://", bruto):
+        ini = m2.start()
+        tam = bruto[ini - 1] if ini > 0 else 0
+        if 18 <= tam <= 200 and ini + tam <= len(bruto):
+            cand = bruto[ini:ini + tam].decode("utf-8", errors="ignore")
+        else:
+            # sem tamanho confiavel, corta no primeiro caractere invalido
+            trecho = bruto[ini:ini + 400].decode("utf-8", errors="ignore")
+            cand = re.split(r"[^\x21-\x7e]", trecho)[0]
+        cand = cand.rstrip(".,;:\\'\"<>)")
+        if "google.com" in cand or len(cand) < 18:
+            continue
+        if not re.match(r"^https?://[\w.\-]+\.[a-z]{2,}", cand):
+            continue
+        return cand
+    return ""
+
+
 def resolver_url(url):
-    """URL do Google News redireciona. Devolve o endereco real da materia."""
+    """Devolve o endereco real da materia por tras do link do Google News."""
     if "news.google.com" not in url:
         return url
+
+    direto = _url_de_base64(url)
+    if direto:
+        return direto
+
+    # se nao der para decodificar, tenta o redirecionamento
     try:
         req = urllib.request.Request(url, headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                           "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"})
         with urllib.request.urlopen(req, timeout=12) as resp:
-            return resp.url or url
+            final = resp.url or url
+            if "news.google.com" not in final:
+                return final
+            corpo = resp.read(120_000).decode("utf-8", errors="ignore")
+        # a pagina de redirecionamento carrega o destino no HTML
+        for padrao in (r'data-n-au="([^"]+)"', r'<meta[^>]+URL=([^"\']+)',
+                       r'href="(https?://(?!(?:www\.)?google\.com)[^"]{20,})"'):
+            m = re.search(padrao, corpo)
+            if m:
+                return html_mod.unescape(m.group(1))
     except Exception:
-        return url
+        pass
+    return url
 
 
 def extrair_texto(html_bruto):
@@ -492,10 +540,15 @@ def extrair_texto(html_bruto):
     return " ".join(frases)[:ARTIGO_CHARS]
 
 
-def baixar_artigo(url):
+def baixar_artigo(url, diagnostico=None):
     """Abre a materia e devolve o texto. String vazia se nao conseguir."""
+    real = url
     try:
         real = resolver_url(url)
+        if "news.google.com" in real:
+            if diagnostico is not None:
+                diagnostico.append("nao consegui descobrir o link real")
+            return ""
         req = urllib.request.Request(real, headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                           "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -503,29 +556,49 @@ def baixar_artigo(url):
             "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8"})
         with urllib.request.urlopen(req, timeout=15) as resp:
             if "html" not in resp.headers.get("Content-Type", "").lower():
+                if diagnostico is not None:
+                    diagnostico.append("resposta nao e pagina HTML")
                 return ""
             bruto = resp.read(900_000).decode("utf-8", errors="ignore")
         texto = extrair_texto(bruto)
-        return texto if len(texto) > 250 else ""
-    except Exception:
+        if len(texto) > 250:
+            return texto
+        if diagnostico is not None:
+            dom = re.sub(r"^https?://(www\.)?", "", real).split("/")[0]
+            diagnostico.append(f"texto curto demais ({len(texto)} chars) em {dom}")
+        return ""
+    except Exception as e:
+        if diagnostico is not None:
+            dom = re.sub(r"^https?://(www\.)?", "", real).split("/")[0]
+            diagnostico.append(f"{str(e)[:45]} em {dom}")
         return ""
 
 
 def baixar_textos(items):
     """Busca o texto real das materias que serao resumidas."""
-    alvo = items[:LER_ARTIGOS]
+    # quem veio de feed direto ja tem link real: tenta esses primeiro
+    alvo = sorted(items, key=lambda x: 0 if x.get("origem") == "feed" else 1)[:LER_ARTIGOS]
     print(f"  Abrindo {len(alvo)} materias para ler o texto...")
-    ok = 0
+
+    ok, motivos = 0, []
     for i, it in enumerate(alvo, 1):
-        texto = baixar_artigo(it["url"])
+        diag = []
+        texto = baixar_artigo(it["url"], diag)
         if texto:
             it["texto"] = texto
             ok += 1
+        elif diag:
+            motivos.append(diag[0])
         time.sleep(0.4)
         if i % 10 == 0:
             print(f"    {i}/{len(alvo)}...")
-    print(f"    Texto obtido em {ok} de {len(alvo)} materias "
-          f"({len(alvo) - ok} bloqueadas ou com paywall)")
+
+    print(f"    Texto obtido em {ok} de {len(alvo)} materias")
+    if motivos:
+        from collections import Counter
+        print("    Por que as outras falharam:")
+        for motivo, n in Counter(motivos).most_common(6):
+            print(f"      {n}x  {motivo}")
     return items
 
 
@@ -1104,10 +1177,11 @@ def fetch_news():
     if _GEMINI_OK and GEMINI_API_KEY and filtered:
         cache = carregar_cache()
         # abre as materias que ainda nao tem resumo guardado
-        sem_resumo = [i for i in filtered
-                      if not isinstance(cache.get(normalize_title(i["title"])), dict)]
-        if sem_resumo:
-            baixar_textos(sem_resumo)
+        pendentes = [i for i in filtered
+                     if not (isinstance(cache.get(normalize_title(i["title"])), dict)
+                             and cache[normalize_title(i["title"])].get("completo"))]
+        if pendentes:
+            baixar_textos(pendentes)
         hoje  = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
         # aproveita o que ja foi resumido antes
@@ -1116,11 +1190,16 @@ def fetch_news():
         for item in filtered:
             chave = normalize_title(item["title"])
             guardado = cache.get(chave)
-            if isinstance(guardado, dict) and guardado.get("resumo"):
+            # resumo antigo, feito so com o titulo, pode ser refeito com o texto real
+            aproveitavel = (isinstance(guardado, dict) and guardado.get("resumo")
+                            and guardado.get("completo"))
+            if aproveitavel:
                 item["summary"] = guardado["resumo"]
                 guardado["data"] = hoje          # renova a validade
                 reaproveitados += 1
             else:
+                if isinstance(guardado, dict) and guardado.get("resumo"):
+                    item["summary"] = guardado["resumo"]   # mantem enquanto nao refaz
                 novas.append(item)
 
         print(f"  Resumos reaproveitados do cache: {reaproveitados}")
@@ -1139,6 +1218,7 @@ def fetch_news():
                     if texto:
                         cache[normalize_title(item["title"])] = {
                             "resumo": texto, "data": hoje,
+                            "completo": bool(item.get("texto")),
                         }
                         ok += 1
             print(f"  Resumos novos gerados: {ok}/{len(novas)}")
