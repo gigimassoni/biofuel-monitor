@@ -4,6 +4,7 @@ BioFuel Monitor - Raizen Novos Negocios
 Google News RSS + Gemini (modelo descoberto automaticamente via ListModels)
 """
 
+import html as html_mod
 import html
 import json
 import os
@@ -23,7 +24,9 @@ FILTER_CHUNK    = 60    # titulos por chamada de filtro
 SUMMARY_BATCH   = 10    # noticias por chamada de resumo
 MIN_INTERVAL    = 7.0   # segundos minimos entre chamadas ao Gemini (limite 10/min)
 RSS_PAUSA       = 1.5   # segundos entre buscas no Google News (evita bloqueio 503)
-RSS_TENTATIVAS  = 3     # quantas vezes reptir uma busca que falhou
+RSS_TENTATIVAS  = 3     # quantas vezes repetir uma busca que falhou
+LER_ARTIGOS     = 25    # quantas materias abrir para resumir com o texto real
+ARTIGO_CHARS    = 3500  # quanto de texto aproveitar de cada materia
 CACHE_FILE      = "resumos.json"
 CACHE_DIAS      = 45    # descarta resumos mais antigos que isso
 MAPA_BLEND      = "mapa-mandatos.html"
@@ -446,6 +449,86 @@ def simple_filter(all_items):
     return kept
 
 
+
+def resolver_url(url):
+    """URL do Google News redireciona. Devolve o endereco real da materia."""
+    if "news.google.com" not in url:
+        return url
+    try:
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                          "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"})
+        with urllib.request.urlopen(req, timeout=12) as resp:
+            return resp.url or url
+    except Exception:
+        return url
+
+
+def extrair_texto(html_bruto):
+    """Tira o texto legivel de uma pagina, sem dependencia externa."""
+    h = re.sub(r"(?is)<(script|style|noscript|nav|header|footer|aside|form)[^>]*>.*?</\1>", " ", html_bruto)
+
+    # tenta o corpo do artigo primeiro
+    corpo = ""
+    for padrao in (r"(?is)<article[^>]*>(.*?)</article>",
+                   r'(?is)<div[^>]*class="[^"]*(?:article|post|entry|content)[^"]*"[^>]*>(.*?)</div>'):
+        m = re.search(padrao, h)
+        if m and len(m.group(1)) > 400:
+            corpo = m.group(1)
+            break
+    if not corpo:
+        paragrafos = re.findall(r"(?is)<p[^>]*>(.*?)</p>", h)
+        corpo = " ".join(p for p in paragrafos if len(p) > 60)
+
+    texto = re.sub(r"(?s)<[^>]+>", " ", corpo)
+    texto = html_mod.unescape(texto)
+    texto = re.sub(r"\s+", " ", texto).strip()
+
+    # descarta frases de rodape e aviso de cookie
+    lixo = ("cookie", "subscribe", "newsletter", "all rights reserved",
+            "sign in", "log in", "privacy policy", "termos de uso")
+    frases = [f for f in re.split(r"(?<=[.!?])\s+", texto)
+              if len(f) > 40 and not any(l in f.lower() for l in lixo)]
+    return " ".join(frases)[:ARTIGO_CHARS]
+
+
+def baixar_artigo(url):
+    """Abre a materia e devolve o texto. String vazia se nao conseguir."""
+    try:
+        real = resolver_url(url)
+        req = urllib.request.Request(real, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                          "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml",
+            "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            if "html" not in resp.headers.get("Content-Type", "").lower():
+                return ""
+            bruto = resp.read(900_000).decode("utf-8", errors="ignore")
+        texto = extrair_texto(bruto)
+        return texto if len(texto) > 250 else ""
+    except Exception:
+        return ""
+
+
+def baixar_textos(items):
+    """Busca o texto real das materias que serao resumidas."""
+    alvo = items[:LER_ARTIGOS]
+    print(f"  Abrindo {len(alvo)} materias para ler o texto...")
+    ok = 0
+    for i, it in enumerate(alvo, 1):
+        texto = baixar_artigo(it["url"])
+        if texto:
+            it["texto"] = texto
+            ok += 1
+        time.sleep(0.4)
+        if i % 10 == 0:
+            print(f"    {i}/{len(alvo)}...")
+    print(f"    Texto obtido em {ok} de {len(alvo)} materias "
+          f"({len(alvo) - ok} bloqueadas ou com paywall)")
+    return items
+
+
 def gemini_filter(all_items):
     """Seleciona as noticias relevantes usando o Gemini, em blocos."""
     if not all_items:
@@ -534,18 +617,25 @@ def gemini_summarize_batch(batch):
     blocks = []
     for idx, it in enumerate(batch):
         entry = f"ID {idx+1}:\nData: {fmt_data_curta(it.get('date_raw',''))}\nTitulo: {it['title']}"
-        if it.get("desc"):
+        if it.get("texto"):
+            entry += f"\nTEXTO DA MATERIA:\n{it['texto'][:2500]}"
+        elif it.get("desc"):
             entry += f"\nResumo da fonte: {it['desc']}"
         blocks.append(entry)
 
     prompt = (
         "Voce e analista do mercado de biocombustiveis (SAF, biobunker maritimo e "
         "mistura etanol+gasolina).\n"
-        "Para CADA noticia abaixo, escreva 2 a 3 frases em portugues explicando o que "
-        "aconteceu e por que importa para o mercado de etanol.\n\n"
+        "Para CADA noticia abaixo, escreva um resumo em portugues.\n\n"
+        "Tamanho:\n"
+        "- Quando vier TEXTO DA MATERIA, escreva de 4 a 6 frases: o que aconteceu, os "
+        "numeros e prazos citados, quem esta envolvido e o efeito para o mercado de etanol. "
+        "Aproveite o texto - nao se limite a reescrever o titulo.\n"
+        "- Quando vier apenas o titulo e um resumo curto da fonte, escreva 1 a 2 frases e "
+        "nao force: e melhor um resumo curto do que um resumo inventado.\n\n"
         "Regras obrigatorias:\n"
-        "- Use SOMENTE o que esta no titulo e na descricao fornecidos. Nao complete com "
-        "conhecimento proprio e NAO INVENTE numero, data, empresa, pais ou percentual.\n"
+        "- Use SOMENTE o que foi fornecido. Nao complete com conhecimento proprio e "
+        "NAO INVENTE numero, data, empresa, pais ou percentual.\n"
         "- Nao cite o nome do veiculo de imprensa.\n"
         "- Diferencie o que ja esta valendo do que e proposta, meta, estudo ou expectativa.\n"
         "- Se o fato descrito ocorreu antes da data da noticia, deixe claro quando ocorreu.\n"
@@ -660,15 +750,22 @@ def detectar_mudancas(items, qual):
         f"Voce monitora mandatos de {cfg['oque']}.\n\n"
         "VALORES ATUALMENTE REGISTRADOS NO MAPA:\n" + atual + "\n\n"
         "NOTICIAS RECENTES:\n" + lista + "\n\n"
-        "Identifique APENAS os casos em que uma noticia informa um valor NOVO que DIFERE "
-        "do registrado acima.\n"
+        "Identifique DOIS tipos de caso:\n"
+        "(a) ALTERACAO - pais que ja esta no mapa e cujo valor mudou;\n"
+        "(b) PAIS NOVO - pais que NAO aparece na lista acima e que passou a ter mandato.\n\n"
         "Regras rigorosas:\n"
         f"- {cfg['regras']}\n"
         "- Ignore se o valor da noticia for igual ao que ja esta no mapa.\n"
+        "- Para pais novo, use o codigo ISO de 3 letras (Guatemala=GTM, Peru=PER, "
+        "Quenia=KEN) e informe o nome do pais em portugues.\n"
         "- Na duvida, NAO proponha.\n\n"
         "Responda SOMENTE com JSON:\n"
-        '{"mudancas": [{"id": "JPN", "campo": "' + cfg["campos"][0] + '", "novo": "1%", '
-        '"noticia": 3, "justificativa": "frase curta"}]}\n'
+        '{"mudancas": [\n'
+        '  {"tipo": "alteracao", "id": "JPN", "campo": "' + cfg["campos"][0] + '", '
+        '"novo": "1%", "noticia": 3, "justificativa": "frase curta"},\n'
+        '  {"tipo": "novo", "id": "GTM", "pais": "Guatemala", "campo": "'
+        + cfg["campos"][0] + '", "novo": "E10", "noticia": 5, '
+        '"justificativa": "frase curta"}\n]}\n'
         f'O campo deve ser um destes: {campos_txt}.\n'
         'Se nao houver nenhuma, responda {"mudancas": []}'
     )
@@ -686,11 +783,19 @@ def detectar_mudancas(items, qual):
         campo = str(mud.get("campo", "")).strip()
         novo  = str(mud.get("novo", "")).strip()
         idx   = mud.get("noticia")
-        if cid not in mapa or campo not in cfg["campos"] or not novo:
+        if len(cid) != 3 or campo not in cfg["campos"] or not novo:
             continue
-        atual_v = mapa[cid]["valores"].get(campo, "")
-        if novo.lower() == atual_v.lower():
-            continue
+
+        pais_novo = cid not in mapa
+        if pais_novo:
+            nome_pais = str(mud.get("pais", "")).strip() or cid
+            atual_v = "(pais ainda nao esta no mapa)"
+        else:
+            nome_pais = mapa[cid]["nome"]
+            atual_v = mapa[cid]["valores"].get(campo, "")
+            if novo.lower() == atual_v.lower():
+                continue
+
         chave = f"{qual}|{cid}|{campo}|{novo}"
         if chave in ja or chave in dados["recusados"]:
             continue
@@ -698,7 +803,8 @@ def detectar_mudancas(items, qual):
             continue
         fonte = noticias[idx - 1]
         dados["pendentes"].append({
-            "mapa": qual, "campo": campo, "id": cid, "pais": mapa[cid]["nome"],
+            "mapa": qual, "campo": campo, "id": cid, "pais": nome_pais,
+            "pais_novo": pais_novo,
             "atual": atual_v or "(vazio)", "novo": novo,
             "justificativa": str(mud.get("justificativa", ""))[:300],
             "noticia_titulo": fonte["title"], "noticia_url": fonte["url"],
@@ -706,8 +812,8 @@ def detectar_mudancas(items, qual):
             "detectado_em": datetime.now(timezone.utc).strftime("%d/%m/%Y"),
         })
         achados += 1
-        print(f"    PROPOSTA [{cfg['rotulo']}]: {mapa[cid]['nome']} {campo} "
-              f"{atual_v} -> {novo}")
+        marca = "PAIS NOVO" if pais_novo else "PROPOSTA"
+        print(f"    {marca} [{cfg['rotulo']}]: {nome_pais} {campo} {atual_v} -> {novo}")
 
     if not achados:
         print("    Nenhuma mudanca nova.")
@@ -730,7 +836,8 @@ def link_issue(p, acao):
         f"Noticia: {p['noticia_titulo']}\n"
         f"{p['noticia_url']}\n\n"
         "```json\n"
-        + json.dumps({"mapa": mapa, "id": p["id"], "campo": campo, "novo": p["novo"]},
+        + json.dumps({"mapa": mapa, "id": p["id"], "campo": campo, "novo": p["novo"],
+                      "pais_novo": bool(p.get("pais_novo")), "pais": p["pais"]},
                      ensure_ascii=False)
         + "\n```\n\n"
         "Envie esta issue para confirmar. O robo aplica a alteracao e fecha sozinho."
@@ -996,6 +1103,11 @@ def fetch_news():
 
     if _GEMINI_OK and GEMINI_API_KEY and filtered:
         cache = carregar_cache()
+        # abre as materias que ainda nao tem resumo guardado
+        sem_resumo = [i for i in filtered
+                      if not isinstance(cache.get(normalize_title(i["title"])), dict)]
+        if sem_resumo:
+            baixar_textos(sem_resumo)
         hoje  = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
         # aproveita o que ja foi resumido antes
@@ -1100,7 +1212,7 @@ def atualizar_destaques(items):
         atual = d["temas"].get(tema, {}).get("texto", "")
         linhas = "\n".join(
             f"- ({fmt_data_curta(n.get('date_raw',''))}) {n['title']}"
-            + (f" | {n.get('summary','')[:150]}" if n.get("summary") else "")
+            + (f" | {n.get('summary','')[:260]}" if n.get("summary") else "")
             for n in noticias
         )
         partes.append(
@@ -1458,6 +1570,7 @@ def render_pendencias(dados):
       <div class="req-head">
         <span class="req-pais">{html.escape(p['pais'])}</span>
         <span class="req-mapa {p.get('mapa','blend')}">{ROT_MAPA.get(p.get('mapa','blend'), '')}</span>
+        {'<span class="req-novo">pais novo</span>' if p.get('pais_novo') else ''}
         <span class="req-data">detectado em {html.escape(p['detectado_em'])}</span>
       </div>
       <div class="req-campo">campo: {html.escape(p.get('campo','blend'))}</div>
@@ -1520,6 +1633,7 @@ def render_pendencias(dados):
   .req-mapa{{font-size:10px;font-weight:600;letter-spacing:.4px;padding:3px 9px;border-radius:20px;border:1px solid}}
   .req-mapa.blend{{color:#EA792B;border-color:#EA792B;background:rgba(234,121,43,.10)}}
   .req-mapa.saf{{color:#5E9BE0;border-color:#5E9BE0;background:rgba(94,155,224,.10)}}
+  .req-novo{{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:#75B73B;color:#06231F}}
   .req-campo{{font-size:11px;color:var(--text3);margin-bottom:10px;font-family:monospace}}
   .req-mud{{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}}
   .pill{{padding:5px 14px;border-radius:8px;font-size:15px;font-weight:700;border:1px solid}}
