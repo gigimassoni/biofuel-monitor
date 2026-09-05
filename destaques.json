@@ -2,18 +2,18 @@
  "semana": "2026-S36",
  "temas": {
   "saf": {
-   "texto": "O setor de SAF registrou novos acordos e avanços em projetos de biomassa, como a parceria entre a Varhad Capital e a Velocys, além da seleção da Axens para iniciativas no Canadá e o projeto de conversão de resíduos plásticos na China. No âmbito regulatório, a Alemanha planeja impor penalidades a companhias aéreas pelo descumprimento de mandatos, enquanto Singapura definiu o início de sua taxa para janeiro de 2027, e a IATA projetou a produção global em 2 milhões de toneladas para 2025. Para quem vende etanol, a consolidação dessas rotas tecnológicas e mandatos expande de forma consistente a demanda de longo prazo por biocombustíveis na aviação.",
-   "atualizado": "03/09",
+   "texto": "O setor de SAF registrou novos avanços com a parceria entre a SUSTAREO e a Nextchem para o desenvolvimento de um projeto de resíduos de madeira no Canadá e a venda pela Petrobras do primeiro lote de SAF produzido com óleo de soja da Bunge certificado pelo CORSIA. No âmbito regulatório e de mercado, o Ministério dos Transportes da Alemanha planeja aplicar penalidades de € 1.332 por tonelada de SAF pelo descumprimento das regras do ReFuelEU a partir de 2025, enquanto Singapura definiu o início de sua taxa para janeiro de 2027 e adiou a cobrança sobre cargas para 2028. Para quem vende etanol, a expansão de mandatos e rotas tecnológicas consolida de forma consistente a demanda de longo prazo por biocombustíveis na aviação.",
+   "atualizado": "05/09",
    "desde": "31/08"
   },
   "bio": {
-   "texto": "O mercado de biobunker avançou com a CPC iniciando entregas de biocombustível marinho em Taiwan e a conclusão de testes de motores compatíveis com etanol pela Everllence na Coreia do Sul, enquanto parcerias como a firmada entre o Grupo CMA CGM e a Shell impulsionam o setor. Discussões na OMI continuam focadas na proteção da estrutura net-zero e na integração de dados de emissões em plataformas regulatórias como a do FuelEU. Para quem vende etanol, esses movimentos abrem rotas comerciais concretas de alto volume para o escoamento do produto no transporte marítimo.",
-   "atualizado": "03/09",
+   "texto": "O mercado de biobunker avançou com o anúncio da CPC de que iniciará entregas de biocombustível marinho em Taiwan e com a conclusão bem-sucedida dos testes de P&D de um motor VLOC operado a etanol. As discussões da estrutura Net-Zero da OMI em Londres mantiveram-se ativas em meio a debates sobre precificação de carbono, enquanto armadores como a Wallenius Sol adotaram o B100 visando a conformidade com o regulamento FuelEU. Para quem vende etanol, esses marcos tecnológicos e operacionais abrem rotas comerciais concretas de alto volume para o escoamento do produto no transporte marítimo.",
+   "atualizado": "05/09",
    "desde": "31/08"
   },
   "blend": {
-   "texto": "O governo brasileiro prepara para setembro o plano de testes para a gasolina com 35% de etanol, enquanto o Ministério Público Federal acionou a Justiça para tentar suspender o aumento da mistura. Nos Estados Unidos, a EPA concedeu 29 isenções a pequenas refinarias totalizando 1,76 bilhão em isenções de biocombustíveis, gerando debates sobre o impacto na demanda de milho para 2026. Na Índia, a ISO reduziu a previsão de produção de etanol combustível devido a um menor desvio de açúcar, ao mesmo tempo em que a Hero MotoCorp lançou motocicletas bicombustíveis. Para quem vende etanol, a volatilidade em torno de isenções regulatórias e mandatos reforça a necessidade de defesa da estabilidade das regras de mistura para garantir a sustentabilidade da base de consumo.",
-   "atualizado": "03/09",
+   "texto": "O governo brasileiro confirmou que planeja publicar em setembro o plano de testes para a implementação da gasolina com 35% de etanol, medida que busca reduzir as importações de combustível. No cenário internacional, a Índia alcançou a marca de 20% de mistura de etanol e avançou na pauta de veículos flex, enquanto as Filipinas consideram elevar a sua mistura obrigatória para 15%. Para quem vende etanol, a evolução desses mandatos e testes de mistura fortalece a base de consumo e abre novas perspectivas de demanda regulada.",
+   "atualizado": "05/09",
    "desde": "31/08"
   }
  }
