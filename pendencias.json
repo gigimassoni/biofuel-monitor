@@ -1,4 +1,19 @@
 {
- "pendentes": [],
+ "pendentes": [
+  {
+   "mapa": "blend",
+   "campo": "blend",
+   "id": "CHL",
+   "pais": "Chile",
+   "pais_novo": true,
+   "atual": "(pais ainda nao esta no mapa)",
+   "novo": "E10",
+   "justificativa": "O Chile está considerando a implementação de um mandato de mistura de E10 para reduzir custos de combustível.",
+   "noticia_titulo": "Chile considers E10 ethanol blend to lower fuel costs and reduce oil price exposure",
+   "noticia_url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE9DaUlfM0otcy1EVzFHN25MMGRFbVRLS0loWDVFc1ozMUM3alJvcnJkSGhVQWVuRVNxZFFXUFpEMTBkYXFYS1gtS3VCQ0NSQQ?oc=5",
+   "noticia_fonte": "BioEnergy Times",
+   "detectado_em": "25/09/2026"
+  }
+ ],
  "recusados": []
 }
