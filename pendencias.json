@@ -13,6 +13,20 @@
    "noticia_url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE9DaUlfM0otcy1EVzFHN25MMGRFbVRLS0loWDVFc1ozMUM3alJvcnJkSGhVQWVuRVNxZFFXUFpEMTBkYXFYS1gtS3VCQ0NSQQ?oc=5",
    "noticia_fonte": "BioEnergy Times",
    "detectado_em": "25/09/2026"
+  },
+  {
+   "mapa": "saf",
+   "campo": "meta2030",
+   "id": "BRA",
+   "pais": "Brasil",
+   "pais_novo": false,
+   "atual": "3%",
+   "novo": "10%",
+   "justificativa": "O Ministério de Minas e Energia oficializou a estimativa de até 10% de SAF para 2030, elevando a meta anterior de 3%.",
+   "noticia_titulo": "Ministério de Minas e Energia estima SAF em até 10% do combustível de aviação em 2030",
+   "noticia_url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOS2RfV1JROFhid2dkVFI1c0Y2UlQ4Tlc2TnBVbF84WEN4c3cwRGwxYzdXcF84ZHF3d3hXTXNCTFNYU3AzcGhrYnhva2g0X3ZSV1N6eExuMXRTZzZFa0xkemNRYVBjcXM5MFN6bFFrRkNfM3dxYzlWUTM0aWlpSDhpMnVnMmZKVXhMNVJzMmZaTXE3ZzFrb0xLd2VQOTZUN21tNlNOR0oybkpvS01RRXM5ZzhlNTRRUm9SNUE?oc=5",
+   "noticia_fonte": "NovaCana",
+   "detectado_em": "27/09/2026"
   }
  ],
  "recusados": []
