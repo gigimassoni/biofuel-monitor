@@ -1,20 +1,8 @@
 {
- "semana": "2026-S39",
+ "semana": "2026-S40",
  "temas": {
-  "saf": {
-   "texto": "A Comissão Europeia distribuiu 5,2 milhões de licenças do EU ETS, avaliadas em €430 milhões, para apoiar o uso de SAF em 2025, volume quatro vezes superior ao anterior. Enquanto o Reino Unido registrou o consumo de 292 milhões de litros de SAF até agosto e a Alemanha lidera um fundo de €2,1 bilhões para e-SAF, o Vietnã propôs seu primeiro mandato de mistura. No Brasil, a Petrobras adiou a operação de três plantas de SAF, embora o Ministério de Minas e Energia mantenha a meta de 10% de participação do combustível na aviação até 2030.",
-   "atualizado": "27/09",
-   "desde": "21/09"
-  },
-  "bio": {
-   "texto": "A Organização Marítima Internacional concluiu a revisão de diretrizes para embarcações movidas a metanol e etanol, reforçando a viabilidade do uso de álcool na descarbonização do setor. Na China, a Petrochina International reportou a mistura de mais de 30.000 toneladas métricas de biocombustível marítimo desde março, enquanto o Porto de Qingdao firmou parceria para expandir o fornecimento de combustíveis verdes. Para quem vende etanol, o avanço regulatório e as novas parcerias logísticas consolidam o biocombustível como alternativa competitiva no transporte marítimo.",
-   "atualizado": "27/09",
-   "desde": "21/09"
-  },
-  "blend": {
-   "texto": "O conselho brasileiro elevou o teor de etanol na gasolina de 30% para 32% por 180 dias, medida que reforça a demanda interna pelo biocombustível. Na Índia, o governo reiterou a expectativa de lançamento de um carro 100% a etanol em outubro e projeta uma demanda nacional de 17,9 bilhões de litros até 2031, apesar do desafio atual de um excedente de quase 7 bilhões de litros. Nos Estados Unidos, seguem as articulações políticas para a aprovação do Farm Bill, que visa permitir a comercialização do E15 durante todo o ano.",
-   "atualizado": "27/09",
-   "desde": "21/09"
-  }
+  "saf": {},
+  "bio": {},
+  "blend": {}
  }
 }
