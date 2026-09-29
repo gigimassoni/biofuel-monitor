@@ -27,6 +27,20 @@
    "noticia_url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOS2RfV1JROFhid2dkVFI1c0Y2UlQ4Tlc2TnBVbF84WEN4c3cwRGwxYzdXcF84ZHF3d3hXTXNCTFNYU3AzcGhrYnhva2g0X3ZSV1N6eExuMXRTZzZFa0xkemNRYVBjcXM5MFN6bFFrRkNfM3dxYzlWUTM0aWlpSDhpMnVnMmZKVXhMNVJzMmZaTXE3ZzFrb0xLd2VQOTZUN21tNlNOR0oybkpvS01RRXM5ZzhlNTRRUm9SNUE?oc=5",
    "noticia_fonte": "NovaCana",
    "detectado_em": "27/09/2026"
+  },
+  {
+   "mapa": "saf",
+   "campo": "meta2030",
+   "id": "VNM",
+   "pais": "Vietnã",
+   "pais_novo": true,
+   "atual": "(pais ainda nao esta no mapa)",
+   "novo": "a definir",
+   "justificativa": "Vietnam proposes first SAF blending mandate under new aviation environmental circular",
+   "noticia_titulo": "Vietnam proposes first SAF blending mandate under new aviation environmental circular",
+   "noticia_url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPWGZpbXJKc1FtZEpJN01hWW51X0dQVzRiQkFJb3JoWEs1blpQd3NNRFZuYUpBYU1TSFdHMmNMUTcxWnV3cjdVTk1lSnBwcFFtR3EwbFFTTDc0YnBqcG9zdWtNWVFnUVVCdmlpcDAwMVNJYTZPc2dZZmtORDdkOGVkR2RXd2p3YnJ3SzRNTDRZaWNfRkd3QUUtRl9UTUYyWkxuZkZvNFZMczBHdXNESEJ2ZDZOSlMyLTFlM0E?oc=5",
+   "noticia_fonte": "ofimagazine.com",
+   "detectado_em": "29/09/2026"
   }
  ],
  "recusados": []
