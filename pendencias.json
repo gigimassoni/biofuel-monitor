@@ -41,6 +41,20 @@
    "noticia_url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPWGZpbXJKc1FtZEpJN01hWW51X0dQVzRiQkFJb3JoWEs1blpQd3NNRFZuYUpBYU1TSFdHMmNMUTcxWnV3cjdVTk1lSnBwcFFtR3EwbFFTTDc0YnBqcG9zdWtNWVFnUVVCdmlpcDAwMVNJYTZPc2dZZmtORDdkOGVkR2RXd2p3YnJ3SzRNTDRZaWNfRkd3QUUtRl9UTUYyWkxuZkZvNFZMczBHdXNESEJ2ZDZOSlMyLTFlM0E?oc=5",
    "noticia_fonte": "ofimagazine.com",
    "detectado_em": "29/09/2026"
+  },
+  {
+   "mapa": "saf",
+   "campo": "meta2030",
+   "id": "PHL",
+   "pais": "Filipinas",
+   "pais_novo": true,
+   "atual": "(pais ainda nao esta no mapa)",
+   "novo": "1%",
+   "justificativa": "Notícia relata que as Filipinas planejam uma mistura de 1% de SAF para voos domésticos até 2030.",
+   "noticia_titulo": "Philippines eyes 1% SAF blend for domestic airlines by 2030",
+   "noticia_url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOM0hOcjdkQ3RBRkt1dWJnU0xGQlR1VnpLQ3Eyd21QVEFYSWhQWU40R05FR2RHQmFHeDJvdWlYcHZRcFNnUGhjV1JCejVJYkZtRE5FVUVDTzJQbXpCeWE0eG5xV3lrd1ctOHR5a1UwVld3bzVLQkNkWXpZRzlVOHBBNktsT2VEc1VUNWc?oc=5",
+   "noticia_fonte": "Bilyonaryo Business",
+   "detectado_em": "08/10/2026"
   }
  ],
  "recusados": []
