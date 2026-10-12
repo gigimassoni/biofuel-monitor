@@ -1,20 +1,20 @@
 {
- "semana": "2026-S41",
+ "semana": "2026-S42",
  "temas": {
   "saf": {
-   "texto": "O setor de SAF registrou avanços com a aprovação da Política de SAF-2026 pelo gabinete em Uttar Pradesh para atrair investimentos e gerar empregos verdes. No Brasil, a JetBio confirmou a adaptação de uma biorrefinaria avaliada em US$ 2 bilhões em Paulínia (SP) para produzir diesel renovável e combustível sustentável de aviação a partir de etanol. Além disso, a Gevo comercializou US$ 70 milhões em créditos fiscais de combustíveis limpos, evidenciando a valorização econômica da captura de carbono ligada ao biocombustível. Para quem vende etanol, esses projetos consolidam novas rotas industriais de alta rentabilidade e demanda de longo prazo.",
-   "atualizado": "11/10",
-   "desde": "05/10"
+   "texto": "O setor de combustíveis sustentáveis registrou novos investimentos e parcerias, com destaque para a reformulação de uma fábrica da JetBio em Paulínia, em São Paulo, voltada para a produção de diesel renovável e SAF a partir de etanol. A Gevo anunciou a venda de 70 milhões de dólares em créditos fiscais de combustíveis limpos e de seus créditos previstos para 2026. Além disso, a Índia aprovou a Política de SAF-2026 em Uttar Pradesh, enquanto a UNICA destacou que a descarbonização aérea global poderá demandar 450 bilhões de litros de combustível sustentável.",
+   "atualizado": "12/10",
+   "desde": "12/10"
   },
   "bio": {
-   "texto": "O mercado de biocombustíveis marítimos ganhou tração com a Zilor obtendo a certificação ISCC EU na unidade São José, em Macatuba, habilitando a empresa a exportar etanol para a União Europeia e para o setor de navegação. Novas análises de entidades do setor reforçam o bioetanol como uma opção promissora para o abastecimento de embarcações, inclusive as movidas a metanol. Para o produtor de etanol, essas certificações abrem rotas consistentes de escoamento voltadas a atender às metas globais de descarbonização da marinha.",
-   "atualizado": "11/10",
-   "desde": "05/10"
+   "texto": "O etanol ganhou força como alternativa viável para o transporte marítimo, mirando um mercado potencial de 30 bilhões de litros no setor. No Brasil, a Zilor obteve a certificação ISCC EU em sua unidade São José, em Macatuba, habilitando-se a atuar no fornecimento de etanol para a UE e para a navegação. Relatórios recentes de centros de estudos marítimos reforçaram a viabilidade do etanol como combustível naval, abrindo novas perspectivas comerciais para os produtores.",
+   "atualizado": "12/10",
+   "desde": "12/10"
   },
   "blend": {
-   "texto": "No segmento de mistura, a Câmara dos Representantes dos EUA aprovou um projeto de lei permitindo a venda de gasolina E15 durante todo o ano, enquanto as exportações norte-americanas de etanol para a safra 2025/2026 atingiram a marca de 1 bilhão de galões. A Indonésia reafirmou o plano de tornar obrigatória a mistura de E20 entre 2027 e 2028, avaliando futuramente o patamar E50 para reduzir as importações de combustíveis e expandir as plantações de cana. Para o produtor de etanol, a consolidação de mandatos e o avanço nas exportações garantem previsibilidade regulatória e firme demanda global.",
-   "atualizado": "11/10",
-   "desde": "05/10"
+   "texto": "A Indonésia anunciou planos para tornar obrigatória a mistura E20 de etanol na gasolina entre 2027 e 2028, além de avaliar a meta E50 para reduzir as importações de combustíveis e expandir suas plantações de cana. Nos Estados Unidos, a Câmara dos Representantes aprovou um projeto de lei que permite a venda de E15 o ano todo. Paralelamente, o governo indiano descartou um avanço imediato além da mistura E20, reafirmando a segurança e os benefícios do programa para a segurança energética e de renda dos agricultores.",
+   "atualizado": "12/10",
+   "desde": "12/10"
   }
  }
 }
