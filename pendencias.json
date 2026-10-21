@@ -55,6 +55,20 @@
    "noticia_url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOM0hOcjdkQ3RBRkt1dWJnU0xGQlR1VnpLQ3Eyd21QVEFYSWhQWU40R05FR2RHQmFHeDJvdWlYcHZRcFNnUGhjV1JCejVJYkZtRE5FVUVDTzJQbXpCeWE0eG5xV3lrd1ctOHR5a1UwVld3bzVLQkNkWXpZRzlVOHBBNktsT2VEc1VUNWc?oc=5",
    "noticia_fonte": "Bilyonaryo Business",
    "detectado_em": "08/10/2026"
+  },
+  {
+   "mapa": "blend",
+   "campo": "blend",
+   "id": "BOL",
+   "pais": "Bolívia",
+   "pais_novo": false,
+   "atual": "E12",
+   "novo": "E15",
+   "justificativa": "Bolívia estabelece mistura de 15% de etanol a partir de 1º de novembro.",
+   "noticia_titulo": "Bolivia sets 15% ethanol blend by Nov. 1 to slash its ballooning gasoline import bill",
+   "noticia_url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxON3dRR0o5WVIxWUlrZEZ4MU5ZcWN4MkRoazdrUk1OWXhPTXRoSGpuVHdIVUtBaDRfNTZCUmdUdFBuRHlOUG8wQndMSkpoYVk4REZXR1BhM0lyXzg5Ykt4WGhoZ2xZcGdVa1R4X3NmTk1EV3g1bTBYN1Vub0tLeGVjd3J1dUxJNWRfZ0d6R2YzRFdISlRnREZjVlVDSUw5bXNDN2dJNWJwS2ZocTBNSWpWQmdBT2daVnY2dGxn?oc=5",
+   "noticia_fonte": "Latin Times",
+   "detectado_em": "21/10/2026"
   }
  ],
  "recusados": []
