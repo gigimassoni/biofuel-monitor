@@ -69,6 +69,20 @@
    "noticia_url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxON3dRR0o5WVIxWUlrZEZ4MU5ZcWN4MkRoazdrUk1OWXhPTXRoSGpuVHdIVUtBaDRfNTZCUmdUdFBuRHlOUG8wQndMSkpoYVk4REZXR1BhM0lyXzg5Ykt4WGhoZ2xZcGdVa1R4X3NmTk1EV3g1bTBYN1Vub0tLeGVjd3J1dUxJNWRfZ0d6R2YzRFdISlRnREZjVlVDSUw5bXNDN2dJNWJwS2ZocTBNSWpWQmdBT2daVnY2dGxn?oc=5",
    "noticia_fonte": "Latin Times",
    "detectado_em": "21/10/2026"
+  },
+  {
+   "mapa": "saf",
+   "campo": "meta2025",
+   "id": "BRA",
+   "pais": "Brasil",
+   "pais_novo": false,
+   "atual": "—",
+   "novo": "1%",
+   "justificativa": "Notícia confirma a introdução de mandato de redução de emissões para aviação doméstica a partir de 2027, mas o mapa requer preenchimento de meta para 2025/2030; contudo, como a notícia especifica o início do mandato em 2027, não há alteração direta nos campos 2025/2030 conforme as regras estritas de",
+   "noticia_titulo": "Brazil to introduce SAF emission reduction mandate for domestic aviation in 2027",
+   "noticia_url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQU1ZiNFlFaFY4OFh1UWtRQXk3cVFUb3hPR05GYzFzVFJ3RXdkRXdaVDM4cTItUXZMZzYyZWhlbnc3aTQxdjJhT0VOdGN5bDl5ZXZRM2UyazRuMkxPVnpFMXN4dG12YnNkdkpBTTNxNWZLUEM3SFFJa2VuU3U0cHJNLWJ5NTVmQVpZU0s2dXJKYU5Fa3VHTG9xb0NzbElobmlYM1g4TWhNX1BMcXNQ?oc=5",
+   "noticia_fonte": "BioEnergy Times",
+   "detectado_em": "26/10/2026"
   }
  ],
  "recusados": []
