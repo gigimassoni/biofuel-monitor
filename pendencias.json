@@ -83,6 +83,20 @@
    "noticia_url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQU1ZiNFlFaFY4OFh1UWtRQXk3cVFUb3hPR05GYzFzVFJ3RXdkRXdaVDM4cTItUXZMZzYyZWhlbnc3aTQxdjJhT0VOdGN5bDl5ZXZRM2UyazRuMkxPVnpFMXN4dG12YnNkdkpBTTNxNWZLUEM3SFFJa2VuU3U0cHJNLWJ5NTVmQVpZU0s2dXJKYU5Fa3VHTG9xb0NzbElobmlYM1g4TWhNX1BMcXNQ?oc=5",
    "noticia_fonte": "BioEnergy Times",
    "detectado_em": "26/10/2026"
+  },
+  {
+   "mapa": "saf",
+   "campo": "meta2025",
+   "id": "IND",
+   "pais": "India",
+   "pais_novo": false,
+   "atual": "—",
+   "novo": "1%",
+   "justificativa": "Índia planeja instituir mandato de 1% de SAF para voos internacionais a partir de janeiro.",
+   "noticia_titulo": "India to mandate 1% SAF blending for international flights from January",
+   "noticia_url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOd21Nb2ZvWGl0RGdrcnRvWmN2QVBGcTdfQzVXRTFSY2M5MGViUVRJQ0JMYmdBNFlJNlc5YjZIWWFxeUFhLUJXcVlJTlFNTWhIQm1xODFIblFPLVpJTWVVV1RTWDhNWnF0X3hfb3FncXVpRXlUVDJ6cG9TVnpRdEtEcGY4b05BbjZhZGlQSWdzUGdtM1hCME9IU2pCLUVKQm9udEdHZEJ1RHVPWTZtZ1Jta01QWXRCWEhfZXdzN1Q0YUpuZUkzM1VJddIBzwFBVV95cUxPVWJ4RzJDZUNuVEc4S1Z4ckZSWFBjbEVTSVQ4NUIySEp4SzZXWUxkekxCN3gzbzR2bE13VTFOckk4N0VkM2F5QVlzS1MyQmRRclA2SkllZ1lDMUdiZGVNV1lJdWpOM29jWWtPcDRDTlZtbU9YcWthYjJVSlhtTFZuOFlfTU1zbmdjbXNqSklMZ0J1bzZLOS05bDVmUEVVYkgwdzRZU3hwN0l0YzRXXzdFMWpka2dFRHI4eWc3bEE5eFJZbmh2R0NQNFZSeV9DUEk?oc=5",
+   "noticia_fonte": "The Hindu",
+   "detectado_em": "27/10/2026"
   }
  ],
  "recusados": []
