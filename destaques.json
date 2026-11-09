@@ -1,20 +1,8 @@
 {
- "semana": "2026-S45",
+ "semana": "2026-S46",
  "temas": {
-  "saf": {
-   "texto": "A Índia propôs em projeto de política banir culturas alimentares como milho, soja e óleo de palma como matérias-primas para combustíveis de aviação, além de oficializar a proposta de um mandato obrigatório de 1% de SAF com vigência prevista para janeiro de 2027. No Egito, um projeto de planta de SAF da Green Sky Capital avançou com o respaldo de compromisso de compra da Shell, enquanto novos financiamentos e parcerias em biorrefinarias e tecnologias de conversão foram firmados globalmente. Para quem vende etanol, a expansão de mandatos e projetos consolida novas rotas de demanda de longo prazo, embora com restrições normativas sobre os insumos permitidos.",
-   "atualizado": "08/11",
-   "desde": "02/11"
-  },
-  "bio": {
-   "texto": "As operações regulares de abastecimento de bioetanol tiveram início no Porto de Santos, reforçando a infraestrutura nacional para o biocombustível marinho. No cenário internacional, navios movidos a etanol entraram na carteira de pedidos de granéis sólidos, acompanhados por discussões regulatórias na Organização Marítima Internacional (IMO) e iniciativas de incentivos a combustíveis limpos na China. Para os produtores de etanol, o avanço operacional portuário e a maior flexibilidade de combustíveis pelos armadores ampliam as perspectivas comerciais do setor.",
-   "atualizado": "08/11",
-   "desde": "02/11"
-  },
-  "blend": {
-   "texto": "No Brasil, uma comissão aprovou a proposta para elevar o teto da mistura de etanol na gasolina para até 35%, enquanto o CNPE analisa a transferência da responsabilidade pela mistura para as refinarias. Na Índia, o Ministério do Petróleo rejeitou as alegações do estado de Karnataka sobre teores de etanol superiores a 20% em amostras de combustível, afirmando que 893 testes realizados em todo o país atendem aos padrões prescritos. Para quem vende etanol, a possível ampliação do mandato interno fortalece as perspectivas de escoamento no mercado doméstico.",
-   "atualizado": "08/11",
-   "desde": "02/11"
-  }
+  "saf": {},
+  "bio": {},
+  "blend": {}
  }
 }
