@@ -226,13 +226,8 @@
  },
  "transport ngos call eu ets aviation extension proposals a missed opportunity": {
   "resumo": "Organizações não governamentais criticaram a proposta recente da Comissão Europeia de estender o escopo do Sistema de Comércio de Emissões da UE (EU ETS) a voos de partida para aeroportos a até 5.000 km de Frankfurt a partir de 2029, considerando-a uma oportunidade perdida. A medida proposta cobriria cerca de 59% das emissões da aviação de partida da Europa, ante 44% atualmente, sendo que allowances de SAF compensariam parte do aumento, reduzindo a proporção de emissões taxadas para 57%. Um relatório apontou que companhias aéreas europeias receberam €10,9 bilhões ($12,5 bi) em allowances gratuitas do EU ETS entre 2013 e 2025 sem reduzir preços de passagens ou contribuir o suficiente para a descarbonização. A proposta atual é apenas uma recomendação em debate, devendo ser analisada pelo Parlamento Europeu e pelo Conselho Europeu antes de uma decisão final, com ONGs pressionando pela antecipação para 2028 e inclusão de todos os voos de partida.",
-  "data": "2026-11-12",
+  "data": "2026-11-16",
   "completo": true
- },
- "lowercost e15 delivers relief at the pump": {
-  "resumo": "O uso de E15 a um custo menor proporciona alívio financeiro na bomba de combustível.",
-  "data": "2026-10-01",
-  "completo": false
  },
  "fedex expands saf agreements across us air network": {
   "resumo": "A FedEx expandiu seus acordos de SAF em toda a sua rede aérea nos Estados Unidos.",
@@ -244,40 +239,10 @@
   "data": "2026-11-11",
   "completo": false
  },
- "cyprus joins mediterranean four as eu rift deepens over imo shipping rules cyprusmailcom": {
-  "resumo": "Chipre juntou-se ao grupo dos quatro do Mediterrâneo, enquanto se aprofundam as divergências na União Europeia sobre as regras de navegação da IMO.",
-  "data": "2026-10-01",
-  "completo": false
- },
- "indonesias b50 biodiesel push expands as government targets higher biofuel use": {
-  "resumo": "A Indonésia expandiu seu avanço rumo ao biodiesel B50, com o governo estabelecendo metas para o aumento do uso de biocombustíveis.",
-  "data": "2026-10-01",
-  "completo": false
- },
- "eu exceeds firstyear sustainable aviation fuel mandate target new challenges emerge": {
-  "resumo": "A União Europeia superou a meta de obrigatoriedade de combustível sustentável de aviação (SAF) em seu primeiro ano, ao mesmo tempo em que novos desafios surgem.",
-  "data": "2026-10-01",
-  "completo": false
- },
  "united and fedex sign agreements to extend saf supplies and scale up use": {
   "resumo": "As companhias aéreas norte-americanas United Airlines e FedEx assinaram acordos para ampliar o acesso a suprimentos de combustível sustentável de aviação (SAF). A United estendeu seu acordo existente com a Neste para o fornecimento de SAF misturado em voos que partem de Chicago O'Hare e Amsterdã Schiphol, com entregas em Amsterdã que ocorreram de junho a agosto e entregas em Chicago planejadas de julho até junho do próximo ano. A FedEx está expandindo sua aquisição de SAF por meio de novos acordos com fornecedores não divulgados, projetados para garantir mais de 20 milhões de galões de SAF puro em cinco aeroportos dos EUA durante 2027. Além disso, a Montana Renewables anunciou uma expansão revisada de sua instalação para atingir uma capacidade de produção de SAF de 200 milhões de galões anuais até o final de 2028. A United relatou que usou mais de 83.000 toneladas de SAF em 2025, um aumento de 104% em relação ao ano anterior, tornando-se a maior usuária de SAF entre as principais companhias aéreas dos EUA naquele ano.",
-  "data": "2026-11-15",
+  "data": "2026-11-16",
   "completo": true
- },
- "core100 haffner energy raises the programmes revenue target to more than 500 million": {
-  "resumo": "A Haffner Energy elevou a meta de receita do programa CORE100 para mais de 500 milhões de euros.",
-  "data": "2026-10-01",
-  "completo": false
- },
- "refueleus first year shows the mandate works": {
-  "resumo": "Um artigo publicado em 17/09 avalia que o primeiro ano do ReFuelEU demonstra que o mandato funciona. A fonte não traz dados numéricos, prazos específicos ou empresas envolvidas além da avaliação geral sobre a eficácia da medida.",
-  "data": "2026-10-01",
-  "completo": false
- },
- "farm to fuel inside north dakota biofuel kfyrtv": {
-  "resumo": "Uma análise detalhou a produção de biocombustíveis a partir da agricultura em Dakota do Norte.",
-  "data": "2026-10-01",
-  "completo": false
  },
  "neste extends saf supply with united airlines at ohare schiphol": {
   "resumo": "A Neste estendeu o fornecimento de combustível sustentável de aviação (SAF) para a United Airlines nos aeroportos de O'Hare e Schiphol.",
@@ -302,11 +267,6 @@
  "best ethanol stocks in india 2026": {
   "resumo": "Análise aborda as melhores ações do setor de etanol na Índia para o ano de 2026.",
   "data": "2026-10-05",
-  "completo": false
- },
- "reports marine biodiesel prices sink below fossil fuel costs for first time": {
-  "resumo": "Relatórios indicam que os preços do biodiesel marinho caíram abaixo dos custos dos combustíveis fósseis pela primeira vez. A fonte não traz mais detalhes sobre prazos ou impactos no setor de etanol.",
-  "data": "2026-10-01",
   "completo": false
  },
  "cathay calls on hong kong to map out longterm sustainable fuel plan beyond 2030": {
@@ -342,11 +302,6 @@
  "mistura de etanol na gasolina leva política de biocombustíveis à disputa eleitoral": {
   "resumo": "A discussão sobre a mistura de etanol na gasolina levou a política de biocombustíveis para o centro da disputa eleitoral.",
   "data": "2026-10-02",
-  "completo": false
- },
- "japan airlines and climeworks solutions sign first cdr corsia deal": {
-  "resumo": "A Japan Airlines e a Climeworks Solutions assinaram um primeiro acordo de CDR sob o CORSIA.",
-  "data": "2026-10-01",
   "completo": false
  },
  "nitin gadkari backs ethanol toyota to launch 100 flexfuel innova": {
@@ -396,7 +351,7 @@
  },
  "easa reports 2025 supplies of saf exceeded first year of eu mandate": {
   "resumo": "De acordo com relatório anual da EASA, o fornecimento de SAF na União Europeia em 2025 alcançou 1,1 milhão de toneladas, representando uma fatia de 2,8% do total de combustível de aviação e superando a meta obrigatória inicial de 2% do ReFuelEU Aviation. Do total de 39,3 milhões de toneladas de combustível fornecidas em 121 aeroportos de estados-membros em 2025, houve um salto em relação aos 193.000 toneladas de 2024, sendo que 86% do SAF fornecido no ano passado foi produzido dentro da própria UE. Holanda, Espanha, Alemanha, Itália e França responderam por 0,8 milhão de toneladas (74% do total), com a Holanda liderando ao receber 0,32 milhão de toneladas. A taxa de conformidade dos fornecedores de combustível obrigados ficou próxima de 90% em 2025, e a utilização de SAF ajudou a reduzir as emissões de gases de efeito estufa nos aeroportos da União em 3,77 milhões de toneladas no mesmo ano.",
-  "data": "2026-11-15",
+  "data": "2026-11-16",
   "completo": true
  },
  "california clears higherethanol fuel sales to curb gasoline costs": {
@@ -407,11 +362,6 @@
  "saf association seeks stronger feedstock collection to meet 5 blending target": {
   "resumo": "A Associação de SAF busca uma coleta mais forte de matérias-primas para atingir a meta de mistura de 5%.",
   "data": "2026-10-05",
-  "completo": false
- },
- "us companys new reactor can make 800 barrels of sustainable aviation fuel per day": {
-  "resumo": "Uma empresa americana apresentou um novo reator capaz de produzir 800 barris de combustível sustentável de aviação por dia. A fonte não traz informações sobre prazos ou efeitos para o mercado de etanol.",
-  "data": "2026-10-01",
   "completo": false
  },
  "velocys expands fischertropsch reactor roadmap with alphacore 800 for largerscale saf and projects": {
@@ -581,12 +531,12 @@
  },
  "news roundup september 2026": {
   "resumo": "A Comissão Europeia adotou uma nova decisão que distribuiu cerca de 5,2 milhões de licenças gratuitas do EU ETS, avaliadas em aproximadamente €430 milhões, para 130 companhias aéreas e operadores em 2025 com o objetivo de apoiar a adoção de combustível de aviação sustentável (SAF). Esse apoio de 2025 supera em mais de quatro vezes as licenças gratuitas alocadas em 2024 e soma-se a um incentivo de €135 milhões resultante da isenção de tarifas para o SAF consumido em rotas cobertas pelo EU ETS. Além disso, a EASA relatou em seu relatório anual de 21 de setembro de 2026 que o fornecimento de SAF na UE no ano passado atingiu 1,1 milhão de toneladas (uma participação de 2,8%), superando confortavelmente a meta obrigatória de 2% do mandato ReFuelEU Aviation para 2025. O texto também menciona acordos assinados por operadoras americanas como United Airlines e FedEx para estender o fornecimento de SAF, incluindo parcerias com a Neste em Amsterdã e Chicago O'Hare. As informações fornecidas não especificam efeitos diretos para o mercado de etanol.",
-  "data": "2026-11-10",
+  "data": "2026-11-16",
   "completo": true
  },
  "over 400m in free eu ets allowances given to airlines in 2025 to support saf uptake": {
   "resumo": "A Comissão Europeia distribuiu cerca de 5,2 milhões de licenças do EU ETS, avaliadas em aproximadamente €430 milhões, para 130 companhias aéreas e operadores no ano de 2025 com o intuito de apoiar o uso de SAF. O valor de 2025 é mais de quatro vezes superior ao alocado em 2024 e complementa um incentivo de €135 milhões decorrente da taxa zero de SAF em rotas obrigatórias do EU ETS. O sistema de suporte foi introduzido pela diretiva revisada do EU ETS em 2023, prevendo a concessão de 20 milhões de licenças gratuitas entre o início de 2024 e o final de 2030, as quais podem se esgotar até 2028. Operadores da UE e de fora da UE receberam alocações em 2025, incluindo transportadoras como FedEx, Korean Air, Qatar Airways, Ethiopian Airlines, Sichuan Airlines, Cathay Pacific e diversas companhias europeias. O mecanismo é financiado por licenças destinadas a cobrir parte ou toda a diferença de preço entre o querosene fóssil e o SAF elegível.",
-  "data": "2026-11-15",
+  "data": "2026-11-16",
   "completo": true
  },
  "vietnam plans phased saf mandate for international domestic flights": {
@@ -627,11 +577,6 @@
  "vietnam proposes first saf blending mandate under new aviation environmental circular": {
   "resumo": "O Vietnã propôs sua primeira obrigação de mistura de SAF (mandato) no âmbito de uma nova circular ambiental para a aviação.",
   "data": "2026-10-07",
-  "completo": false
- },
- "haffner energys sbhefa process targets 50 cost cut for renewable diesel and saf news and statistics": {
-  "resumo": "A Haffner Energy lançou o processo SB-HEFA, que tem como objetivo reduzir em até 50% o custo de produção de diesel renovável e SAF.",
-  "data": "2026-10-01",
   "completo": false
  },
  "trump targets imos netzero framework at united nations general assembly": {
@@ -681,7 +626,7 @@
  },
  "air france shares results of largescale north atlantic contrail avoidance trial": {
   "resumo": "A Air France divulgou os resultados de um programa de testes em larga escala realizado entre fevereiro e abril de 2026 para entender e mitigar o impacto de rastros de condensação. A iniciativa, que cobriu quase 4.300 voos comerciais sobre o Atlântico Norte em colaboração com as startups Estuaire e Klima, resultou no desvio de 130 voos e evitou um impacto climático equivalente a 22.000 toneladas de CO2. Os voos desviados efetivamente obtiveram uma redução de 57% no impacto climático dos rastros e de 36% no impacto climático geral. O programa faz parte do projeto CICONIA, financiado pela UE, e a companhia destacou que mudanças de rota dependem da aprovação do controle de tráfego aéreo. O texto não menciona efeitos diretos para o mercado de etanol.",
-  "data": "2026-11-05",
+  "data": "2026-11-16",
   "completo": true
  },
  "b100 bunkering picks up in rotterdam in 2026 engine data": {
@@ -704,11 +649,6 @@
   "data": "2026-10-08",
   "completo": false
  },
- "imo ccc 12 revised guidelines for methanol as fuel": {
-  "resumo": "A IMO CCC 12 discutiu diretrizes revisadas para o uso de metanol como combustível.",
-  "data": "2026-10-01",
-  "completo": false
- },
  "southeast asian countries have released four times more longterm renewable energy policies than fossil fuel policies since the iran war": {
   "resumo": "Países do Sudeste Asiático lançaram quatro vezes mais políticas de energia renovável de longo prazo do que de combustíveis fósseis desde a guerra do Irã.",
   "data": "2026-10-07",
@@ -727,11 +667,6 @@
  "airlines seek rethink of saf mandate amid fears of higher fares travel weekly": {
   "resumo": "Companhias aéreas buscam uma revisão do mandato de SAF devido a temores de tarifas mais altas. A discussão reflete a preocupação do setor de aviação com os custos operacionais associados às obrigações de combustível sustentável.",
   "data": "2026-10-04",
-  "completo": false
- },
- "aviation industry soars past eu sustainable fuel target": {
-  "resumo": "A indústria da aviação superou a meta europeia de combustível sustentável.",
-  "data": "2026-10-01",
   "completo": false
  },
  "indias ethanol surplus exposes a growing policy gap": {
@@ -762,26 +697,6 @@
  "uk aviation market receives 292 million litres of saf through august": {
   "resumo": "O mercado de aviação do Reino Unido recebeu 292 milhões de litros de SAF até o mês de agosto. O dado consolida o volume já entregue ao setor no período informado.",
   "data": "2026-10-08",
-  "completo": false
- },
- "canadian firm to wind down ethanol plant by december": {
-  "resumo": "Uma empresa canadense planeja encerrar as operações de sua planta de etanol até o mês de dezembro.",
-  "data": "2026-10-01",
-  "completo": false
- },
- "allied biofuels raises planned esaf capacity for uzbek project": {
-  "resumo": "A Allied Biofuels aumentou a capacidade planejada de e-SAF para o seu projeto no Uzbequistão.",
-  "data": "2026-10-01",
-  "completo": false
- },
- "brussels airport tests mobile saf blending unit": {
-  "resumo": "O Brussels Airport está testando uma unidade móvel de mistura de SAF.",
-  "data": "2026-10-01",
-  "completo": false
- },
- "zhejiang atj saf firm closes funding round aims for pilot plant in q1 2027": {
-  "resumo": "Uma empresa de SAF AtJ baseada em Zhejiang concluiu uma rodada de financiamento e tem como meta colocar uma planta-piloto em funcionamento no primeiro trimestre de 2027.",
-  "data": "2026-10-01",
   "completo": false
  },
  "praj and gevo enter development and commercialization agreement for bioisobutanol in india": {
@@ -826,7 +741,7 @@
  },
  "synthetic aviation fuel projects advance in europe africa us and china": {
   "resumo": "Projetos de combustíveis sintéticos para aviação avançam em diversas regiões, incluindo Europa, África, Estados Unidos e China. A startup suíça Synhelion assinou um memorando de entendimento com o governo do Marrocos para desenvolver uma planta comercial de grande escala planejada para produzir 100.000 toneladas de combustível de aviação renovável, diesel e gasolina por ano na região de Guelmim-Oued Noun. Outras iniciativas incluem a Metafuels inaugurando uma instalação de demonstração de metanol para jato em agosto e fechando colaboração com a MB Energy, além da Phelan Green Group alcançando decisão final de investimento (FID) em um projeto de eSAF de 35.000 toneladas na África do Sul. Na Europa, a Arcadia eFuels firmou um acordo de offtake de 10 anos com a Uniper na Dinamarca, enquanto a Carbon Neutral Fuels assinou um memorando na Austrália, a Twelve garantiu US$ 45 milhões em financiamento nos EUA e a Carbonology iniciou a construção de uma planta piloto na China. Além disso, a planta DAWN da Synhelion na Alemanha opera desde o verão de 2024, tendo fornecido 190 litros de petróleo sintético bruto a uma refinaria no ano passado.",
-  "data": "2026-11-15",
+  "data": "2026-11-16",
   "completo": true
  },
  "maersk tests us ethanol bunkering as shipping weighs alternative fuels": {
@@ -847,11 +762,6 @@
  "maersk dualfuel vessel receives 100 bioethanol in houston": {
   "resumo": "Uma embarcação bicombustível da Maersk recebeu 100% de bioetanol em Houston.",
   "data": "2026-10-12",
-  "completo": false
- },
- "rising jet fuel demand to boost indias sustainable aviation fuel market": {
-  "resumo": "O aumento na demanda por combustível de aviação deve impulsionar o mercado de combustíveis sustentáveis de aviação (SAF) na Índia.",
-  "data": "2026-10-01",
   "completo": false
  },
  "maersk completes first us shiptoship ethanol bunkering": {
@@ -959,11 +869,6 @@
   "data": "2026-10-05",
   "completo": false
  },
- "a gasolina com 32 de etanol avança no brasil e anfavea e abeifa reagem sem estudos conclusivos temem danos em carros a gasolina": {
-  "resumo": "A proposta de avanço da gasolina com 32% de etanol no Brasil gerou reação das entidades Anfavea e Abeifa, que temem danos em carros a gasolina caso não sejam realizados estudos conclusivos.",
-  "data": "2026-10-01",
-  "completo": false
- },
  "goa to approves redevelopment of sugar factory to support ethanol market report": {
   "resumo": "Goa aprovou a reestruturação de uma fábrica de açúcar para apoiar o mercado de etanol, conforme um relatório.",
   "data": "2026-10-05",
@@ -972,11 +877,6 @@
  "tfg marine says 88 of fleet now equipped with mfm as barge heads to jamaica": {
   "resumo": "A TFG Marine informou que 88% de sua frota está equipada com medidores de fluxo mássico (MFM), enquanto uma barcaça se dirige à Jamaica.",
   "data": "2026-10-04",
-  "completo": false
- },
- "eneos to fuel mazda race cars with e20 gasoline in october": {
-  "resumo": "A Eneos planeja abastecer carros de corrida da Mazda com gasolina E20 em outubro.",
-  "data": "2026-10-01",
   "completo": false
  },
  "gadkari urges sugar mills to diversify into saf cbg biomanure tap to know more inshorts": {
@@ -1062,11 +962,6 @@
  "combustível sustentável de aviação ganha impulso das metas de redução de emissões em voos": {
   "resumo": "O combustível sustentável de aviação ganha impulso a partir de metas de redução de emissões em voos.",
   "data": "2026-10-04",
-  "completo": false
- },
- "ethanol could open new marine fuel market boosting demand for us corn": {
-  "resumo": "O uso de etanol como combustível marítimo pode abrir um novo mercado e impulsionar a demanda pelo milho dos Estados Unidos.",
-  "data": "2026-10-01",
   "completo": false
  },
  "usda targets global markets including india to expand us ethanol exports": {
@@ -1156,7 +1051,7 @@
  },
  "global aviations gross emissions to rise 87 by 2050 despite efficiency gains forecasts iba": {
   "resumo": "A empresa de inteligência de mercado de aviação IBA prevê que as emissões brutas da aviação global subirão 87% até 2050, passando de 843 milhões de toneladas de CO2 em 2025 para 1.583 MtCO2 em 2050, apesar de um ganho de 20% na eficiência de combustível. Esse aumento absoluto nas emissões brutas tank-to-wake, que não incluem os benefícios de redução de combustíveis sustentáveis ou medidas de mercado, será impulsionado por um crescimento de 134% no tráfego global de passageiros e pela expansão da frota comercial para mais de 56.000 aeronaves. A análise aponta que a intensidade média das emissões da frota cairá de cerca de 91gCO2/RPK em 2025 para 73gCO2/RPK em 2050, mas a renovação da frota não será suficiente para compensar o crescimento do tráfego. Como resultado, o setor dependerá de uma aceleração nos combustíveis sustentáveis de aviação e na remoção de carbono para fechar a lacuna em direção às metas de zero líquido.",
-  "data": "2026-11-10",
+  "data": "2026-11-16",
   "completo": true
  },
  "singapore hosts imo forum on alternativefuel pollution preparedness": {
@@ -1179,11 +1074,6 @@
   "data": "2026-10-02",
   "completo": false
  },
- "velocys unveils larger alphacore reactor for saf and efuels": {
-  "resumo": "A Velocys revelou um reator AlphaCore maior para a produção de SAF e e-combustíveis. A informação fornecida é limitada e não menciona prazos ou efeitos no mercado de etanol.",
-  "data": "2026-10-01",
-  "completo": false
- },
  "last 10 days book by 30 september to avoid singapores saf tax": {
   "resumo": "Há uma recomendação para reservas até 30 de setembro para evitar um imposto de SAF em Singapura. O prazo informado é o dia 30 de setembro.",
   "data": "2026-10-02",
@@ -1192,11 +1082,6 @@
  "why gevo fell 36 while the case itself started to crack": {
   "resumo": "As ações da Gevo registraram queda de 36% em meio a desdobramentos sobre o caso da empresa.",
   "data": "2026-10-10",
-  "completo": false
- },
- "new group aims to bring more sustainable aviation fuel biofuel facilities to georgia": {
-  "resumo": "Um novo grupo foi formado com o objetivo de atrair mais instalações de combustíveis sustentáveis de aviação (SAF) e biocombustíveis para o estado da Geórgia.",
-  "data": "2026-10-01",
   "completo": false
  },
  "a buyer outside finance paid 50 million for gevos tax credits": {
@@ -1224,11 +1109,6 @@
   "data": "2026-10-10",
   "completo": false
  },
- "ethanol blending will help diversify indias agriculture sector gadkari": {
-  "resumo": "Autoridades indicaram que a mistura de etanol ajudará a diversificar o setor agrícola da Índia.",
-  "data": "2026-10-01",
-  "completo": false
- },
  "ethanol manufacturing plant setup in india": {
   "resumo": "Há previsões sobre a instalação de uma fábrica de fabricação de etanol na Índia.",
   "data": "2026-10-04",
@@ -1254,11 +1134,6 @@
   "data": "2026-10-14",
   "completo": false
  },
- "us eases bidenera fuel economy rules cutting 2031 mpg target from 504 to 349": {
-  "resumo": "Os Estados Unidos abrandaram as regras de economia de combustível da era Biden, cortando a meta de mpg para 2031 de 50,4 para 34,9.",
-  "data": "2026-10-01",
-  "completo": false
- },
  "brazils largest energy giant tests cardano to fix carbon doublecounting": {
   "resumo": "A maior gigante energética do Brasil está testando a tecnologia da Cardano para solucionar o problema da dupla contagem de créditos de carbono. O teste com a blockchain já está em andamento pela empresa.",
   "data": "2026-10-12",
@@ -1277,11 +1152,6 @@
  "cafe iii norms to support next phase of indias ethanol journey says isma": {
   "resumo": "Segundo a associação ISMA, as normas CAFE III deverão apoiar a próxima fase da jornada do etanol na Índia.",
   "data": "2026-10-05",
-  "completo": false
- },
- "petrobras deploys cardano to trace saf and renewable diesel in brazil": {
-  "resumo": "A Petrobras adotou a tecnologia da Cardano para rastrear SAF e diesel renovável no Brasil.",
-  "data": "2026-10-01",
   "completo": false
  },
  "etanol de cana brasileiro pode ganhar espaço nos navios ainda em 2026 se imo aprovar padrão que permite contabilizar redução de carbono no transporte marítimo": {
@@ -1389,11 +1259,6 @@
   "data": "2026-10-02",
   "completo": false
  },
- "asia biofuels china saf holds ucome market stable": {
-  "resumo": "No mercado asiático de biocombustíveis, o SAF da China se manteve estável, assim como o mercado de UCOME.",
-  "data": "2026-10-01",
-  "completo": false
- },
  "100 ethanol vehicle set for october launch iit delhi paper": {
   "resumo": "Um veículo movido a 100% etanol tem lançamento programado para outubro, de acordo com um documento do IIT Delhi divulgado em 28/09.",
   "data": "2026-10-02",
@@ -1402,21 +1267,6 @@
  "haffner energy unveils sbhefa fuel process": {
   "resumo": "A Haffner Energy revelou o processo de combustivel SB-HEFA.",
   "data": "2026-10-10",
-  "completo": false
- },
- "pei government to suspend taxes on gas diesel starting sept 26 2026": {
-  "resumo": "O governo de P.E.I. suspenderá os impostos sobre gasolina e diesel a partir de 26 de setembro de 2026.",
-  "data": "2026-10-01",
-  "completo": false
- },
- "governo autoriza testes para ampliar mistura do etanol na gasolina para 35": {
-  "resumo": "O governo brasileiro autorizou testes para avaliar a ampliação da mistura de etanol na gasolina para até 35%. A medida representa uma proposta em fase de testes e sinaliza uma expectativa de maior demanda futura para o mercado de etanol.",
-  "data": "2026-10-01",
-  "completo": false
- },
- "governo federal autoriza testes para ampliar mistura do etanol na gasolina para 35": {
-  "resumo": "O governo federal autorizou a realização de testes para verificar a viabilidade de ampliar a mistura de etanol na gasolina para 35%. Trata-se de uma fase de testes oficial que pode impactar diretamente o mercado de etanol caso venha a ser implementada.",
-  "data": "2026-10-01",
   "completo": false
  },
  "fuel suppliers smash through eu saf blending mandates": {
@@ -3031,7 +2881,7 @@
  },
  "flying off into the sunset": {
   "resumo": "O veículo GreenAir News anunciou que encerrará suas atividades no final de setembro de 2026, após 19 anos cobrindo questões ambientais e climáticas da aviação. O fundador apontou dificuldades financeiras e a falta de sustentabilidade econômica como motivos para o fechamento, além da transição do público para fontes gratuitas de informação. O evento anual Aviation Carbon, organizado pelo veículo desde 2012, já havia sido transferido para o SAE Media Group no início do ano. A saída de circulação reflete a diminuição de publicações especializadas B2B e jornalistas qualificados no setor de aviação e clima.",
-  "data": "2026-11-10",
+  "data": "2026-11-16",
   "completo": true
  },
  "higher petronas dividend could weigh on upstream investments analyst warns": {
@@ -4081,7 +3931,7 @@
  },
  "news extra september 2026": {
   "resumo": "Diversas iniciativas no setor de aviação sustentável foram divulgadas, incluindo o primeiro acordo comercial entre a Japan Airlines e a Climeworks Solutions para aquisição de créditos de remoção de carbono por captura direta de ar elegíveis ao esquema CORSIA da ICAO. Em combustíveis sintéticos, a Aether Fuels operou com sucesso sua tecnologia Aurora de 2,5 barris por dia usando gás natural renovável e CO2 industrial, além de planejar uma fábrica em Cingapura com meta de 2.000 toneladas de SAF por ano via memorandos com companhias aéreas como JetBlue e Singapore Airlines. Paralelamente, o International Airlines Group contratou a plataforma SkyBreathe para gerenciar a eficiência de combustível de mais de 600 aeronaves de suas marcas. Já a SkyNRG contratou parceiros de engenharia para o projeto da unidade Wigeon, no estado de Washington, que visa produzir 50 milhões de galões (143 mil toneladas) de SAF anuais a partir de 2031, enquanto sua planta DSL-01 em construção na Holanda contratou sistemas de automação da Emerson. Por fim, a SkyTeam abriu a quinta edição do The Aviation Challenge para incentivar soluções de sustentabilidade com inscrições previstas até o início de novembro.",
-  "data": "2026-11-10",
+  "data": "2026-11-16",
   "completo": true
  },
  "india halts sugarbased ethanol procurement for 202627 to protect domestic sugar supplies": {
