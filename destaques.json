@@ -1,20 +1,8 @@
 {
- "semana": "2026-S47",
+ "semana": "2026-S48",
  "temas": {
-  "saf": {
-   "texto": "A ANAC aprovou novas regras para o SAF no Brasil, estabelecendo uma multa de R$ 750 por tonelada de CO₂ não reduzida a partir de 2027, enquanto o governo planeja abrir consulta pública sobre a política do setor em duas semanas. Internacionalmente, o Reino Unido superou a meta de 2% de mistura no primeiro ano de regulação e a Europa elevou suas cotas de SAF. Esses avanços regulatórios consolidam a demanda global, valorizando o produto para quem vende etanol ao sinalizar um mercado de prêmios atrelado à descarbonização.",
-   "atualizado": "21/11",
-   "desde": "20/11"
-  },
-  "bio": {
-   "texto": "Grupos do setor de milho e etanol intensificaram a pressão para que o biocombustível seja priorizado nos padrões de combustíveis marítimos, amparados por um estudo que aponta o etanol como uma alternativa de redução de emissões mais barata que o metanol e a amônia. Paralelamente, a indústria aguarda a adoção de um marco Net-Zero pela OMI, enquanto a TotalEnergies abandonou um projeto de amônia verde de US$ 16 bilhões no Chile. Para quem vende etanol, a possível inclusão do produto na matriz de bunker representa uma nova e relevante fronteira de mercado.",
-   "atualizado": "21/11",
-   "desde": "20/11"
-  },
-  "blend": {
-   "texto": "A Índia atingiu a marca de 19,99% de mistura de etanol na gasolina, com o milho superando o açúcar como principal matéria-prima, embora o governo tenha descartado avanços imediatos além do E20 após pressões políticas no estado de Karnataka. No Brasil, o preço do etanol nos postos subiu 2,41%, chegando a R$ 4,25 por litro, o que exige atenção dos motoristas na paridade com a gasolina. O cenário global reflete um mercado em expansão, mas sujeito a impasses regulatórios que impactam a competitividade do biocombustível.",
-   "atualizado": "21/11",
-   "desde": "20/11"
-  }
+  "saf": {},
+  "bio": {},
+  "blend": {}
  }
 }
